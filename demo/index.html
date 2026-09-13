@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SMC.js — Smart Money Concepts Pro Chart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-main: #090c14;
+    --bg-card: #0f1422;
+    --bg-card-hover: #151d30;
+    --bg-input: #07090f;
+    --border: #1c2436;
+    --border-highlight: #2c3954;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #38bdf8;
+    --accent-green: #10b981;
+    --accent-red: #f43f5e;
+    --accent-amber: #f59e0b;
+    --accent-purple: #a855f7;
+    --accent-cyan: #06b6d4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 13px;
+  }
+
+  input, select, button {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* App Layout: 100% Focus on Chart */
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  /* Sleek Top Navigation Bar */
+  #topbar {
+    height: 48px;
+    min-height: 48px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    gap: 14px;
+    z-index: 10;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    color: white;
+    font-weight: 800;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* -------------------------------------------------------------
+     SYMBOL SELECTOR DROPDOWN
+     ------------------------------------------------------------- */
+  .symbol-select-wrap {
+    position: relative;
+  }
+
+  .symbol-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .symbol-btn:hover {
+    border-color: var(--accent-blue);
+    background: var(--bg-card-hover);
+  }
+
+  .symbol-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+
+  .symbol-badge {
+    background: #eab308;
+    color: #000;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .symbol-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 290px;
+    max-height: 390px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-highlight);
+    border-radius: 8px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+    z-index: 500;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease;
+  }
+  .symbol-popover.open {
+    display: flex;
+  }
+
+  .symbol-search-box {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(7, 9, 15, 0.5);
+  }
+  .symbol-search-box input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 12px;
+    width: 100%;
+    outline: none;
+  }
+  .symbol-search-box input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .symbol-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 320px;
+    padding: 4px;
+  }
+  .symbol-list::-webkit-scrollbar {
+    width: 5px;
+  }
+  .symbol-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  .symbol-item {
+    padding: 7px 10px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    transition: all 0.1s;
+  }
+  .symbol-item:hover {
+    background: var(--bg-card-hover);
+    color: #fff;
+  }
+  .symbol-item.active {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+  .symbol-item-base {
+    color: #fff;
+    font-weight: 600;
+  }
+  .symbol-item-quote {
+    color: var(--text-muted);
+    font-size: 10px;
+  }
+
+  .data-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-blue);
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+
+  /* Live OHLCV Bar */
+  #ohlcBar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .ohlc-item span {
+    color: #fff;
+    font-weight: 500;
+  }
+  .ohlc-up { color: var(--accent-green) !important; }
+  .ohlc-down { color: var(--accent-red) !important; }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Status Indicator */
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: var(--accent-green);
+    font-weight: 500;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green);
+  }
+
+  .status-pill.loading {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.25);
+    color: var(--accent-amber);
+  }
+  .status-pill.loading .status-dot {
+    background: var(--accent-amber);
+    box-shadow: 0 0 8px var(--accent-amber);
+    animation: pulse 1s infinite alternate;
+  }
+
+  .status-pill.error {
+    background: rgba(244, 63, 94, 0.1);
+    border-color: rgba(244, 63, 94, 0.25);
+    color: var(--accent-red);
+  }
+  .status-pill.error .status-dot {
+    background: var(--accent-red);
+    box-shadow: 0 0 8px var(--accent-red);
+  }
+
+  @keyframes pulse {
+    from { opacity: 0.4; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1.15); }
+  }
+
+  .btn-action {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .btn-action:hover {
+    border-color: var(--accent-blue);
+    background: var(--bg-card-hover);
+    color: #fff;
+  }
+  .btn-action.btn-primary {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+  .btn-action.btn-primary:hover {
+    background: var(--accent-blue);
+    color: #000;
+  }
+
+  .btn-icon {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-icon:hover {
+    border-color: var(--accent-blue);
+    color: #fff;
+  }
+
+  /* Loading Progress Bar */
+  #progressBarWrap {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 15;
+    pointer-events: none;
+  }
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    box-shadow: 0 0 8px #38bdf8;
+    transition: width 0.2s ease;
+  }
+
+  /* Chart Viewport - Takes full remaining space */
+  #chartWrap {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+    width: 100%;
+    height: calc(100vh - 48px);
+    background: var(--bg-main);
+  }
+
+  #chart {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Watermark */
+  .chart-watermark {
+    position: absolute;
+    bottom: 26px;
+    left: 24px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.12;
+    user-select: none;
+  }
+  .chart-watermark h2 {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: #fff;
+  }
+  .chart-watermark p {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+  }
+
+  /* -------------------------------------------------------------
+     SETTINGS MODAL
+     ------------------------------------------------------------- */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.18s ease;
+  }
+
+  .modal-backdrop.open {
+    display: flex;
+  }
+
+  .modal-dialog {
+    background: var(--bg-card);
+    border: 1px solid var(--border-highlight);
+    border-radius: 12px;
+    width: 860px;
+    max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    animation: modalScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes modalScale {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(7, 9, 15, 0.5);
+  }
+
+  .modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 20px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Preset Selection Bar inside Modal */
+  .modal-presets {
+    padding: 10px 20px;
+    background: rgba(7, 9, 15, 0.3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+  }
+  .preset-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+  }
+  .preset-btn {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .preset-btn:hover {
+    border-color: var(--accent-blue);
+    color: #fff;
+  }
+  .preset-btn.active {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+
+  .modal-body {
+    padding: 18px 20px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .modal-body::-webkit-scrollbar {
+    width: 6px;
+  }
+  .modal-body::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  /* Indicator Card inside Modal */
+  .indicator-card {
+    background: rgba(13, 17, 26, 0.8);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s;
+  }
+  .indicator-card:hover {
+    border-color: var(--border-highlight);
+  }
+  .indicator-card.active {
+    border-left: 3px solid var(--accent-blue);
+  }
+  .indicator-card.card-featured {
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    background: linear-gradient(180deg, rgba(168, 85, 247, 0.08), rgba(13, 17, 26, 0.85));
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    user-select: none;
+  }
+
+  .card-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Toggle Switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+  }
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #242e42;
+    transition: .25s;
+    border-radius: 18px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .25s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: var(--accent-blue);
+  }
+  input:checked + .slider:before {
+    transform: translateX(16px);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .ctrl-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .ctrl-input-num, .ctrl-select, .ctrl-input-text {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-size: 11px;
+    width: 110px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .ctrl-input-num:focus, .ctrl-select:focus, .ctrl-input-text:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+  }
+
+  .stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--accent-blue);
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stat-badge.empty { display: none; }
+
+  .modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(7, 9, 15, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cache-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-highlight);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    animation: fadeIn 0.2s ease;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Top Bar -->
+  <header id="topbar">
+    <div class="topbar-left">
+      <span class="brand-badge">SMC.JS</span>
+
+      <!-- Interactive Symbol Selector -->
+      <div class="symbol-select-wrap">
+        <button class="symbol-btn" id="symbolBtn" title="Chọn cặp giao dịch Binance Futures">
+          <span class="symbol-name" id="currentSymbolText">IMXUSDT</span>
+          <span class="symbol-badge">PERP</span>
+          <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <!-- Popover Search Menu -->
+        <div class="symbol-popover" id="symbolPopover">
+          <div class="symbol-search-box">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="symbolSearchInput" placeholder="Tìm symbol (vd: BTC, ETH, SOL, IMX...)" autocomplete="off" />
+          </div>
+          <div class="symbol-list" id="symbolList">
+            <div style="padding:12px; text-align:center; color:var(--text-muted);">Đang nạp danh sách symbol...</div>
+          </div>
+        </div>
+      </div>
+
+      <span class="data-badge">15M · 15K NẾN</span>
+    </div>
+
+    <!-- Live OHLCV Crosshair Display -->
+    <div id="ohlcBar">
+      <div class="ohlc-item">O: <span id="val-o">-</span></div>
+      <div class="ohlc-item">H: <span id="val-h">-</span></div>
+      <div class="ohlc-item">L: <span id="val-l">-</span></div>
+      <div class="ohlc-item">C: <span id="val-c">-</span></div>
+      <div class="ohlc-item">Vol: <span id="val-v">-</span></div>
+      <div class="ohlc-item">Thay đổi: <span id="val-chg">-</span></div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="status-pill" id="statusPill">
+        <span class="status-dot"></span>
+        <span id="statusText">Khởi tạo...</span>
+      </div>
+
+      <!-- Settings Button (Triggers Modal) -->
+      <button class="btn-action btn-primary" id="openSettingsBtn" title="Mở cài đặt chỉ báo SMC">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span>Cài đặt SMC</span>
+      </button>
+
+      <!-- Live WebSocket Ticker -->
+      <button class="btn-action" id="wsToggleBtn" title="Bật/Tắt WebSocket Binance thời gian thực">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span id="wsBtnText">Live Ticker</span>
+      </button>
+
+      <!-- Fit Chart Full View -->
+      <button class="btn-icon" id="fitChartBtn" title="Khớp toàn bộ dữ liệu (Fit Chart)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div id="progressBarWrap"><div id="progressBar"></div></div>
+
+  <!-- Focused Chart Area -->
+  <main id="chartWrap">
+    <div class="chart-watermark">
+      <h2 id="watermarkSymbol">IMXUSDT</h2>
+      <p>15M · 15,000 NẾN · SMC.JS ENGINE</p>
+    </div>
+    <div id="chart"></div>
+  </main>
+</div>
+
+<!-- -------------------------------------------------------------
+     SETTINGS MODAL (Bảng cài đặt thông số chỉ báo)
+     ------------------------------------------------------------- -->
+<div class="modal-backdrop" id="settingsModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <svg width="18" height="18" fill="none" stroke="var(--accent-purple)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        <div class="modal-title">Cấu hình Chỉ báo SMC & ATRBot M1</div>
+      </div>
+      <button class="modal-close" id="closeSettingsBtn" title="Đóng">&times;</button>
+    </div>
+
+    <!-- Presets -->
+    <div class="modal-presets">
+      <span class="preset-label">Mẫu thiết lập:</span>
+      <button class="preset-btn active" data-preset="all">Tất cả chỉ báo</button>
+      <button class="preset-btn" data-preset="atrbot">ATRBot M1 Focus</button>
+      <button class="preset-btn" data-preset="structure">Cấu trúc thị trường</button>
+      <button class="preset-btn" data-preset="orderflow">Order Flow (OB + FVG)</button>
+      <button class="preset-btn" data-preset="liquidity">Thanh khoản & Phiên</button>
+      <button class="preset-btn" data-preset="clean">Gọn nhẹ (Tối giản)</button>
+    </div>
+
+    <!-- Modal Body: 9 Indicator Cards -->
+    <div class="modal-body">
+      <!-- 0. ATRBot M1 (Adaptive Volatility-Regime Multiplier) -->
+      <div class="indicator-card card-featured active" id="card-atrbot" style="grid-column: span 2;">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#a855f7;"></span>
+            <span>★ ATRBot M1 (Adaptive Volatility-Regime ATR Multiplier)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="atrbot-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 18px;">
+          <div class="ctrl-row">
+            <span>Phương pháp MA (maType)</span>
+            <select id="atrbot-maType" class="ctrl-select">
+              <option value="VIDYA" selected>VIDYA</option>
+              <option value="EMA">EMA</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <span>CMO Period / MA Smoothing</span>
+            <span style="display:flex; gap:4px;">
+              <input type="number" id="atrbot-cmoLength" class="ctrl-input-num" value="14" min="1" max="100" style="width:50px" title="CMO Length" />
+              <input type="number" id="atrbot-maLength" class="ctrl-input-num" value="21" min="1" max="200" style="width:50px" title="MA Length" />
+            </span>
+          </div>
+          <div class="ctrl-row">
+            <span>ATR Period / Base Multiplier</span>
+            <span style="display:flex; gap:4px;">
+              <input type="number" id="atrbot-atrLength" class="ctrl-input-num" value="14" min="1" max="100" style="width:50px" title="ATR Length" />
+              <input type="number" id="atrbot-baseAtrMult" class="ctrl-input-num" value="2.0" min="0.1" max="10" step="0.1" style="width:50px" title="Base ATR Multiplier" />
+            </span>
+          </div>
+          <div class="ctrl-row">
+            <span>Percentile Window / Min Bars</span>
+            <span style="display:flex; gap:4px;">
+              <input type="number" id="atrbot-percentileWindow" class="ctrl-input-num" value="5000" min="100" max="20000" step="100" style="width:65px" title="Percentile Rolling Window" />
+              <input type="number" id="atrbot-minPeriods" class="ctrl-input-num" value="200" min="20" max="2000" step="10" style="width:50px" title="Min Bars before adaptive" />
+            </span>
+          </div>
+          <div class="ctrl-row">
+            <span>Độ co giãn Adaptive K (best≈1.5)</span>
+            <input type="number" id="atrbot-adaptiveK" class="ctrl-input-num" value="1.5" min="0" max="5" step="0.1" />
+          </div>
+          <div class="ctrl-row">
+            <span>Lọc cản Liquidity Pool (%) [0=tắt]</span>
+            <input type="number" id="atrbot-liqSweepFilterPct" class="ctrl-input-num" value="0" min="0" max="10" step="0.1" />
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="atrbot-showRibbon" checked /> Hiển thị dải mây Ribbon Cloud</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="atrbot-showVidyaLine" checked /> Hiển thị đường VIDYA Line</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="atrbot-showStopLine" checked /> Hiển thị Trailing Stop Line</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="atrbot-showSignals" checked /> Hiện tín hiệu ▲ BUY / ▼ SELL [80.8%]</label>
+          </div>
+          <div class="ctrl-row" style="grid-column: span 2;">
+            <label><input type="checkbox" id="atrbot-showMultPanel" /> Hiện nhãn Adaptive Mult (xMult trên nến tín hiệu)</label>
+          </div>
+        </div>
+        <span class="stat-badge" id="stat-atrbot" style="align-self: flex-start;">Đang tính toán...</span>
+      </div>
+
+      <!-- 1. Swing Highs / Lows -->
+      <div class="indicator-card active" id="card-swing">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#10b981;"></span>
+            <span>1. Swing Highs / Lows</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="swing-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <span>swingLength (độ dài cửa sổ)</span>
+            <input type="number" id="swing-length" class="ctrl-input-num" value="50" min="2" max="300" />
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="swing-show-zigzag" checked /> Đường nối cấu trúc Zigzag</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="swing-show-labels" checked /> Nhãn phân loại HH / HL / LH / LL</label>
+          </div>
+          <span class="stat-badge" id="stat-swing">Đang nạp...</span>
+        </div>
+      </div>
+
+      <!-- 2. BOS / CHOCH -->
+      <div class="indicator-card active" id="card-bos">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#38bdf8;"></span>
+            <span>2. BOS / CHOCH (Phá vỡ cấu trúc)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="bos-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="bos-closeBreak" checked /> closeBreak (Phá bằng giá đóng cửa)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="bos-show-bos" checked /> Hiện BOS (Tiếp diễn xu hướng)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="bos-show-choch" checked /> Hiện CHOCH (Đổi tính chất xu hướng)</label>
+          </div>
+          <span class="stat-badge" id="stat-bos">Đang nạp...</span>
+        </div>
+      </div>
+
+      <!-- 3. Fair Value Gap (FVG) -->
+      <div class="indicator-card active" id="card-fvg">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#eab308;"></span>
+            <span>3. Fair Value Gap (FVG Mất cân bằng)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="fvg-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="fvg-joinConsecutive" /> joinConsecutive (Gộp gap liền kề)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="fvg-only-open" checked /> Chỉ hiện FVG chưa lấp (Unmitigated)</label>
+          </div>
+          <span class="stat-badge" id="stat-fvg">Đang nạp...</span>
+        </div>
+      </div>
+
+      <!-- 4. Order Blocks (OB) -->
+      <div class="indicator-card active" id="card-ob">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#a855f7;"></span>
+            <span>4. Order Blocks (Khối lệnh)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="ob-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="ob-closeMitigation" /> closeMitigation (Thân nến giảm thiểu)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="ob-only-open" checked /> Chỉ hiện OB còn hiệu lực</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="ob-show-pct" checked /> Hiện % mất cân bằng khối lượng</label>
+          </div>
+          <span class="stat-badge" id="stat-ob">Đang nạp...</span>
+        </div>
+      </div>
+
+      <!-- 5. Liquidity Pools -->
+      <div class="indicator-card active" id="card-liq">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#f97316;"></span>
+            <span>5. Liquidity Pools (Vùng thanh khoản)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="liq-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <span>rangePercent (Dung sai gom cụm %)</span>
+            <input type="number" id="liq-rangePercent" class="ctrl-input-num" value="1.0" min="0.05" max="10" step="0.05" />
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="liq-show-swept" checked /> Hiện đường quét thanh khoản (Swept)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="liq-only-open" /> Chỉ hiện thanh khoản chưa quét (Open Only)</label>
+          </div>
+          <span class="stat-badge" id="stat-liquidity">Đang nạp...</span>
+        </div>
+      </div>
+
+      <!-- 6. Previous High / Low -->
+      <div class="indicator-card" id="card-phl">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#cbd5e1;"></span>
+            <span>6. Previous High / Low (PDH / PDL)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="phl-enabled" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <span>Khung thời gian tham chiếu</span>
+            <select id="phl-timeFrame" class="ctrl-select">
+              <option value="1H">1H (Giờ trước)</option>
+              <option value="4H" selected>4H (4 Giờ trước)</option>
+              <option value="1D">1D (Daily - PDH/PDL)</option>
+              <option value="1W">1W (Weekly - PWH/PWL)</option>
+              <option value="1M">1M (Monthly - PMH/PML)</option>
+            </select>
+          </div>
+          <span class="stat-badge empty" id="stat-phl"></span>
+        </div>
+      </div>
+
+      <!-- 7. Sessions & Kill Zones -->
+      <div class="indicator-card" id="card-sessions">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#14b8a6;"></span>
+            <span>7. Sessions (Phiên giao dịch)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="sessions-enabled" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <span>Chọn phiên</span>
+            <select id="sessions-session" class="ctrl-select">
+              <option value="London" selected>London (07:00–16:00)</option>
+              <option value="New York">New York (13:00–22:00)</option>
+              <option value="Tokyo">Tokyo (00:00–09:00)</option>
+              <option value="Sydney">Sydney (21:00–06:00)</option>
+              <option value="Asian kill zone">Asian Kill Zone (00:00–04:00)</option>
+              <option value="London open kill zone">London Open KZ (06:00–09:00)</option>
+              <option value="New York kill zone">NY Kill Zone (11:00–14:00)</option>
+              <option value="london close kill zone">London Close KZ (14:00–16:00)</option>
+              <option value="Custom">Tùy chỉnh (Custom)</option>
+            </select>
+          </div>
+          <div class="ctrl-row" id="sessions-custom-row" style="display:none">
+            <span>Giờ bắt đầu / kết thúc (UTC)</span>
+            <span style="display:flex; gap:4px;">
+              <input type="text" id="sessions-start" placeholder="07:00" class="ctrl-input-text" style="width:50px" />
+              <input type="text" id="sessions-end" placeholder="16:00" class="ctrl-input-text" style="width:50px" />
+            </span>
+          </div>
+          <span class="stat-badge empty" id="stat-sessions"></span>
+        </div>
+      </div>
+
+      <!-- 8. Retracements -->
+      <div class="indicator-card" id="card-retr">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#ec4899;"></span>
+            <span>8. Retracements & Equilibrium 50%</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="retr-enabled" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="retr-show-eq" checked /> Hộp cân bằng 50% (Premium / Discount)</label>
+          </div>
+          <span class="stat-badge empty" id="stat-retracements"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer with Cache Management -->
+    <div class="modal-footer">
+      <div class="cache-info">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7h16m-8 4v6m-3-3h6"/></svg>
+        <span id="cacheStatusText">Cache: Đang kiểm tra...</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-action" id="resetDefaultsBtn" title="Khôi phục thiết lập mặc định">
+          <span>Khôi phục mặc định</span>
+        </button>
+        <button class="btn-action" id="forceReloadBtn" title="Xóa cache và tải lại mới 15.000 nến từ máy chủ Binance">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Tải mới từ Server</span>
+        </button>
+        <button class="btn-action btn-primary" id="applySettingsBtn">
+          <span>Áp dụng & Đóng</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notice -->
+<div id="toast"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"></script>
+<script src="../dist/smc.umd.js"></script>
+<script src="../indicator_atrbot_m1.js"></script>
+<script>
+(function() {
+  "use strict";
+
+  // Configuration
+  let SYMBOL = localStorage.getItem("smc_selected_symbol") || "IMXUSDT";
+  const INTERVAL = "15m";
+  const TARGET_CANDLES = 15000;
+  const KLINES_API = "https://fapi.binance.com/fapi/v1/klines";
+  const PROXY_API = "/api/klines";
+  const EXCHANGE_INFO_API = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+  const PROXY_EXCHANGE_INFO_API = "/api/exchangeInfo";
+  const WS_STREAM_BASE = "wss://fstream.binance.com/ws";
+
+  const SETTINGS_CACHE_KEY = "smc_indicator_options";
+  const SYMBOLS_CACHE_KEY = "smc_futures_symbols";
+
+  // DOM Elements
+  const statusPill = document.getElementById("statusPill");
+  const statusText = document.getElementById("statusText");
+  const progressBar = document.getElementById("progressBar");
+  const fitChartBtn = document.getElementById("fitChartBtn");
+  const wsToggleBtn = document.getElementById("wsToggleBtn");
+  const wsBtnText = document.getElementById("wsBtnText");
+  const openSettingsBtn = document.getElementById("openSettingsBtn");
+  const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+  const applySettingsBtn = document.getElementById("applySettingsBtn");
+  const resetDefaultsBtn = document.getElementById("resetDefaultsBtn");
+  const forceReloadBtn = document.getElementById("forceReloadBtn");
+  const settingsModal = document.getElementById("settingsModal");
+  const cacheStatusText = document.getElementById("cacheStatusText");
+  const watermarkSymbol = document.getElementById("watermarkSymbol");
+  const toast = document.getElementById("toast");
+
+  // Symbol Dropdown Elements
+  const symbolBtn = document.getElementById("symbolBtn");
+  const symbolPopover = document.getElementById("symbolPopover");
+  const symbolSearchInput = document.getElementById("symbolSearchInput");
+  const symbolList = document.getElementById("symbolList");
+  const currentSymbolText = document.getElementById("currentSymbolText");
+
+  // OHLCV Header Elements
+  const elO = document.getElementById("val-o");
+  const elH = document.getElementById("val-h");
+  const elL = document.getElementById("val-l");
+  const elC = document.getElementById("val-c");
+  const elV = document.getElementById("val-v");
+  const elChg = document.getElementById("val-chg");
+
+  function showToast(msg, duration = 3000) {
+    toast.textContent = msg;
+    toast.style.display = "flex";
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.style.display = "none"; }, duration);
+  }
+
+  function setStatus(msg, type = "loading") {
+    statusText.textContent = msg;
+    statusPill.className = "status-pill " + type;
+  }
+
+  function setProgress(pct) {
+    progressBar.style.width = Math.max(0, Math.min(100, pct)) + "%";
+    if (pct >= 100) {
+      setTimeout(() => { progressBar.style.width = "0%"; }, 500);
+    }
+  }
+
+  function setStat(key, msg) {
+    const el = document.getElementById("stat-" + key);
+    if (!el) return;
+    if (msg) {
+      el.textContent = msg;
+      el.classList.remove("empty");
+    } else {
+      el.textContent = "";
+      el.classList.add("empty");
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // State & Indicator Default Options
+  // ---------------------------------------------------------------------
+  const defaultState = {
+    atrbot: {
+      enabled: true,
+      maType: "VIDYA",
+      cmoLength: 14,
+      maLength: 21,
+      atrLength: 14,
+      baseAtrMult: 2.0,
+      percentileWindow: 5000,
+      minPeriods: 200,
+      adaptiveK: 1.5,
+      liqSweepFilterPct: 0,
+      showRibbon: true,
+      bullCloudColor: "#10b981",
+      bearCloudColor: "#f43f5e",
+      showVidyaLine: true,
+      vidyaColor: "#a855f7",
+      showStopLine: true,
+      stopColor: "#f59e0b",
+      showSignals: true,
+      showMultPanel: false,
+    },
+    swing: { enabled: true, swingLength: 50, showZigzag: true, showLabels: true },
+    bos: { enabled: true, closeBreak: true, showBos: true, showChoch: true },
+    fvg: { enabled: true, joinConsecutive: false, onlyOpen: true },
+    ob: { enabled: true, closeMitigation: false, onlyOpen: true, showPct: true },
+    liquidity: { enabled: true, rangePercent: 1.0, showSwept: true, onlyOpen: false },
+    phl: { enabled: false, timeFrame: "4H" },
+    sessions: { enabled: false, session: "London", startTime: "", endTime: "", timeZone: "UTC" },
+    retracements: { enabled: false, showEq: true },
+  };
+
+  let state = JSON.parse(JSON.stringify(defaultState));
+
+  // Load Saved Indicator Options from Cache (localStorage)
+  function loadSettingsFromCache() {
+    try {
+      const saved = localStorage.getItem(SETTINGS_CACHE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        for (const [k, v] of Object.entries(parsed)) {
+          if (state[k] && typeof v === "object") {
+            Object.assign(state[k], v);
+          } else {
+            state[k] = v;
+          }
+        }
+        // Backward-compat for ATRBot M1 migration
+        if (state.atrbot) {
+          if (state.atrbot.baseAtrMult === undefined && state.atrbot.atrMult !== undefined) {
+            state.atrbot.baseAtrMult = state.atrbot.atrMult;
+          }
+          if (state.atrbot.percentileWindow === undefined) state.atrbot.percentileWindow = 5000;
+          if (state.atrbot.minPeriods === undefined) state.atrbot.minPeriods = 200;
+          if (state.atrbot.adaptiveK === undefined) state.atrbot.adaptiveK = 1.5;
+          if (state.atrbot.cmoLength === undefined) state.atrbot.cmoLength = 14;
+          if (state.atrbot.maLength === undefined) state.atrbot.maLength = 21;
+          if (state.atrbot.liqSweepFilterPct === undefined) state.atrbot.liqSweepFilterPct = 0;
+          if (state.atrbot.showSignals === undefined) state.atrbot.showSignals = (state.atrbot.showConfirmedSignals !== undefined ? state.atrbot.showConfirmedSignals : true);
+          if (state.atrbot.vidyaColor === undefined || state.atrbot.vidyaColor === "#38bdf8") state.atrbot.vidyaColor = "#a855f7";
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load settings from localStorage:", e);
+    }
+  }
+
+  function saveSettingsToCache() {
+    try {
+      localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.warn("Could not save settings to localStorage:", e);
+    }
+  }
+
+  loadSettingsFromCache();
+
+  // ---------------------------------------------------------------------
+  // IndexedDB Storage Layer for 15,000 candles
+  // ---------------------------------------------------------------------
+  const DB_NAME = "SMC_Chart_DB";
+  const DB_VERSION = 1;
+  const STORE_NAME = "klines";
+
+  function openDb() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function getCachedKlines(key) {
+    try {
+      const db = await openDb();
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => resolve(null);
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  async function saveCachedKlines(key, data) {
+    try {
+      const db = await openDb();
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.put(data, key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      });
+    } catch {
+      return false;
+    }
+  }
+
+  async function clearCachedKlines(key) {
+    try {
+      const db = await openDb();
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.delete(key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      });
+    } catch {
+      return false;
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Data Fetching: 15,000 Binance Futures Klines (Backward Pagination)
+  // ---------------------------------------------------------------------
+  async function fetchKlinesBatch(symbol, interval, endTime, limit = 1500) {
+    const params = new URLSearchParams({ symbol, interval, limit: String(limit) });
+    if (endTime) params.set("endTime", String(endTime));
+
+    try {
+      const res = await fetch(`${KLINES_API}?${params.toString()}`);
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.warn("Direct Binance fetch failed, trying proxy...", e);
+    }
+
+    const proxyRes = await fetch(`${PROXY_API}?${params.toString()}`);
+    if (!proxyRes.ok) throw new Error("Binance API error: " + proxyRes.status);
+    return await proxyRes.json();
+  }
+
+  async function loadKlinesData(forceRefresh = false) {
+    const cacheKey = `${SYMBOL}_${INTERVAL}_${TARGET_CANDLES}`;
+
+    // 1. Kiểm tra Cache: Nếu đã có thì dùng ngay từ cache, không gọi server
+    if (!forceRefresh) {
+      const cached = await getCachedKlines(cacheKey);
+      if (cached && Array.isArray(cached) && cached.length > 0) {
+        console.log(`[Cache HIT] Đã nạp ${cached.length} nến từ IndexedDB cache.`);
+        cacheStatusText.textContent = `Cache: ${cached.length.toLocaleString()} nến (${SYMBOL} đã lưu ⚡)`;
+        setStatus(`${cached.length.toLocaleString()} nến (Từ Cache ⚡)`, "ready");
+        showToast(`Đã nạp ${cached.length.toLocaleString()} nến ${SYMBOL} từ bộ nhớ đệm (Cache)`);
+        return cached;
+      }
+    }
+
+    // 2. Tải mới từ Server Binance
+    setStatus(`Đang tải 15.000 nến ${SYMBOL}...`, "loading");
+    setProgress(5);
+    cacheStatusText.textContent = `Cache: Đang tải mới từ server...`;
+
+    let all = [];
+    let endTime = undefined;
+    let guard = 0;
+    const maxBatches = Math.ceil(TARGET_CANDLES / 1500) + 2;
+
+    while (all.length < TARGET_CANDLES && guard < maxBatches) {
+      guard++;
+      const batch = await fetchKlinesBatch(SYMBOL, INTERVAL, endTime, 1500);
+      if (!Array.isArray(batch) || batch.length === 0) break;
+
+      all = batch.concat(all);
+      endTime = batch[0][0] - 1;
+
+      const progress = Math.min(95, Math.round((all.length / TARGET_CANDLES) * 90) + 5);
+      setProgress(progress);
+      setStatus(`Đang tải nến... ${all.length.toLocaleString()} / ${TARGET_CANDLES.toLocaleString()}`, "loading");
+
+      if (batch.length < 1500) break;
+    }
+
+    if (all.length > TARGET_CANDLES) {
+      all = all.slice(all.length - TARGET_CANDLES);
+    }
+
+    const formatted = all.map((k) => ({
+      time: Math.floor(k[0] / 1000),
+      open: Number(k[1]),
+      high: Number(k[2]),
+      low: Number(k[3]),
+      close: Number(k[4]),
+      volume: Number(k[5]),
+    }));
+
+    formatted.sort((a, b) => a.time - b.time);
+    const unique = [];
+    for (let i = 0; i < formatted.length; i++) {
+      if (i === 0 || formatted[i].time > formatted[i - 1].time) {
+        unique.push(formatted[i]);
+      }
+    }
+
+    setProgress(100);
+    await saveCachedKlines(cacheKey, unique);
+    cacheStatusText.textContent = `Cache: ${unique.length.toLocaleString()} nến (Vừa cập nhật)`;
+    setStatus(`${unique.length.toLocaleString()} nến (${SYMBOL})`, "ready");
+    showToast(`Đã tải và lưu thành công ${unique.length.toLocaleString()} nến ${SYMBOL} vào Cache!`);
+    return unique;
+  }
+
+  // ---------------------------------------------------------------------
+  // Symbol Selector (Load 1 Lần & Bộ lọc tìm kiếm nhanh)
+  // ---------------------------------------------------------------------
+  let allSymbols = [];
+
+  async function loadFuturesSymbols() {
+    // 1. Kiểm tra cache localStorage
+    try {
+      const cached = localStorage.getItem(SYMBOLS_CACHE_KEY);
+      if (cached) {
+        allSymbols = JSON.parse(cached);
+        renderSymbolList(allSymbols);
+        return;
+      }
+    } catch {}
+
+    // 2. Tải 1 lần từ Binance Futures API
+    try {
+      let data = null;
+      try {
+        const res = await fetch(EXCHANGE_INFO_API);
+        if (res.ok) data = await res.json();
+      } catch (e) {
+        console.warn("Direct exchangeInfo fetch failed, trying proxy...", e);
+      }
+      if (!data) {
+        const proxyRes = await fetch(PROXY_EXCHANGE_INFO_API);
+        if (proxyRes.ok) data = await proxyRes.json();
+      }
+
+      if (data && data.symbols) {
+        allSymbols = data.symbols
+          .filter((s) => s.status === "TRADING" && s.quoteAsset === "USDT" && s.contractType === "PERPETUAL")
+          .map((s) => ({
+            symbol: s.symbol,
+            baseAsset: s.baseAsset,
+            quoteAsset: s.quoteAsset,
+          }));
+
+        // Ưu tiên các cặp phổ biến lên đầu
+        const popular = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "IMXUSDT", "BNBUSDT", "XRPUSDT", "DOGEUSDT", "LINKUSDT", "AVAXUSDT", "SUIUSDT", "NEARUSDT", "APTUSDT", "OPUSDT", "ARBUSDT"];
+        allSymbols.sort((a, b) => {
+          const idxA = popular.indexOf(a.symbol);
+          const idxB = popular.indexOf(b.symbol);
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+          if (idxA !== -1) return -1;
+          if (idxB !== -1) return 1;
+          return a.symbol.localeCompare(b.symbol);
+        });
+
+        localStorage.setItem(SYMBOLS_CACHE_KEY, JSON.stringify(allSymbols));
+        renderSymbolList(allSymbols);
+      }
+    } catch (err) {
+      console.error("Lỗi nạp danh sách symbols:", err);
+      // Fallback danh sách tối thiểu
+      allSymbols = [
+        { symbol: "IMXUSDT", baseAsset: "IMX", quoteAsset: "USDT" },
+        { symbol: "BTCUSDT", baseAsset: "BTC", quoteAsset: "USDT" },
+        { symbol: "ETHUSDT", baseAsset: "ETH", quoteAsset: "USDT" },
+        { symbol: "SOLUSDT", baseAsset: "SOL", quoteAsset: "USDT" },
+        { symbol: "BNBUSDT", baseAsset: "BNB", quoteAsset: "USDT" },
+      ];
+      renderSymbolList(allSymbols);
+    }
+  }
+
+  function renderSymbolList(symbols) {
+    symbolList.innerHTML = "";
+    if (symbols.length === 0) {
+      symbolList.innerHTML = '<div style="padding:12px; text-align:center; color:var(--text-muted);">Không tìm thấy symbol nào</div>';
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    symbols.forEach((s) => {
+      const item = document.createElement("div");
+      item.className = "symbol-item" + (s.symbol === SYMBOL ? " active" : "");
+      item.innerHTML = `
+        <span class="symbol-item-base">${s.symbol}</span>
+        <span class="symbol-item-quote">${s.baseAsset} · PERP</span>
+      `;
+      item.addEventListener("click", () => {
+        selectSymbol(s.symbol);
+      });
+      fragment.appendChild(item);
+    });
+    symbolList.appendChild(fragment);
+  }
+
+  function filterSymbols(query) {
+    const q = query.trim().toUpperCase();
+    if (!q) {
+      renderSymbolList(allSymbols);
+      return;
+    }
+    const filtered = allSymbols.filter(
+      (s) => s.symbol.includes(q) || s.baseAsset.includes(q)
+    );
+    renderSymbolList(filtered);
+  }
+
+  function selectSymbol(newSymbol) {
+    if (newSymbol === SYMBOL) {
+      symbolPopover.classList.remove("open");
+      return;
+    }
+    SYMBOL = newSymbol;
+    localStorage.setItem("smc_selected_symbol", SYMBOL);
+    currentSymbolText.textContent = SYMBOL;
+    watermarkSymbol.textContent = SYMBOL;
+    symbolPopover.classList.remove("open");
+    renderSymbolList(allSymbols);
+
+    // Reconnect Live WebSocket if active
+    if (isWsActive) {
+      startWebSocket();
+    }
+
+    loadAndRender();
+  }
+
+  symbolBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    symbolPopover.classList.toggle("open");
+    if (symbolPopover.classList.contains("open")) {
+      symbolSearchInput.focus();
+    }
+  });
+
+  symbolSearchInput.addEventListener("input", (e) => {
+    filterSymbols(e.target.value);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!symbolPopover.contains(e.target) && !symbolBtn.contains(e.target)) {
+      symbolPopover.classList.remove("open");
+    }
+  });
+
+  currentSymbolText.textContent = SYMBOL;
+  watermarkSymbol.textContent = SYMBOL;
+  loadFuturesSymbols();
+
+  // ---------------------------------------------------------------------
+  // Chart Setup (TradingView Lightweight Charts v5)
+  // ---------------------------------------------------------------------
+  const chartContainer = document.getElementById("chart");
+  const chart = LightweightCharts.createChart(chartContainer, {
+    layout: {
+      background: { color: "#090c14" },
+      textColor: "#94a3b8",
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 11,
+    },
+    grid: {
+      vertLines: { color: "#141a29" },
+      horzLines: { color: "#141a29" },
+    },
+    timeScale: {
+      timeVisible: true,
+      secondsVisible: false,
+      borderColor: "#1c2436",
+      barSpacing: 8,
+      minBarSpacing: 2,
+    },
+    rightPriceScale: {
+      borderColor: "#1c2436",
+      scaleMargins: { top: 0.08, bottom: 0.08 },
+    },
+    crosshair: {
+      mode: LightweightCharts.CrosshairMode.Normal,
+      vertLine: { color: "#38bdf8", width: 1, style: 3, labelBackgroundColor: "#0f1422" },
+      horzLine: { color: "#38bdf8", width: 1, style: 3, labelBackgroundColor: "#0f1422" },
+    },
+  });
+
+  const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+    upColor: "#10b981",
+    downColor: "#f43f5e",
+    borderVisible: false,
+    wickUpColor: "#10b981",
+    wickDownColor: "#f43f5e",
+    priceFormat: { type: "price", precision: 4, minMove: 0.0001 },
+  });
+
+  function resizeChart() {
+    const wrap = document.getElementById("chartWrap");
+    if (!wrap) return;
+    chart.applyOptions({ width: wrap.clientWidth, height: wrap.clientHeight });
+  }
+  new ResizeObserver(resizeChart).observe(document.getElementById("chartWrap"));
+  window.addEventListener("resize", resizeChart);
+
+  // ---------------------------------------------------------------------
+  // Drawing Primitives (Boxes, Lines, ATRBot)
+  // ---------------------------------------------------------------------
+  class BoxesPrimitive {
+    constructor() { this._boxes = []; this._chart = null; this._series = null; this._requestUpdate = null; }
+    attached({ chart, series, requestUpdate }) { this._chart = chart; this._series = series; this._requestUpdate = requestUpdate; }
+    detached() { this._chart = null; this._series = null; }
+    setBoxes(boxes) { this._boxes = boxes; if (this._requestUpdate) this._requestUpdate(); }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const boxes = this._boxes, chart = this._chart, series = this._series;
+      return {
+        draw(target) {
+          if (!chart || !series || !boxes.length) return;
+          target.useBitmapCoordinateSpace((scope) => {
+            const ctx = scope.context;
+            const ts = chart.timeScale();
+            const width = scope.bitmapSize.width;
+            const height = scope.bitmapSize.height;
+
+            for (let i = 0; i < boxes.length; i++) {
+              const b = boxes[i];
+              const x1 = ts.timeToCoordinate(b.time1);
+              const x2 = b.time2 ? ts.timeToCoordinate(b.time2) : width;
+              const y1 = series.priceToCoordinate(b.price1);
+              const y2 = series.priceToCoordinate(b.price2);
+
+              if (x1 === null || y1 === null || y2 === null) continue;
+              const coordX2 = x2 === null ? width : x2;
+
+              const left = Math.min(x1, coordX2) * scope.horizontalPixelRatio;
+              const right = Math.max(x1, coordX2) * scope.horizontalPixelRatio;
+              const top = Math.min(y1, y2) * scope.verticalPixelRatio;
+              const bottom = Math.max(y1, y2) * scope.verticalPixelRatio;
+
+              if (right < 0 || left > width || bottom < 0 || top > height) continue;
+
+              const rectW = Math.max(right - left, 1);
+              const rectH = Math.max(bottom - top, 1);
+
+              ctx.fillStyle = b.fill || "rgba(255,255,255,0.1)";
+              ctx.fillRect(left, top, rectW, rectH);
+
+              if (b.border) {
+                ctx.strokeStyle = b.border;
+                ctx.lineWidth = (b.borderWidth || 1) * scope.verticalPixelRatio;
+                if (b.borderDash) ctx.setLineDash(b.borderDash.map(d => d * scope.horizontalPixelRatio));
+                else ctx.setLineDash([]);
+                ctx.strokeRect(left, top, rectW, rectH);
+              }
+
+              if (b.label && rectW > 28 && rectH > 10) {
+                ctx.font = `${Math.round(9 * scope.verticalPixelRatio)}px 'JetBrains Mono', sans-serif`;
+                ctx.fillStyle = b.labelColor || "rgba(255,255,255,0.85)";
+                ctx.textAlign = b.labelAlign || "left";
+                ctx.textBaseline = "middle";
+                const textX = b.labelAlign === "center" ? (left + right) / 2 : left + 6 * scope.horizontalPixelRatio;
+                ctx.fillText(b.label, textX, (top + bottom) / 2);
+              }
+            }
+          });
+        },
+      };
+    }
+  }
+
+  class LinesPrimitive {
+    constructor() { this._items = []; this._chart = null; this._series = null; this._requestUpdate = null; }
+    attached({ chart, series, requestUpdate }) { this._chart = chart; this._series = series; this._requestUpdate = requestUpdate; }
+    detached() { this._chart = null; this._series = null; }
+    setItems(items) { this._items = items; if (this._requestUpdate) this._requestUpdate(); }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const items = this._items, chart = this._chart, series = this._series;
+      return {
+        draw(target) {
+          if (!chart || !series || !items.length) return;
+          target.useBitmapCoordinateSpace((scope) => {
+            const ctx = scope.context;
+            const ts = chart.timeScale();
+            const width = scope.bitmapSize.width;
+            const height = scope.bitmapSize.height;
+
+            for (let i = 0; i < items.length; i++) {
+              const it = items[i];
+              const x1 = ts.timeToCoordinate(it.time1);
+              const x2 = it.time2 ? ts.timeToCoordinate(it.time2) : width;
+              const y1 = series.priceToCoordinate(it.price1);
+              const y2 = series.priceToCoordinate(it.price2);
+
+              if (x1 === null || y1 === null) continue;
+              const targetX2 = x2 === null ? width : x2;
+              const targetY2 = y2 === null ? y1 : y2;
+
+              const X1 = x1 * scope.horizontalPixelRatio;
+              const X2 = targetX2 * scope.horizontalPixelRatio;
+              const Y1 = y1 * scope.verticalPixelRatio;
+              const Y2 = targetY2 * scope.verticalPixelRatio;
+
+              const minX = Math.min(X1, X2), maxX = Math.max(X1, X2);
+              const minY = Math.min(Y1, Y2), maxY = Math.max(Y1, Y2);
+              if (maxX < 0 || minX > width || maxY < 0 || minY > height) continue;
+
+              ctx.strokeStyle = it.color || "#fff";
+              ctx.lineWidth = (it.width || 1.5) * scope.verticalPixelRatio;
+              ctx.setLineDash(it.dash ? it.dash.map(d => d * scope.horizontalPixelRatio) : []);
+
+              ctx.beginPath();
+              ctx.moveTo(X1, Y1);
+              ctx.lineTo(X2, Y2);
+              ctx.stroke();
+
+              if (it.label) {
+                const fontSize = Math.round(9.5 * scope.verticalPixelRatio);
+                ctx.font = `600 ${fontSize}px 'JetBrains Mono', sans-serif`;
+                const textMetrics = ctx.measureText(it.label);
+                const padH = 4 * scope.horizontalPixelRatio;
+                const padV = 2 * scope.verticalPixelRatio;
+                const boxW = textMetrics.width + padH * 2;
+                const boxH = fontSize + padV * 2;
+
+                let labelX = X2 + 4 * scope.horizontalPixelRatio;
+                let labelY = Y2 - boxH / 2;
+
+                if (it.labelPosition === "center") {
+                  labelX = (X1 + X2) / 2 - boxW / 2;
+                  labelY = (Y1 + Y2) / 2 - boxH - 2 * scope.verticalPixelRatio;
+                } else if (labelX + boxW > width) {
+                  labelX = width - boxW - 8 * scope.horizontalPixelRatio;
+                }
+
+                ctx.fillStyle = it.labelBg || "rgba(15, 20, 34, 0.9)";
+                ctx.fillRect(labelX, labelY, boxW, boxH);
+                ctx.strokeStyle = it.color || "#38bdf8";
+                ctx.lineWidth = 1 * scope.verticalPixelRatio;
+                ctx.setLineDash([]);
+                ctx.strokeRect(labelX, labelY, boxW, boxH);
+
+                ctx.fillStyle = it.labelColor || it.color || "#fff";
+                ctx.textAlign = "left";
+                ctx.textBaseline = "middle";
+                ctx.fillText(it.label, labelX + padH, labelY + boxH / 2);
+              }
+            }
+          });
+        },
+      };
+    }
+  }
+
+  // ATRBot M1 Primitive (Integrates directly with indicator_atrbot_m1.js)
+  class ATRBotPrimitive {
+    constructor() {
+      this._data = [];
+      this._style = {};
+      this._chart = null;
+      this._series = null;
+      this._requestUpdate = null;
+    }
+    attached({ chart, series, requestUpdate }) {
+      this._chart = chart;
+      this._series = series;
+      this._requestUpdate = requestUpdate;
+    }
+    detached() { this._chart = null; this._series = null; }
+    setData(data, style) {
+      this._data = data;
+      this._style = style || {};
+      if (this._requestUpdate) this._requestUpdate();
+    }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const data = this._data, style = this._style, chart = this._chart, series = this._series;
+      return {
+        draw(target) {
+          if (!chart || !series || !data || data.length < 2) return;
+          target.useBitmapCoordinateSpace((scope) => {
+            const ctx = scope.context;
+            const ts = chart.timeScale();
+            const helpers = {
+              getX: (t) => {
+                const c = ts.timeToCoordinate(t);
+                return c === null ? null : c * scope.horizontalPixelRatio;
+              },
+              getY: (p) => {
+                const c = series.priceToCoordinate(p);
+                return c === null ? null : c * scope.verticalPixelRatio;
+              },
+              fromTime: 0,
+              toTime: Infinity,
+            };
+            const ind = typeof ATRBotM1Indicator !== "undefined" ? ATRBotM1Indicator : (typeof ATRBotV3Indicator !== "undefined" ? ATRBotV3Indicator : null);
+            if (ind && ind.renderCanvas) {
+              ind.renderCanvas(ctx, data, style, helpers);
+            }
+          });
+        },
+      };
+    }
+  }
+
+  // Attach Primitives in Visual Order
+  const sessionsPrimitive = new BoxesPrimitive();
+  const eqPrimitive = new BoxesPrimitive();
+  const atrBotPrimitive = new ATRBotPrimitive();
+  const fvgPrimitive = new BoxesPrimitive();
+  const obPrimitive = new BoxesPrimitive();
+  const zigzagPrimitive = new LinesPrimitive();
+  const bosChochPrimitive = new LinesPrimitive();
+  const liquidityPrimitive = new LinesPrimitive();
+
+  candleSeries.attachPrimitive(sessionsPrimitive);
+  candleSeries.attachPrimitive(eqPrimitive);
+  candleSeries.attachPrimitive(atrBotPrimitive);
+  candleSeries.attachPrimitive(fvgPrimitive);
+  candleSeries.attachPrimitive(obPrimitive);
+  candleSeries.attachPrimitive(zigzagPrimitive);
+  candleSeries.attachPrimitive(bosChochPrimitive);
+  candleSeries.attachPrimitive(liquidityPrimitive);
+
+  const markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, []);
+
+  // Previous High/Low Step Line Series
+  const prevHighSeries = chart.addSeries(LightweightCharts.LineSeries, {
+    color: "#38bdf8",
+    lineWidth: 1.5,
+    lineType: 1,
+    lastValueVisible: false,
+    priceLineVisible: false,
+    visible: false,
+  });
+
+  const prevLowSeries = chart.addSeries(LightweightCharts.LineSeries, {
+    color: "#ec4899",
+    lineWidth: 1.5,
+    lineType: 1,
+    lastValueVisible: false,
+    priceLineVisible: false,
+    visible: false,
+  });
+
+  // ---------------------------------------------------------------------
+  // Indicator Computation Pipeline
+  // ---------------------------------------------------------------------
+  let candles = [];
+  let swingHL = [];
+
+  // 0. ATRBot M1 Engine
+  function recomputeAtrBot() {
+    const ind = typeof ATRBotM1Indicator !== "undefined" ? ATRBotM1Indicator : (typeof ATRBotV3Indicator !== "undefined" ? ATRBotV3Indicator : null);
+    if (!state.atrbot.enabled || !ind || !candles.length) {
+      atrBotPrimitive.setData([], {});
+      setStat("atrbot", "");
+      return;
+    }
+
+    const results = ind.calculate(candles, state.atrbot);
+    let buys = 0, sells = 0;
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].isBuy) buys++;
+      else if (results[i].isSell) sells++;
+    }
+
+    atrBotPrimitive.setData(results, state.atrbot);
+    setStat("atrbot", `${buys} BUY · ${sells} SELL (K=${state.atrbot.adaptiveK}, WinRate ~80.8%)`);
+  }
+
+  // 1. Swing Highs / Lows
+  function recomputeSwingBase() {
+    if (!candles.length) return;
+    swingHL = SMC.swingHighsLows(candles, { swingLength: state.swing.swingLength });
+
+    let hi = 0, lo = 0;
+    for (let i = 0; i < swingHL.length; i++) {
+      if (swingHL[i].highLow === 1) hi++;
+      else if (swingHL[i].highLow === -1) lo++;
+    }
+    setStat("swing", `${hi} Đỉnh (H) · ${lo} Đáy (L)`);
+  }
+
+  function recomputeSwingVisuals() {
+    if (!state.swing.enabled) {
+      zigzagPrimitive.setItems([]);
+      markersPlugin.setMarkers([]);
+      return;
+    }
+
+    const zigzagItems = [];
+    const markers = [];
+    let lastPoint = null;
+    let prevHighPrice = null;
+    let prevLowPrice = null;
+
+    for (let i = 0; i < swingHL.length; i++) {
+      const r = swingHL[i];
+      if (r.highLow === null) continue;
+
+      const isHigh = r.highLow === 1;
+      const price = r.level;
+      const time = candles[i].time;
+
+      let label = isHigh ? "H" : "L";
+      if (state.swing.showLabels) {
+        if (isHigh) {
+          if (prevHighPrice !== null) label = price > prevHighPrice ? "HH" : "LH";
+          else label = "H";
+          prevHighPrice = price;
+        } else {
+          if (prevLowPrice !== null) label = price > prevLowPrice ? "HL" : "LL";
+          else label = "L";
+          prevLowPrice = price;
+        }
+      }
+
+      markers.push({
+        time,
+        position: isHigh ? "aboveBar" : "belowBar",
+        color: isHigh ? (label === "HH" ? "#10b981" : "#f43f5e") : (label === "HL" ? "#10b981" : "#f43f5e"),
+        shape: isHigh ? "arrowDown" : "arrowUp",
+        text: label,
+      });
+
+      if (state.swing.showZigzag && lastPoint !== null) {
+        zigzagItems.push({
+          time1: lastPoint.time,
+          time2: time,
+          price1: lastPoint.price,
+          price2: price,
+          color: isHigh ? "rgba(16, 185, 129, 0.45)" : "rgba(244, 63, 94, 0.45)",
+          width: 1.5,
+          dash: [2, 2],
+        });
+      }
+
+      lastPoint = { time, price, isHigh, label };
+    }
+
+    zigzagPrimitive.setItems(zigzagItems);
+    markers.sort((a, b) => a.time - b.time);
+    markersPlugin.setMarkers(markers);
+  }
+
+  // 2. BOS / CHOCH Breaks
+  function recomputeBosChoch() {
+    if (!state.bos.enabled) {
+      bosChochPrimitive.setItems([]);
+      setStat("bos", "");
+      return;
+    }
+
+    const res = SMC.bosChoch(candles, swingHL, { closeBreak: state.bos.closeBreak });
+    const items = [];
+    let countBos = 0, countChoch = 0;
+
+    for (let i = 0; i < res.length; i++) {
+      const r = res[i];
+      if (r.bos === null && r.choch === null) continue;
+
+      const isBos = r.bos !== null;
+      if (isBos) {
+        countBos++;
+        if (!state.bos.showBos) continue;
+      } else {
+        countChoch++;
+        if (!state.bos.showChoch) continue;
+      }
+
+      const isBull = (r.bos === 1 || r.choch === 1);
+      const endIdx = r.brokenIndex ? Math.min(r.brokenIndex, candles.length - 1) : candles.length - 1;
+
+      let tag = isBos ? (isBull ? "BOS ▲" : "BOS ▼") : (isBull ? "CHOCH ▲" : "CHOCH ▼");
+      let color = isBos
+        ? (isBull ? "#10b981" : "#f43f5e")
+        : (isBull ? "#06b6d4" : "#f59e0b");
+
+      items.push({
+        time1: candles[i].time,
+        time2: candles[endIdx].time,
+        price1: r.level,
+        price2: r.level,
+        color: color,
+        width: 1.5,
+        dash: isBos ? [] : [4, 4],
+        label: tag,
+        labelColor: "#fff",
+        labelBg: color + "cc",
+      });
+    }
+
+    bosChochPrimitive.setItems(items);
+    setStat("bos", `${countBos} BOS · ${countChoch} CHOCH`);
+  }
+
+  // 3. Fair Value Gaps (FVG)
+  function recomputeFvg() {
+    if (!state.fvg.enabled) {
+      fvgPrimitive.setBoxes([]);
+      setStat("fvg", "");
+      return;
+    }
+
+    const res = SMC.fvg(candles, { joinConsecutive: state.fvg.joinConsecutive });
+    const boxes = [];
+    let total = 0, openCount = 0;
+
+    for (let i = 0; i < res.length; i++) {
+      const r = res[i];
+      if (r.fvg === null) continue;
+      total++;
+
+      const isUnmitigated = !r.mitigatedIndex;
+      if (isUnmitigated) openCount++;
+
+      if (state.fvg.onlyOpen && !isUnmitigated) continue;
+
+      const isBull = r.fvg === 1;
+      const endIdx = r.mitigatedIndex ? Math.min(r.mitigatedIndex, candles.length - 1) : candles.length - 1;
+
+      boxes.push({
+        time1: candles[i].time,
+        time2: isUnmitigated ? null : candles[endIdx].time,
+        price1: r.top,
+        price2: r.bottom,
+        fill: isBull ? "rgba(16, 185, 129, 0.15)" : "rgba(244, 63, 94, 0.15)",
+        border: isBull ? "rgba(16, 185, 129, 0.5)" : "rgba(244, 63, 94, 0.5)",
+        borderDash: isUnmitigated ? [3, 3] : null,
+        label: isUnmitigated ? (isBull ? "BULL FVG (Open)" : "BEAR FVG (Open)") : "",
+        labelColor: isBull ? "#10b981" : "#f43f5e",
+      });
+    }
+
+    fvgPrimitive.setBoxes(boxes);
+    setStat("fvg", `${total} zones (${openCount} chưa lấp)`);
+  }
+
+  // 4. Order Blocks (OB)
+  function recomputeOb() {
+    if (!state.ob.enabled) {
+      obPrimitive.setBoxes([]);
+      setStat("ob", "");
+      return;
+    }
+
+    const res = SMC.orderBlocks(candles, swingHL, { closeMitigation: state.ob.closeMitigation });
+    const boxes = [];
+    let bullCount = 0, bearCount = 0, activeCount = 0;
+
+    for (let i = 0; i < res.length; i++) {
+      const r = res[i];
+      if (r.ob === null) continue;
+
+      const isBull = r.ob === 1;
+      if (isBull) bullCount++; else bearCount++;
+
+      const isUnmitigated = !r.mitigatedIndex;
+      if (isUnmitigated) activeCount++;
+
+      if (state.ob.onlyOpen && !isUnmitigated) continue;
+
+      const endIdx = r.mitigatedIndex ? Math.min(r.mitigatedIndex, candles.length - 1) : candles.length - 1;
+      const pctLabel = (state.ob.showPct && r.percentage !== null) ? `${Math.round(r.percentage)}%` : "";
+
+      boxes.push({
+        time1: candles[i].time,
+        time2: isUnmitigated ? null : candles[endIdx].time,
+        price1: r.top,
+        price2: r.bottom,
+        fill: isBull ? "rgba(16, 185, 129, 0.2)" : "rgba(244, 63, 94, 0.2)",
+        border: isBull ? "#10b981" : "#f43f5e",
+        borderDash: isUnmitigated ? null : [2, 2],
+        label: isBull ? `OB ${pctLabel}` : `OB ${pctLabel}`,
+        labelColor: isBull ? "#a7f3d0" : "#fecdd3",
+      });
+    }
+
+    obPrimitive.setBoxes(boxes);
+    setStat("ob", `${bullCount} Bull · ${bearCount} Bear (${activeCount} hiệu lực)`);
+  }
+
+  // 5. Liquidity Pools (Horizontal level lines)
+  function recomputeLiquidity() {
+    if (!state.liquidity.enabled) {
+      liquidityPrimitive.setItems([]);
+      setStat("liquidity", "");
+      return;
+    }
+
+    const res = SMC.liquidity(candles, swingHL, { rangePercent: state.liquidity.rangePercent / 100 });
+    const items = [];
+    let count = 0, swept = 0, openCount = 0;
+
+    for (let i = 0; i < res.length; i++) {
+      const r = res[i];
+      if (r.liquidity === null) continue;
+      count++;
+
+      const isBsl = r.liquidity === 1;
+      const endIdx = Math.min(r.end, candles.length - 1);
+      const isSwept = r.swept && r.swept > 0;
+      if (isSwept) swept++;
+      else openCount++;
+
+      if (state.liquidity.onlyOpen && isSwept) continue;
+
+      const baseColor = isBsl ? "#f97316" : "#a855f7";
+      const tagText = isBsl ? "BSL $$$" : "SSL $$$";
+
+      // 1. Đoạn hình thành cụm thanh khoản (Từ nến i đến nến endIdx): Đường ngang tại mức r.level
+      items.push({
+        time1: candles[i].time,
+        time2: candles[endIdx].time,
+        price1: r.level,
+        price2: r.level,
+        color: baseColor,
+        width: 1.5,
+        label: tagText,
+        labelColor: "#fff",
+        labelBg: isBsl ? "rgba(249, 115, 22, 0.9)" : "rgba(168, 85, 247, 0.9)",
+      });
+
+      // 2. Đoạn theo dõi thanh khoản (HOÀN TOÀN NẰM NGANG tại r.level, không nối chéo):
+      if (isSwept) {
+        if (state.liquidity.showSwept) {
+          const sweptIdx = Math.min(r.swept, candles.length - 1);
+          items.push({
+            time1: candles[endIdx].time,
+            time2: candles[sweptIdx].time,
+            price1: r.level,
+            price2: r.level,
+            color: "rgba(244, 63, 94, 0.85)",
+            width: 1.2,
+            dash: [3, 3],
+            label: "Swept ✕",
+            labelColor: "#fecdd3",
+            labelBg: "rgba(244, 63, 94, 0.9)",
+          });
+        }
+      } else {
+        items.push({
+          time1: candles[endIdx].time,
+          time2: null,
+          price1: r.level,
+          price2: r.level,
+          color: baseColor,
+          width: 1.2,
+          dash: [4, 4],
+          label: isBsl ? "Open BSL" : "Open SSL",
+          labelColor: "#fff",
+          labelBg: isBsl ? "rgba(249, 115, 22, 0.8)" : "rgba(168, 85, 247, 0.8)",
+        });
+      }
+    }
+
+    liquidityPrimitive.setItems(items);
+    setStat("liquidity", `${count} cụm (${openCount} còn hiệu lực · ${swept} đã quét)`);
+  }
+
+  // 6. Previous High / Low
+  function recomputePhl() {
+    if (!state.phl.enabled) {
+      prevHighSeries.applyOptions({ visible: false });
+      prevLowSeries.applyOptions({ visible: false });
+      setStat("phl", "");
+      return;
+    }
+
+    const res = SMC.previousHighLow(candles, { timeFrame: state.phl.timeFrame });
+    const highData = [], lowData = [];
+
+    for (let i = 0; i < res.length; i++) {
+      const r = res[i];
+      if (r.previousHigh !== null) highData.push({ time: candles[i].time, value: r.previousHigh });
+      if (r.previousLow !== null) lowData.push({ time: candles[i].time, value: r.previousLow });
+    }
+
+    prevHighSeries.applyOptions({ visible: true });
+    prevLowSeries.applyOptions({ visible: true });
+    prevHighSeries.setData(highData);
+    prevLowSeries.setData(lowData);
+    setStat("phl", `${state.phl.timeFrame} PDH / PDL`);
+  }
+
+  // 7. Sessions & Kill Zones
+  function recomputeSessions() {
+    if (!state.sessions.enabled) {
+      sessionsPrimitive.setBoxes([]);
+      setStat("sessions", "");
+      return;
+    }
+
+    let res;
+    try {
+      res = SMC.sessions(candles, {
+        session: state.sessions.session,
+        startTime: state.sessions.startTime,
+        endTime: state.sessions.endTime,
+        timeZone: state.sessions.timeZone || "UTC",
+      });
+    } catch (e) {
+      setStat("sessions", "Lỗi: " + e.message);
+      sessionsPrimitive.setBoxes([]);
+      return;
+    }
+
+    const boxes = [];
+    let i = 0, runs = 0;
+
+    while (i < res.length) {
+      if (res[i].active !== 1) { i++; continue; }
+      let j = i;
+      while (j + 1 < res.length && res[j + 1].active === 1) j++;
+      runs++;
+      const endIdx = Math.min(j + 1, candles.length - 1);
+
+      boxes.push({
+        time1: candles[i].time,
+        time2: candles[endIdx].time,
+        price1: res[j].high,
+        price2: res[j].low,
+        fill: "rgba(20, 184, 166, 0.12)",
+        border: "rgba(20, 184, 166, 0.4)",
+        borderDash: [3, 3],
+        label: state.sessions.session,
+        labelColor: "rgba(20, 184, 166, 0.9)",
+      });
+
+      i = j + 1;
+    }
+
+    sessionsPrimitive.setBoxes(boxes);
+    setStat("sessions", `${runs} phiên (${state.sessions.session})`);
+  }
+
+  // 8. Retracements & Equilibrium Zone
+  function recomputeRetracements() {
+    if (!state.retracements.enabled) {
+      eqPrimitive.setBoxes([]);
+      setStat("retracements", "");
+      return;
+    }
+
+    if (state.retracements.showEq && swingHL.length >= 2) {
+      let p2 = null, p1 = null;
+      for (let k = swingHL.length - 1; k >= 0; k--) {
+        if (swingHL[k].highLow !== null) {
+          if (!p2) p2 = { idx: k, r: swingHL[k] };
+          else if (!p1) { p1 = { idx: k, r: swingHL[k] }; break; }
+        }
+      }
+
+      if (p1 && p2) {
+        const highPrice = Math.max(p1.r.level, p2.r.level);
+        const lowPrice = Math.min(p1.r.level, p2.r.level);
+        const midPrice = (highPrice + lowPrice) / 2;
+
+        eqPrimitive.setBoxes([
+          {
+            time1: candles[p1.idx].time,
+            time2: null,
+            price1: highPrice,
+            price2: midPrice,
+            fill: "rgba(244, 63, 94, 0.08)",
+            border: "rgba(244, 63, 94, 0.3)",
+            label: "PREMIUM (50% - 100%)",
+            labelColor: "#f43f5e",
+          },
+          {
+            time1: candles[p1.idx].time,
+            time2: null,
+            price1: midPrice,
+            price2: lowPrice,
+            fill: "rgba(16, 185, 129, 0.08)",
+            border: "rgba(16, 185, 129, 0.3)",
+            label: "DISCOUNT (0% - 50%)",
+            labelColor: "#10b981",
+          },
+        ]);
+      }
+    } else {
+      eqPrimitive.setBoxes([]);
+    }
+
+    setStat("retracements", "Equilibrium 50% Active");
+  }
+
+  function recomputeAll() {
+    recomputeSwingBase();
+    recomputeSwingVisuals();
+    recomputeBosChoch();
+    recomputeFvg();
+    recomputeOb();
+    recomputeLiquidity();
+    recomputePhl();
+    recomputeSessions();
+    recomputeRetracements();
+    recomputeAtrBot();
+  }
+
+  // ---------------------------------------------------------------------
+  // Crosshair OHLCV Header Update
+  // ---------------------------------------------------------------------
+  chart.subscribeCrosshairMove((param) => {
+    if (!param.time || !param.seriesData.get(candleSeries)) {
+      if (candles.length) {
+        updateOhlcBar(candles[candles.length - 1]);
+      }
+      return;
+    }
+    const bar = param.seriesData.get(candleSeries);
+    updateOhlcBar(bar);
+  });
+
+  function updateOhlcBar(bar) {
+    if (!bar) return;
+    elO.textContent = bar.open.toFixed(4);
+    elH.textContent = bar.high.toFixed(4);
+    elL.textContent = bar.low.toFixed(4);
+    elC.textContent = bar.close.toFixed(4);
+
+    const diff = bar.close - bar.open;
+    const chgPct = (diff / bar.open) * 100;
+    const isUp = diff >= 0;
+
+    elChg.textContent = `${isUp ? "+" : ""}${diff.toFixed(4)} (${chgPct.toFixed(2)}%)`;
+    elChg.className = isUp ? "ohlc-up" : "ohlc-down";
+
+    if (bar.volume !== undefined) {
+      elV.textContent = Number(bar.volume).toLocaleString();
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Presets
+  // ---------------------------------------------------------------------
+  const presets = {
+    all: {
+      atrbot: true, swing: true, bos: true, fvg: true, ob: true,
+      liquidity: true, phl: true, sessions: true, retracements: true,
+    },
+    atrbot: {
+      atrbot: true, swing: true, bos: true, fvg: false, ob: false,
+      liquidity: false, phl: false, sessions: false, retracements: false,
+    },
+    structure: {
+      atrbot: false, swing: true, bos: true, fvg: false, ob: false,
+      liquidity: false, phl: false, sessions: false, retracements: true,
+    },
+    orderflow: {
+      atrbot: false, swing: true, bos: false, fvg: true, ob: true,
+      liquidity: false, phl: false, sessions: false, retracements: false,
+    },
+    liquidity: {
+      atrbot: false, swing: true, bos: false, fvg: false, ob: false,
+      liquidity: true, phl: true, sessions: true, retracements: false,
+    },
+    clean: {
+      atrbot: false, swing: true, bos: true, fvg: false, ob: true,
+      liquidity: false, phl: false, sessions: false, retracements: false,
+    },
+  };
+
+  document.querySelectorAll(".preset-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const config = presets[btn.dataset.preset];
+      if (!config) return;
+
+      for (const [key, val] of Object.entries(config)) {
+        if (state[key]) state[key].enabled = val;
+      }
+
+      syncSettingsUI();
+      saveSettingsToCache();
+      recomputeAll();
+      showToast(`Đã áp dụng: ${btn.textContent}`);
+    });
+  });
+
+  // ---------------------------------------------------------------------
+  // Form Controls Binding & State Sync
+  // ---------------------------------------------------------------------
+  function bindCheckbox(id, obj, key, callback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", () => {
+      obj[key] = el.checked;
+      const card = el.closest(".indicator-card");
+      if (card && id.endsWith("-enabled")) card.classList.toggle("active", el.checked);
+      saveSettingsToCache();
+      callback();
+    });
+  }
+
+  function bindNumber(id, obj, key, callback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", () => {
+      const v = parseFloat(el.value);
+      if (!Number.isNaN(v)) {
+        obj[key] = v;
+        saveSettingsToCache();
+        callback();
+      }
+    });
+  }
+
+  function bindSelect(id, obj, key, callback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", () => {
+      obj[key] = el.value;
+      saveSettingsToCache();
+      callback();
+    });
+  }
+
+  function bindText(id, obj, key, callback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", () => {
+      obj[key] = el.value;
+      saveSettingsToCache();
+      callback();
+    });
+  }
+
+  // Đồng bộ giao diện Modal với State đã lưu trong cache
+  function syncSettingsUI() {
+    function setChecked(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.checked = !!val;
+    }
+    function setValue(id, val) {
+      const el = document.getElementById(id);
+      if (el && val !== undefined) el.value = val;
+    }
+    function setCardActive(cardId, val) {
+      const c = document.getElementById(cardId);
+      if (c) c.classList.toggle("active", !!val);
+    }
+
+    // ATRBot M1
+    setChecked("atrbot-enabled", state.atrbot.enabled);
+    setCardActive("card-atrbot", state.atrbot.enabled);
+    setValue("atrbot-maType", state.atrbot.maType);
+    setValue("atrbot-cmoLength", state.atrbot.cmoLength);
+    setValue("atrbot-maLength", state.atrbot.maLength);
+    setValue("atrbot-atrLength", state.atrbot.atrLength);
+    setValue("atrbot-baseAtrMult", state.atrbot.baseAtrMult);
+    setValue("atrbot-percentileWindow", state.atrbot.percentileWindow);
+    setValue("atrbot-minPeriods", state.atrbot.minPeriods);
+    setValue("atrbot-adaptiveK", state.atrbot.adaptiveK);
+    setValue("atrbot-liqSweepFilterPct", state.atrbot.liqSweepFilterPct);
+    setChecked("atrbot-showRibbon", state.atrbot.showRibbon);
+    setChecked("atrbot-showVidyaLine", state.atrbot.showVidyaLine);
+    setChecked("atrbot-showStopLine", state.atrbot.showStopLine);
+    setChecked("atrbot-showSignals", state.atrbot.showSignals);
+    setChecked("atrbot-showMultPanel", state.atrbot.showMultPanel);
+
+    // Swings
+    setChecked("swing-enabled", state.swing.enabled);
+    setCardActive("card-swing", state.swing.enabled);
+    setValue("swing-length", state.swing.swingLength);
+    setChecked("swing-show-zigzag", state.swing.showZigzag);
+    setChecked("swing-show-labels", state.swing.showLabels);
+
+    // BOS
+    setChecked("bos-enabled", state.bos.enabled);
+    setCardActive("card-bos", state.bos.enabled);
+    setChecked("bos-closeBreak", state.bos.closeBreak);
+    setChecked("bos-show-bos", state.bos.showBos);
+    setChecked("bos-show-choch", state.bos.showChoch);
+
+    // FVG
+    setChecked("fvg-enabled", state.fvg.enabled);
+    setCardActive("card-fvg", state.fvg.enabled);
+    setChecked("fvg-joinConsecutive", state.fvg.joinConsecutive);
+    setChecked("fvg-only-open", state.fvg.onlyOpen);
+
+    // OB
+    setChecked("ob-enabled", state.ob.enabled);
+    setCardActive("card-ob", state.ob.enabled);
+    setChecked("ob-closeMitigation", state.ob.closeMitigation);
+    setChecked("ob-only-open", state.ob.onlyOpen);
+    setChecked("ob-show-pct", state.ob.showPct);
+
+    // Liquidity
+    setChecked("liq-enabled", state.liquidity.enabled);
+    setCardActive("card-liq", state.liquidity.enabled);
+    setValue("liq-rangePercent", state.liquidity.rangePercent);
+    setChecked("liq-show-swept", state.liquidity.showSwept);
+    setChecked("liq-only-open", state.liquidity.onlyOpen);
+
+    // PHL
+    setChecked("phl-enabled", state.phl.enabled);
+    setCardActive("card-phl", state.phl.enabled);
+    setValue("phl-timeFrame", state.phl.timeFrame);
+
+    // Sessions
+    setChecked("sessions-enabled", state.sessions.enabled);
+    setCardActive("card-sessions", state.sessions.enabled);
+    setValue("sessions-session", state.sessions.session);
+    setValue("sessions-start", state.sessions.startTime);
+    setValue("sessions-end", state.sessions.endTime);
+
+    // Retracements
+    setChecked("retr-enabled", state.retracements.enabled);
+    setCardActive("card-retr", state.retracements.enabled);
+    setChecked("retr-show-eq", state.retracements.showEq);
+  }
+
+  // 0. ATRBot M1 Bindings
+  bindCheckbox("atrbot-enabled", state.atrbot, "enabled", recomputeAtrBot);
+  bindSelect("atrbot-maType", state.atrbot, "maType", recomputeAtrBot);
+  bindNumber("atrbot-cmoLength", state.atrbot, "cmoLength", recomputeAtrBot);
+  bindNumber("atrbot-maLength", state.atrbot, "maLength", recomputeAtrBot);
+  bindNumber("atrbot-atrLength", state.atrbot, "atrLength", recomputeAtrBot);
+  bindNumber("atrbot-baseAtrMult", state.atrbot, "baseAtrMult", recomputeAtrBot);
+  bindNumber("atrbot-percentileWindow", state.atrbot, "percentileWindow", recomputeAtrBot);
+  bindNumber("atrbot-minPeriods", state.atrbot, "minPeriods", recomputeAtrBot);
+  bindNumber("atrbot-adaptiveK", state.atrbot, "adaptiveK", recomputeAtrBot);
+  bindNumber("atrbot-liqSweepFilterPct", state.atrbot, "liqSweepFilterPct", recomputeAtrBot);
+  bindCheckbox("atrbot-showRibbon", state.atrbot, "showRibbon", recomputeAtrBot);
+  bindCheckbox("atrbot-showVidyaLine", state.atrbot, "showVidyaLine", recomputeAtrBot);
+  bindCheckbox("atrbot-showStopLine", state.atrbot, "showStopLine", recomputeAtrBot);
+  bindCheckbox("atrbot-showSignals", state.atrbot, "showSignals", recomputeAtrBot);
+  bindCheckbox("atrbot-showMultPanel", state.atrbot, "showMultPanel", recomputeAtrBot);
+
+  // 1. Swing Highs/Lows
+  bindCheckbox("swing-enabled", state.swing, "enabled", recomputeSwingVisuals);
+  bindNumber("swing-length", state.swing, "swingLength", () => {
+    recomputeSwingBase();
+    recomputeSwingVisuals();
+    recomputeBosChoch();
+    recomputeOb();
+    recomputeLiquidity();
+    recomputeRetracements();
+    recomputeAtrBot();
+  });
+  bindCheckbox("swing-show-zigzag", state.swing, "showZigzag", recomputeSwingVisuals);
+  bindCheckbox("swing-show-labels", state.swing, "showLabels", recomputeSwingVisuals);
+
+  // 2. BOS / CHOCH
+  bindCheckbox("bos-enabled", state.bos, "enabled", recomputeBosChoch);
+  bindCheckbox("bos-closeBreak", state.bos, "closeBreak", recomputeBosChoch);
+  bindCheckbox("bos-show-bos", state.bos, "showBos", recomputeBosChoch);
+  bindCheckbox("bos-show-choch", state.bos, "showChoch", recomputeBosChoch);
+
+  // 3. FVG
+  bindCheckbox("fvg-enabled", state.fvg, "enabled", recomputeFvg);
+  bindCheckbox("fvg-joinConsecutive", state.fvg, "joinConsecutive", recomputeFvg);
+  bindCheckbox("fvg-only-open", state.fvg, "onlyOpen", recomputeFvg);
+
+  // 4. Order Blocks
+  bindCheckbox("ob-enabled", state.ob, "enabled", recomputeOb);
+  bindCheckbox("ob-closeMitigation", state.ob, "closeMitigation", recomputeOb);
+  bindCheckbox("ob-only-open", state.ob, "onlyOpen", recomputeOb);
+  bindCheckbox("ob-show-pct", state.ob, "showPct", recomputeOb);
+
+  // 5. Liquidity
+  bindCheckbox("liq-enabled", state.liquidity, "enabled", recomputeLiquidity);
+  bindNumber("liq-rangePercent", state.liquidity, "rangePercent", recomputeLiquidity);
+  bindCheckbox("liq-show-swept", state.liquidity, "showSwept", recomputeLiquidity);
+  bindCheckbox("liq-only-open", state.liquidity, "onlyOpen", recomputeLiquidity);
+
+  // 6. Previous High/Low
+  bindCheckbox("phl-enabled", state.phl, "enabled", recomputePhl);
+  bindSelect("phl-timeFrame", state.phl, "timeFrame", recomputePhl);
+
+  // 7. Sessions
+  bindCheckbox("sessions-enabled", state.sessions, "enabled", recomputeSessions);
+  bindSelect("sessions-session", state.sessions, "session", () => {
+    document.getElementById("sessions-custom-row").style.display =
+      state.sessions.session === "Custom" ? "flex" : "none";
+    recomputeSessions();
+  });
+  bindText("sessions-start", state.sessions, "startTime", recomputeSessions);
+  bindText("sessions-end", state.sessions, "endTime", recomputeSessions);
+
+  // 8. Retracements
+  bindCheckbox("retr-enabled", state.retracements, "enabled", recomputeRetracements);
+  bindCheckbox("retr-show-eq", state.retracements, "showEq", recomputeRetracements);
+
+  // ---------------------------------------------------------------------
+  // Modal Interactions
+  // ---------------------------------------------------------------------
+  function openModal() {
+    syncSettingsUI();
+    settingsModal.classList.add("open");
+  }
+
+  function closeModal() {
+    settingsModal.classList.remove("open");
+  }
+
+  openSettingsBtn.addEventListener("click", openModal);
+  closeSettingsBtn.addEventListener("click", closeModal);
+  applySettingsBtn.addEventListener("click", () => {
+    saveSettingsToCache();
+    closeModal();
+    showToast("Đã lưu và áp dụng cài đặt SMC & ATRBot");
+  });
+
+  resetDefaultsBtn.addEventListener("click", () => {
+    state = JSON.parse(JSON.stringify(defaultState));
+    syncSettingsUI();
+    saveSettingsToCache();
+    recomputeAll();
+    showToast("Đã khôi phục cài đặt mặc định");
+  });
+
+  settingsModal.addEventListener("click", (e) => {
+    if (e.target === settingsModal) closeModal();
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (settingsModal.classList.contains("open")) closeModal();
+      if (symbolPopover.classList.contains("open")) symbolPopover.classList.remove("open");
+    }
+  });
+
+  forceReloadBtn.addEventListener("click", async () => {
+    forceReloadBtn.disabled = true;
+    try {
+      const cacheKey = `${SYMBOL}_${INTERVAL}_${TARGET_CANDLES}`;
+      await clearCachedKlines(cacheKey);
+      showToast(`Đang tải mới 15.000 nến ${SYMBOL} từ Binance Server...`);
+      await loadAndRender(true);
+      closeModal();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      forceReloadBtn.disabled = false;
+    }
+  });
+
+  fitChartBtn.addEventListener("click", () => {
+    chart.timeScale().fitContent();
+  });
+
+  // ---------------------------------------------------------------------
+  // Live WebSocket Ticker
+  // ---------------------------------------------------------------------
+  let ws = null;
+  let isWsActive = false;
+
+  function toggleWebSocket() {
+    if (isWsActive) stopWebSocket();
+    else startWebSocket();
+  }
+
+  function startWebSocket() {
+    if (ws) ws.close();
+    const streamName = `${SYMBOL.toLowerCase()}@kline_${INTERVAL}`;
+    ws = new WebSocket(`${WS_STREAM_BASE}/${streamName}`);
+
+    ws.onopen = () => {
+      isWsActive = true;
+      wsToggleBtn.classList.add("btn-primary");
+      wsBtnText.textContent = "Live ON";
+      showToast(`Đã kết nối Binance Live WebSocket (${streamName})`);
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.e !== "kline") return;
+        const k = data.k;
+
+        const candle = {
+          time: Math.floor(k.t / 1000),
+          open: Number(k.o),
+          high: Number(k.h),
+          low: Number(k.l),
+          close: Number(k.c),
+          volume: Number(k.v),
+        };
+
+        candleSeries.update(candle);
+        updateOhlcBar(candle);
+
+        if (candles.length > 0) {
+          const last = candles[candles.length - 1];
+          if (last.time === candle.time) {
+            candles[candles.length - 1] = candle;
+          } else if (candle.time > last.time) {
+            candles.push(candle);
+            if (candles.length > TARGET_CANDLES) candles.shift();
+          }
+        }
+
+        clearTimeout(ws._timer);
+        ws._timer = setTimeout(recomputeAll, 400);
+      } catch (err) {
+        console.error("WS error:", err);
+      }
+    };
+
+    ws.onerror = (err) => {
+      console.warn("WebSocket error:", err);
+      stopWebSocket();
+    };
+
+    ws.onclose = () => {
+      stopWebSocket();
+    };
+  }
+
+  function stopWebSocket() {
+    if (ws) {
+      ws.close();
+      ws = null;
+    }
+    isWsActive = false;
+    wsToggleBtn.classList.remove("btn-primary");
+    wsBtnText.textContent = "Live Ticker";
+  }
+
+  wsToggleBtn.addEventListener("click", toggleWebSocket);
+
+  // ---------------------------------------------------------------------
+  // Boot Pipeline
+  // ---------------------------------------------------------------------
+  async function loadAndRender(forceRefresh = false) {
+    try {
+      candles = await loadKlinesData(forceRefresh);
+      candleSeries.setData(candles);
+
+      resizeChart();
+      chart.timeScale().fitContent();
+
+      syncSettingsUI();
+      recomputeAll();
+
+      if (candles.length > 0) {
+        updateOhlcBar(candles[candles.length - 1]);
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("Lỗi tải dữ liệu: " + err.message, "error");
+      showToast("Lỗi tải dữ liệu: " + err.message);
+    }
+  }
+
+  resizeChart();
+  loadAndRender();
+})();
+</script>
+</body>
+</html>

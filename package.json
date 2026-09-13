@@ -1,0 +1,27 @@
+{
+  "name": "smcjs",
+  "version": "0.1.0",
+  "description": "JavaScript port of smart-money-concepts (joshyattridge/smart-money-concepts) - SMC indicators for Node, Bun and the browser",
+  "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "test": "node test/parity.mjs",
+    "demo": "node serve.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
