@@ -58,14 +58,17 @@ const structure = bosChoch(candles, swingHL);
 Run `npm run build` to (re)generate `dist/smc.umd.js` (global `SMC`) and
 `dist/smc.esm.js` from `src/` via esbuild.
 
-## Demo
+## Live Demo
+
+🚀 **Interactive Web Demo on GitHub Pages**: [https://btm2021.github.io/smcjs/](https://btm2021.github.io/smcjs/)
 
 `demo/index.html` is a self-contained chart viewer built on
 [TradingView Lightweight Charts](https://github.com/tradingview/lightweight-charts)
-v5. It loads 15,000 15-minute candles for **IMXUSDT** from the **Binance
-Futures** public API (paginated client-side, no server/API key needed) and
-lets you toggle every indicator above on/off with its parameters live from a
-sidebar.
+v5. It loads 15,000 15-minute candles from the **Binance Futures** public API
+(with instant symbol search, IndexedDB caching, and real-time WebSocket ticker)
+and provides full control over all SMC indicators plus **ATRBot M1** (Adaptive Volatility-Regime ATR Multiplier).
+
+To run locally:
 
 ```bash
 npm run demo
