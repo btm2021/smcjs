@@ -210,21 +210,25 @@
         if (smcEngine && typeof smcEngine.swing_highs_lows === 'function' && typeof smcEngine.liquidity === 'function') {
           try {
             const swingLen = 20;
-            const swings = smcEngine.swing_highs_lows(candles, swingLen);
-            const liqList = smcEngine.liquidity(candles, swings, 0.01) || [];
+            const swings = smcEngine.swing_highs_lows(candles, { swing_length: swingLen });
+            const liqList = smcEngine.liquidity(candles, swings, { rangePercent: 0.01 }) || [];
             // strict-causal zones: use the swing's OWN level (no future-averaged group level)
+            // NOTE: field names below (lowercase) must match the current JS port's output
+            // shape ({liquidity, level, end, swept}) — a prior PascalCase mismatch here
+            // (Liquidity/Level/End/Swept) silently made `zones` always empty, so this
+            // filter was a complete no-op regardless of `liqSweepFilterPct`.
             const zones = [];
             for (let i = 0; i < liqList.length; i++) {
               const item = liqList[i];
-              if (!item || item.Liquidity === null || isNaN(item.Liquidity)) continue;
+              if (!item || item.liquidity === null || isNaN(item.liquidity)) continue;
               const sw = swings[i];
-              if (!sw || sw.Level === null || isNaN(sw.Level)) continue;
+              if (!sw || sw.level === null || isNaN(sw.level)) continue;
               zones.push({
                 start: i + swingLen,
-                end: (item.End !== null && !isNaN(item.End)) ? item.End : 999999,
-                swept: (item.Swept !== null && !isNaN(item.Swept) && item.Swept > 0) ? item.Swept : null,
-                type: item.Liquidity === 1 ? 'BSL' : 'SSL',
-                level: sw.Level
+                end: (item.end !== null && !isNaN(item.end)) ? item.end : 999999,
+                swept: (item.swept !== null && !isNaN(item.swept) && item.swept > 0) ? item.swept : null,
+                type: item.liquidity === 1 ? 'BSL' : 'SSL',
+                level: sw.level
               });
             }
             for (let i = 0; i < n; i++) {

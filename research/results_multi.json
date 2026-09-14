@@ -1,0 +1,1973 @@
+{
+  "perModel": {
+    "M1": {
+      "name": "ATRBot gốc (mult cố định, market)",
+      "total": {
+        "signals": 4970,
+        "filled": 4970,
+        "wins": 3115,
+        "hit4": 2144,
+        "hit6": 1484,
+        "barsSum": 160323,
+        "barsCount": 3115
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 491,
+          "filled": 491,
+          "wins": 313,
+          "hit4": 226,
+          "hit6": 152,
+          "barsSum": 15162,
+          "barsCount": 313
+        },
+        "AVAXUSDT": {
+          "signals": 507,
+          "filled": 507,
+          "wins": 347,
+          "hit4": 259,
+          "hit6": 182,
+          "barsSum": 14938,
+          "barsCount": 347
+        },
+        "BNBUSDT": {
+          "signals": 513,
+          "filled": 513,
+          "wins": 257,
+          "hit4": 154,
+          "hit6": 98,
+          "barsSum": 18181,
+          "barsCount": 257
+        },
+        "BTCUSDT": {
+          "signals": 501,
+          "filled": 501,
+          "wins": 248,
+          "hit4": 144,
+          "hit6": 88,
+          "barsSum": 18188,
+          "barsCount": 248
+        },
+        "DOGEUSDT": {
+          "signals": 500,
+          "filled": 500,
+          "wins": 335,
+          "hit4": 234,
+          "hit6": 175,
+          "barsSum": 15658,
+          "barsCount": 335
+        },
+        "ETHUSDT": {
+          "signals": 490,
+          "filled": 490,
+          "wins": 289,
+          "hit4": 189,
+          "hit6": 125,
+          "barsSum": 16974,
+          "barsCount": 289
+        },
+        "IMXUSDT": {
+          "signals": 531,
+          "filled": 531,
+          "wins": 371,
+          "hit4": 279,
+          "hit6": 209,
+          "barsSum": 13590,
+          "barsCount": 371
+        },
+        "LINKUSDT": {
+          "signals": 492,
+          "filled": 492,
+          "wins": 334,
+          "hit4": 241,
+          "hit6": 168,
+          "barsSum": 13890,
+          "barsCount": 334
+        },
+        "SOLUSDT": {
+          "signals": 474,
+          "filled": 474,
+          "wins": 326,
+          "hit4": 229,
+          "hit6": 167,
+          "barsSum": 15388,
+          "barsCount": 326
+        },
+        "XRPUSDT": {
+          "signals": 471,
+          "filled": 471,
+          "wins": 295,
+          "hit4": 189,
+          "hit6": 120,
+          "barsSum": 18354,
+          "barsCount": 295
+        }
+      }
+    },
+    "M2": {
+      "name": "ATRBot M1 adaptive (market)",
+      "total": {
+        "signals": 3335,
+        "filled": 3335,
+        "wins": 2366,
+        "hit4": 1746,
+        "hit6": 1278,
+        "barsSum": 156834,
+        "barsCount": 2366
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 329,
+          "filled": 329,
+          "wins": 239,
+          "hit4": 187,
+          "hit6": 137,
+          "barsSum": 16479,
+          "barsCount": 239
+        },
+        "AVAXUSDT": {
+          "signals": 335,
+          "filled": 335,
+          "wins": 263,
+          "hit4": 206,
+          "hit6": 155,
+          "barsSum": 13620,
+          "barsCount": 263
+        },
+        "BNBUSDT": {
+          "signals": 343,
+          "filled": 343,
+          "wins": 197,
+          "hit4": 132,
+          "hit6": 96,
+          "barsSum": 16705,
+          "barsCount": 197
+        },
+        "BTCUSDT": {
+          "signals": 340,
+          "filled": 340,
+          "wins": 201,
+          "hit4": 122,
+          "hit6": 79,
+          "barsSum": 20128,
+          "barsCount": 201
+        },
+        "DOGEUSDT": {
+          "signals": 326,
+          "filled": 326,
+          "wins": 240,
+          "hit4": 186,
+          "hit6": 141,
+          "barsSum": 14148,
+          "barsCount": 240
+        },
+        "ETHUSDT": {
+          "signals": 340,
+          "filled": 340,
+          "wins": 229,
+          "hit4": 150,
+          "hit6": 108,
+          "barsSum": 17274,
+          "barsCount": 229
+        },
+        "IMXUSDT": {
+          "signals": 338,
+          "filled": 338,
+          "wins": 277,
+          "hit4": 222,
+          "hit6": 167,
+          "barsSum": 12512,
+          "barsCount": 277
+        },
+        "LINKUSDT": {
+          "signals": 342,
+          "filled": 342,
+          "wins": 258,
+          "hit4": 192,
+          "hit6": 143,
+          "barsSum": 15627,
+          "barsCount": 258
+        },
+        "SOLUSDT": {
+          "signals": 334,
+          "filled": 334,
+          "wins": 244,
+          "hit4": 193,
+          "hit6": 136,
+          "barsSum": 13560,
+          "barsCount": 244
+        },
+        "XRPUSDT": {
+          "signals": 308,
+          "filled": 308,
+          "wins": 218,
+          "hit4": 156,
+          "hit6": 116,
+          "barsSum": 16781,
+          "barsCount": 218
+        }
+      }
+    },
+    "M3": {
+      "name": "ATRBot M1 + xác nhận BOS/CHOCH gốc (market)",
+      "total": {
+        "signals": 479,
+        "filled": 479,
+        "wins": 401,
+        "hit4": 303,
+        "hit6": 227,
+        "barsSum": 26381,
+        "barsCount": 401
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 44,
+          "filled": 44,
+          "wins": 35,
+          "hit4": 25,
+          "hit6": 16,
+          "barsSum": 2189,
+          "barsCount": 35
+        },
+        "AVAXUSDT": {
+          "signals": 46,
+          "filled": 46,
+          "wins": 39,
+          "hit4": 31,
+          "hit6": 23,
+          "barsSum": 1976,
+          "barsCount": 39
+        },
+        "BNBUSDT": {
+          "signals": 58,
+          "filled": 58,
+          "wins": 41,
+          "hit4": 29,
+          "hit6": 21,
+          "barsSum": 3557,
+          "barsCount": 41
+        },
+        "BTCUSDT": {
+          "signals": 42,
+          "filled": 42,
+          "wins": 29,
+          "hit4": 19,
+          "hit6": 13,
+          "barsSum": 2898,
+          "barsCount": 29
+        },
+        "DOGEUSDT": {
+          "signals": 46,
+          "filled": 46,
+          "wins": 42,
+          "hit4": 36,
+          "hit6": 29,
+          "barsSum": 1992,
+          "barsCount": 42
+        },
+        "ETHUSDT": {
+          "signals": 60,
+          "filled": 60,
+          "wins": 55,
+          "hit4": 35,
+          "hit6": 28,
+          "barsSum": 4571,
+          "barsCount": 55
+        },
+        "IMXUSDT": {
+          "signals": 50,
+          "filled": 50,
+          "wins": 46,
+          "hit4": 35,
+          "hit6": 24,
+          "barsSum": 2289,
+          "barsCount": 46
+        },
+        "LINKUSDT": {
+          "signals": 43,
+          "filled": 43,
+          "wins": 38,
+          "hit4": 29,
+          "hit6": 24,
+          "barsSum": 1993,
+          "barsCount": 38
+        },
+        "SOLUSDT": {
+          "signals": 46,
+          "filled": 46,
+          "wins": 40,
+          "hit4": 35,
+          "hit6": 24,
+          "barsSum": 2178,
+          "barsCount": 40
+        },
+        "XRPUSDT": {
+          "signals": 44,
+          "filled": 44,
+          "wins": 36,
+          "hit4": 29,
+          "hit6": 25,
+          "barsSum": 2738,
+          "barsCount": 36
+        }
+      }
+    },
+    "M4": {
+      "name": "ATRBot trend + retest Order Block (limit)",
+      "total": {
+        "signals": 330,
+        "filled": 330,
+        "wins": 304,
+        "hit4": 272,
+        "hit6": 252,
+        "barsSum": 8411,
+        "barsCount": 304
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 29,
+          "filled": 29,
+          "wins": 28,
+          "hit4": 27,
+          "hit6": 25,
+          "barsSum": 426,
+          "barsCount": 28
+        },
+        "AVAXUSDT": {
+          "signals": 36,
+          "filled": 36,
+          "wins": 35,
+          "hit4": 31,
+          "hit6": 30,
+          "barsSum": 776,
+          "barsCount": 35
+        },
+        "BNBUSDT": {
+          "signals": 34,
+          "filled": 34,
+          "wins": 27,
+          "hit4": 24,
+          "hit6": 22,
+          "barsSum": 1129,
+          "barsCount": 27
+        },
+        "BTCUSDT": {
+          "signals": 45,
+          "filled": 45,
+          "wins": 37,
+          "hit4": 32,
+          "hit6": 25,
+          "barsSum": 1825,
+          "barsCount": 37
+        },
+        "DOGEUSDT": {
+          "signals": 29,
+          "filled": 29,
+          "wins": 28,
+          "hit4": 25,
+          "hit6": 23,
+          "barsSum": 449,
+          "barsCount": 28
+        },
+        "ETHUSDT": {
+          "signals": 24,
+          "filled": 24,
+          "wins": 22,
+          "hit4": 20,
+          "hit6": 19,
+          "barsSum": 1001,
+          "barsCount": 22
+        },
+        "IMXUSDT": {
+          "signals": 46,
+          "filled": 46,
+          "wins": 44,
+          "hit4": 41,
+          "hit6": 39,
+          "barsSum": 468,
+          "barsCount": 44
+        },
+        "LINKUSDT": {
+          "signals": 27,
+          "filled": 27,
+          "wins": 25,
+          "hit4": 22,
+          "hit6": 21,
+          "barsSum": 530,
+          "barsCount": 25
+        },
+        "SOLUSDT": {
+          "signals": 31,
+          "filled": 31,
+          "wins": 30,
+          "hit4": 26,
+          "hit6": 26,
+          "barsSum": 852,
+          "barsCount": 30
+        },
+        "XRPUSDT": {
+          "signals": 29,
+          "filled": 29,
+          "wins": 28,
+          "hit4": 24,
+          "hit6": 22,
+          "barsSum": 955,
+          "barsCount": 28
+        }
+      }
+    },
+    "M5": {
+      "name": "ATRBot trend + retest FVG (limit)",
+      "total": {
+        "signals": 100246,
+        "filled": 100246,
+        "wins": 19135,
+        "hit4": 9974,
+        "hit6": 6802,
+        "barsSum": 161288,
+        "barsCount": 19135
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 9303,
+          "filled": 9303,
+          "wins": 2003,
+          "hit4": 1025,
+          "hit6": 708,
+          "barsSum": 11897,
+          "barsCount": 2003
+        },
+        "AVAXUSDT": {
+          "signals": 10396,
+          "filled": 10396,
+          "wins": 2367,
+          "hit4": 1230,
+          "hit6": 843,
+          "barsSum": 14989,
+          "barsCount": 2367
+        },
+        "BNBUSDT": {
+          "signals": 10825,
+          "filled": 10825,
+          "wins": 1418,
+          "hit4": 745,
+          "hit6": 473,
+          "barsSum": 22870,
+          "barsCount": 1418
+        },
+        "BTCUSDT": {
+          "signals": 10345,
+          "filled": 10345,
+          "wins": 1176,
+          "hit4": 616,
+          "hit6": 385,
+          "barsSum": 26405,
+          "barsCount": 1176
+        },
+        "DOGEUSDT": {
+          "signals": 9725,
+          "filled": 9725,
+          "wins": 2129,
+          "hit4": 1122,
+          "hit6": 773,
+          "barsSum": 13023,
+          "barsCount": 2129
+        },
+        "ETHUSDT": {
+          "signals": 9666,
+          "filled": 9666,
+          "wins": 1566,
+          "hit4": 818,
+          "hit6": 564,
+          "barsSum": 15512,
+          "barsCount": 1566
+        },
+        "IMXUSDT": {
+          "signals": 10413,
+          "filled": 10413,
+          "wins": 2681,
+          "hit4": 1415,
+          "hit6": 995,
+          "barsSum": 12395,
+          "barsCount": 2681
+        },
+        "LINKUSDT": {
+          "signals": 10248,
+          "filled": 10248,
+          "wins": 2027,
+          "hit4": 1046,
+          "hit6": 717,
+          "barsSum": 14134,
+          "barsCount": 2027
+        },
+        "SOLUSDT": {
+          "signals": 9659,
+          "filled": 9659,
+          "wins": 2039,
+          "hit4": 1041,
+          "hit6": 712,
+          "barsSum": 14377,
+          "barsCount": 2039
+        },
+        "XRPUSDT": {
+          "signals": 9666,
+          "filled": 9666,
+          "wins": 1729,
+          "hit4": 916,
+          "hit6": 632,
+          "barsSum": 15686,
+          "barsCount": 1729
+        }
+      }
+    },
+    "M6": {
+      "name": "Liquidity Sweep + Reject (market, độc lập ATRBot)",
+      "total": {
+        "signals": 208,
+        "filled": 208,
+        "wins": 169,
+        "hit4": 136,
+        "hit6": 115,
+        "barsSum": 2100,
+        "barsCount": 169
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 20,
+          "filled": 20,
+          "wins": 17,
+          "hit4": 13,
+          "hit6": 12,
+          "barsSum": 163,
+          "barsCount": 17
+        },
+        "AVAXUSDT": {
+          "signals": 23,
+          "filled": 23,
+          "wins": 20,
+          "hit4": 18,
+          "hit6": 16,
+          "barsSum": 201,
+          "barsCount": 20
+        },
+        "BNBUSDT": {
+          "signals": 16,
+          "filled": 16,
+          "wins": 13,
+          "hit4": 12,
+          "hit6": 11,
+          "barsSum": 53,
+          "barsCount": 13
+        },
+        "BTCUSDT": {
+          "signals": 11,
+          "filled": 11,
+          "wins": 9,
+          "hit4": 7,
+          "hit6": 3,
+          "barsSum": 182,
+          "barsCount": 9
+        },
+        "DOGEUSDT": {
+          "signals": 21,
+          "filled": 21,
+          "wins": 18,
+          "hit4": 16,
+          "hit6": 14,
+          "barsSum": 76,
+          "barsCount": 18
+        },
+        "ETHUSDT": {
+          "signals": 34,
+          "filled": 34,
+          "wins": 25,
+          "hit4": 16,
+          "hit6": 11,
+          "barsSum": 538,
+          "barsCount": 25
+        },
+        "IMXUSDT": {
+          "signals": 11,
+          "filled": 11,
+          "wins": 10,
+          "hit4": 10,
+          "hit6": 8,
+          "barsSum": 169,
+          "barsCount": 10
+        },
+        "LINKUSDT": {
+          "signals": 31,
+          "filled": 31,
+          "wins": 26,
+          "hit4": 20,
+          "hit6": 18,
+          "barsSum": 382,
+          "barsCount": 26
+        },
+        "SOLUSDT": {
+          "signals": 22,
+          "filled": 22,
+          "wins": 15,
+          "hit4": 12,
+          "hit6": 10,
+          "barsSum": 170,
+          "barsCount": 15
+        },
+        "XRPUSDT": {
+          "signals": 19,
+          "filled": 19,
+          "wins": 16,
+          "hit4": 12,
+          "hit6": 12,
+          "barsSum": 166,
+          "barsCount": 16
+        }
+      }
+    },
+    "M7": {
+      "name": "BOS/CHOCH gốc breakout + chờ retest mức phá (limit)",
+      "total": {
+        "signals": 11938,
+        "filled": 10629,
+        "wins": 4262,
+        "hit4": 1694,
+        "hit6": 720,
+        "barsSum": 76201,
+        "barsCount": 4262
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 1188,
+          "filled": 1064,
+          "wins": 472,
+          "hit4": 187,
+          "hit6": 78,
+          "barsSum": 7669,
+          "barsCount": 472
+        },
+        "AVAXUSDT": {
+          "signals": 1233,
+          "filled": 1079,
+          "wins": 489,
+          "hit4": 220,
+          "hit6": 84,
+          "barsSum": 8320,
+          "barsCount": 489
+        },
+        "BNBUSDT": {
+          "signals": 1206,
+          "filled": 1082,
+          "wins": 274,
+          "hit4": 84,
+          "hit6": 27,
+          "barsSum": 5779,
+          "barsCount": 274
+        },
+        "BTCUSDT": {
+          "signals": 1180,
+          "filled": 1045,
+          "wins": 233,
+          "hit4": 65,
+          "hit6": 24,
+          "barsSum": 4842,
+          "barsCount": 233
+        },
+        "DOGEUSDT": {
+          "signals": 1166,
+          "filled": 1046,
+          "wins": 494,
+          "hit4": 210,
+          "hit6": 105,
+          "barsSum": 8446,
+          "barsCount": 494
+        },
+        "ETHUSDT": {
+          "signals": 1165,
+          "filled": 1034,
+          "wins": 356,
+          "hit4": 102,
+          "hit6": 40,
+          "barsSum": 6905,
+          "barsCount": 356
+        },
+        "IMXUSDT": {
+          "signals": 1183,
+          "filled": 1061,
+          "wins": 606,
+          "hit4": 290,
+          "hit6": 132,
+          "barsSum": 10058,
+          "barsCount": 606
+        },
+        "LINKUSDT": {
+          "signals": 1211,
+          "filled": 1086,
+          "wins": 467,
+          "hit4": 188,
+          "hit6": 83,
+          "barsSum": 8950,
+          "barsCount": 467
+        },
+        "SOLUSDT": {
+          "signals": 1221,
+          "filled": 1085,
+          "wins": 495,
+          "hit4": 200,
+          "hit6": 85,
+          "barsSum": 8419,
+          "barsCount": 495
+        },
+        "XRPUSDT": {
+          "signals": 1185,
+          "filled": 1047,
+          "wins": 376,
+          "hit4": 148,
+          "hit6": 62,
+          "barsSum": 6813,
+          "barsCount": 376
+        }
+      }
+    },
+    "M8": {
+      "name": "Multi-entry DCA: OB+FVG hợp lưu, 2 lệnh (limit)",
+      "total": {
+        "signals": 77,
+        "filled": 77,
+        "wins": 66,
+        "hit4": 59,
+        "hit6": 49,
+        "barsSum": 2556,
+        "barsCount": 66
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 5,
+          "filled": 5,
+          "wins": 5,
+          "hit4": 5,
+          "hit6": 4,
+          "barsSum": 76,
+          "barsCount": 5
+        },
+        "AVAXUSDT": {
+          "signals": 4,
+          "filled": 4,
+          "wins": 4,
+          "hit4": 3,
+          "hit6": 3,
+          "barsSum": 211,
+          "barsCount": 4
+        },
+        "BNBUSDT": {
+          "signals": 11,
+          "filled": 11,
+          "wins": 8,
+          "hit4": 7,
+          "hit6": 6,
+          "barsSum": 391,
+          "barsCount": 8
+        },
+        "BTCUSDT": {
+          "signals": 17,
+          "filled": 17,
+          "wins": 12,
+          "hit4": 11,
+          "hit6": 8,
+          "barsSum": 714,
+          "barsCount": 12
+        },
+        "DOGEUSDT": {
+          "signals": 4,
+          "filled": 4,
+          "wins": 3,
+          "hit4": 3,
+          "hit6": 2,
+          "barsSum": 54,
+          "barsCount": 3
+        },
+        "ETHUSDT": {
+          "signals": 8,
+          "filled": 8,
+          "wins": 7,
+          "hit4": 6,
+          "hit6": 6,
+          "barsSum": 336,
+          "barsCount": 7
+        },
+        "IMXUSDT": {
+          "signals": 4,
+          "filled": 4,
+          "wins": 4,
+          "hit4": 4,
+          "hit6": 3,
+          "barsSum": 64,
+          "barsCount": 4
+        },
+        "LINKUSDT": {
+          "signals": 6,
+          "filled": 6,
+          "wins": 6,
+          "hit4": 5,
+          "hit6": 4,
+          "barsSum": 231,
+          "barsCount": 6
+        },
+        "SOLUSDT": {
+          "signals": 5,
+          "filled": 5,
+          "wins": 5,
+          "hit4": 4,
+          "hit6": 4,
+          "barsSum": 101,
+          "barsCount": 5
+        },
+        "XRPUSDT": {
+          "signals": 13,
+          "filled": 13,
+          "wins": 12,
+          "hit4": 11,
+          "hit6": 9,
+          "barsSum": 378,
+          "barsCount": 12
+        }
+      }
+    },
+    "M9": {
+      "name": "Retracement 50% pullback theo trend ATRBot (market)",
+      "total": {
+        "signals": 21699,
+        "filled": 21699,
+        "wins": 11024,
+        "hit4": 7820,
+        "hit6": 5722,
+        "barsSum": 748380,
+        "barsCount": 11024
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 2205,
+          "filled": 2205,
+          "wins": 1168,
+          "hit4": 881,
+          "hit6": 665,
+          "barsSum": 68416,
+          "barsCount": 1168
+        },
+        "AVAXUSDT": {
+          "signals": 2186,
+          "filled": 2186,
+          "wins": 1242,
+          "hit4": 919,
+          "hit6": 725,
+          "barsSum": 67852,
+          "barsCount": 1242
+        },
+        "BNBUSDT": {
+          "signals": 2216,
+          "filled": 2216,
+          "wins": 915,
+          "hit4": 521,
+          "hit6": 336,
+          "barsSum": 96592,
+          "barsCount": 915
+        },
+        "BTCUSDT": {
+          "signals": 2093,
+          "filled": 2093,
+          "wins": 834,
+          "hit4": 500,
+          "hit6": 311,
+          "barsSum": 79876,
+          "barsCount": 834
+        },
+        "DOGEUSDT": {
+          "signals": 2216,
+          "filled": 2216,
+          "wins": 1146,
+          "hit4": 837,
+          "hit6": 642,
+          "barsSum": 69741,
+          "barsCount": 1146
+        },
+        "ETHUSDT": {
+          "signals": 2150,
+          "filled": 2150,
+          "wins": 1043,
+          "hit4": 734,
+          "hit6": 471,
+          "barsSum": 82407,
+          "barsCount": 1043
+        },
+        "IMXUSDT": {
+          "signals": 2106,
+          "filled": 2106,
+          "wins": 1266,
+          "hit4": 984,
+          "hit6": 754,
+          "barsSum": 61069,
+          "barsCount": 1266
+        },
+        "LINKUSDT": {
+          "signals": 2092,
+          "filled": 2092,
+          "wins": 1089,
+          "hit4": 791,
+          "hit6": 585,
+          "barsSum": 64072,
+          "barsCount": 1089
+        },
+        "SOLUSDT": {
+          "signals": 2208,
+          "filled": 2208,
+          "wins": 1195,
+          "hit4": 864,
+          "hit6": 650,
+          "barsSum": 68703,
+          "barsCount": 1195
+        },
+        "XRPUSDT": {
+          "signals": 2227,
+          "filled": 2227,
+          "wins": 1126,
+          "hit4": 789,
+          "hit6": 583,
+          "barsSum": 89652,
+          "barsCount": 1126
+        }
+      }
+    },
+    "M10": {
+      "name": "ATRBot M1 + xác nhận StatefulBosChoch (market)",
+      "total": {
+        "signals": 470,
+        "filled": 470,
+        "wins": 392,
+        "hit4": 296,
+        "hit6": 222,
+        "barsSum": 25192,
+        "barsCount": 392
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 40,
+          "filled": 40,
+          "wins": 31,
+          "hit4": 22,
+          "hit6": 15,
+          "barsSum": 1917,
+          "barsCount": 31
+        },
+        "AVAXUSDT": {
+          "signals": 46,
+          "filled": 46,
+          "wins": 39,
+          "hit4": 31,
+          "hit6": 22,
+          "barsSum": 1728,
+          "barsCount": 39
+        },
+        "BNBUSDT": {
+          "signals": 58,
+          "filled": 58,
+          "wins": 41,
+          "hit4": 29,
+          "hit6": 21,
+          "barsSum": 3557,
+          "barsCount": 41
+        },
+        "BTCUSDT": {
+          "signals": 40,
+          "filled": 40,
+          "wins": 27,
+          "hit4": 18,
+          "hit6": 13,
+          "barsSum": 2584,
+          "barsCount": 27
+        },
+        "DOGEUSDT": {
+          "signals": 45,
+          "filled": 45,
+          "wins": 41,
+          "hit4": 35,
+          "hit6": 29,
+          "barsSum": 1968,
+          "barsCount": 41
+        },
+        "ETHUSDT": {
+          "signals": 62,
+          "filled": 62,
+          "wins": 57,
+          "hit4": 37,
+          "hit6": 30,
+          "barsSum": 4731,
+          "barsCount": 57
+        },
+        "IMXUSDT": {
+          "signals": 49,
+          "filled": 49,
+          "wins": 44,
+          "hit4": 33,
+          "hit6": 22,
+          "barsSum": 2125,
+          "barsCount": 44
+        },
+        "LINKUSDT": {
+          "signals": 44,
+          "filled": 44,
+          "wins": 39,
+          "hit4": 30,
+          "hit6": 24,
+          "barsSum": 2023,
+          "barsCount": 39
+        },
+        "SOLUSDT": {
+          "signals": 44,
+          "filled": 44,
+          "wins": 39,
+          "hit4": 34,
+          "hit6": 23,
+          "barsSum": 2095,
+          "barsCount": 39
+        },
+        "XRPUSDT": {
+          "signals": 42,
+          "filled": 42,
+          "wins": 34,
+          "hit4": 27,
+          "hit6": 23,
+          "barsSum": 2464,
+          "barsCount": 34
+        }
+      }
+    },
+    "M11": {
+      "name": "StatefulBosChoch breakout + chờ retest mức phá (limit)",
+      "total": {
+        "signals": 11614,
+        "filled": 10310,
+        "wins": 4208,
+        "hit4": 1690,
+        "hit6": 721,
+        "barsSum": 75042,
+        "barsCount": 4208
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 1158,
+          "filled": 1038,
+          "wins": 469,
+          "hit4": 186,
+          "hit6": 79,
+          "barsSum": 7659,
+          "barsCount": 469
+        },
+        "AVAXUSDT": {
+          "signals": 1202,
+          "filled": 1047,
+          "wins": 484,
+          "hit4": 219,
+          "hit6": 84,
+          "barsSum": 8292,
+          "barsCount": 484
+        },
+        "BNBUSDT": {
+          "signals": 1166,
+          "filled": 1041,
+          "wins": 270,
+          "hit4": 83,
+          "hit6": 26,
+          "barsSum": 5702,
+          "barsCount": 270
+        },
+        "BTCUSDT": {
+          "signals": 1142,
+          "filled": 1006,
+          "wins": 226,
+          "hit4": 63,
+          "hit6": 23,
+          "barsSum": 4696,
+          "barsCount": 226
+        },
+        "DOGEUSDT": {
+          "signals": 1140,
+          "filled": 1024,
+          "wins": 486,
+          "hit4": 210,
+          "hit6": 106,
+          "barsSum": 8345,
+          "barsCount": 486
+        },
+        "ETHUSDT": {
+          "signals": 1129,
+          "filled": 999,
+          "wins": 357,
+          "hit4": 104,
+          "hit6": 40,
+          "barsSum": 6902,
+          "barsCount": 357
+        },
+        "IMXUSDT": {
+          "signals": 1154,
+          "filled": 1030,
+          "wins": 593,
+          "hit4": 288,
+          "hit6": 133,
+          "barsSum": 9631,
+          "barsCount": 593
+        },
+        "LINKUSDT": {
+          "signals": 1183,
+          "filled": 1057,
+          "wins": 460,
+          "hit4": 191,
+          "hit6": 83,
+          "barsSum": 8727,
+          "barsCount": 460
+        },
+        "SOLUSDT": {
+          "signals": 1199,
+          "filled": 1064,
+          "wins": 495,
+          "hit4": 205,
+          "hit6": 89,
+          "barsSum": 8399,
+          "barsCount": 495
+        },
+        "XRPUSDT": {
+          "signals": 1141,
+          "filled": 1004,
+          "wins": 368,
+          "hit4": 141,
+          "hit6": 58,
+          "barsSum": 6689,
+          "barsCount": 368
+        }
+      }
+    },
+    "M12": {
+      "name": "ATRBot trend + retest Order Block (Dynamic Swing, limit)",
+      "total": {
+        "signals": 260,
+        "filled": 260,
+        "wins": 237,
+        "hit4": 220,
+        "hit6": 203,
+        "barsSum": 7456,
+        "barsCount": 237
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 23,
+          "filled": 23,
+          "wins": 22,
+          "hit4": 21,
+          "hit6": 19,
+          "barsSum": 392,
+          "barsCount": 22
+        },
+        "AVAXUSDT": {
+          "signals": 28,
+          "filled": 28,
+          "wins": 27,
+          "hit4": 25,
+          "hit6": 24,
+          "barsSum": 635,
+          "barsCount": 27
+        },
+        "BNBUSDT": {
+          "signals": 27,
+          "filled": 27,
+          "wins": 22,
+          "hit4": 19,
+          "hit6": 17,
+          "barsSum": 1075,
+          "barsCount": 22
+        },
+        "BTCUSDT": {
+          "signals": 41,
+          "filled": 41,
+          "wins": 32,
+          "hit4": 29,
+          "hit6": 22,
+          "barsSum": 1515,
+          "barsCount": 32
+        },
+        "DOGEUSDT": {
+          "signals": 23,
+          "filled": 23,
+          "wins": 22,
+          "hit4": 21,
+          "hit6": 20,
+          "barsSum": 601,
+          "barsCount": 22
+        },
+        "ETHUSDT": {
+          "signals": 19,
+          "filled": 19,
+          "wins": 18,
+          "hit4": 17,
+          "hit6": 15,
+          "barsSum": 873,
+          "barsCount": 18
+        },
+        "IMXUSDT": {
+          "signals": 30,
+          "filled": 30,
+          "wins": 28,
+          "hit4": 27,
+          "hit6": 27,
+          "barsSum": 333,
+          "barsCount": 28
+        },
+        "LINKUSDT": {
+          "signals": 20,
+          "filled": 20,
+          "wins": 18,
+          "hit4": 17,
+          "hit6": 17,
+          "barsSum": 465,
+          "barsCount": 18
+        },
+        "SOLUSDT": {
+          "signals": 24,
+          "filled": 24,
+          "wins": 23,
+          "hit4": 21,
+          "hit6": 21,
+          "barsSum": 706,
+          "barsCount": 23
+        },
+        "XRPUSDT": {
+          "signals": 25,
+          "filled": 25,
+          "wins": 25,
+          "hit4": 23,
+          "hit6": 21,
+          "barsSum": 861,
+          "barsCount": 25
+        }
+      }
+    },
+    "M13": {
+      "name": "BOS/CHOCH breakout + retest (Dynamic Swing, limit)",
+      "total": {
+        "signals": 6989,
+        "filled": 6162,
+        "wins": 2617,
+        "hit4": 1106,
+        "hit6": 493,
+        "barsSum": 45022,
+        "barsCount": 2617
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 713,
+          "filled": 633,
+          "wins": 302,
+          "hit4": 122,
+          "hit6": 51,
+          "barsSum": 4946,
+          "barsCount": 302
+        },
+        "AVAXUSDT": {
+          "signals": 724,
+          "filled": 618,
+          "wins": 291,
+          "hit4": 136,
+          "hit6": 56,
+          "barsSum": 5058,
+          "barsCount": 291
+        },
+        "BNBUSDT": {
+          "signals": 699,
+          "filled": 616,
+          "wins": 173,
+          "hit4": 59,
+          "hit6": 22,
+          "barsSum": 3326,
+          "barsCount": 173
+        },
+        "BTCUSDT": {
+          "signals": 704,
+          "filled": 609,
+          "wins": 132,
+          "hit4": 42,
+          "hit6": 18,
+          "barsSum": 2667,
+          "barsCount": 132
+        },
+        "DOGEUSDT": {
+          "signals": 677,
+          "filled": 598,
+          "wins": 287,
+          "hit4": 131,
+          "hit6": 69,
+          "barsSum": 4852,
+          "barsCount": 287
+        },
+        "ETHUSDT": {
+          "signals": 714,
+          "filled": 622,
+          "wins": 229,
+          "hit4": 69,
+          "hit6": 30,
+          "barsSum": 4254,
+          "barsCount": 229
+        },
+        "IMXUSDT": {
+          "signals": 680,
+          "filled": 617,
+          "wins": 362,
+          "hit4": 180,
+          "hit6": 85,
+          "barsSum": 5658,
+          "barsCount": 362
+        },
+        "LINKUSDT": {
+          "signals": 695,
+          "filled": 612,
+          "wins": 287,
+          "hit4": 125,
+          "hit6": 57,
+          "barsSum": 5006,
+          "barsCount": 287
+        },
+        "SOLUSDT": {
+          "signals": 710,
+          "filled": 631,
+          "wins": 304,
+          "hit4": 139,
+          "hit6": 57,
+          "barsSum": 5010,
+          "barsCount": 304
+        },
+        "XRPUSDT": {
+          "signals": 673,
+          "filled": 606,
+          "wins": 250,
+          "hit4": 103,
+          "hit6": 48,
+          "barsSum": 4245,
+          "barsCount": 250
+        }
+      }
+    },
+    "M14": {
+      "name": "Liquidity Sweep + Reject (Dynamic Swing, market)",
+      "total": {
+        "signals": 147,
+        "filled": 147,
+        "wins": 122,
+        "hit4": 102,
+        "hit6": 82,
+        "barsSum": 1389,
+        "barsCount": 122
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 14,
+          "filled": 14,
+          "wins": 13,
+          "hit4": 11,
+          "hit6": 10,
+          "barsSum": 68,
+          "barsCount": 13
+        },
+        "AVAXUSDT": {
+          "signals": 18,
+          "filled": 18,
+          "wins": 15,
+          "hit4": 13,
+          "hit6": 11,
+          "barsSum": 142,
+          "barsCount": 15
+        },
+        "BNBUSDT": {
+          "signals": 8,
+          "filled": 8,
+          "wins": 7,
+          "hit4": 7,
+          "hit6": 6,
+          "barsSum": 14,
+          "barsCount": 7
+        },
+        "BTCUSDT": {
+          "signals": 10,
+          "filled": 10,
+          "wins": 8,
+          "hit4": 7,
+          "hit6": 2,
+          "barsSum": 204,
+          "barsCount": 8
+        },
+        "DOGEUSDT": {
+          "signals": 15,
+          "filled": 15,
+          "wins": 13,
+          "hit4": 12,
+          "hit6": 10,
+          "barsSum": 79,
+          "barsCount": 13
+        },
+        "ETHUSDT": {
+          "signals": 25,
+          "filled": 25,
+          "wins": 18,
+          "hit4": 12,
+          "hit6": 9,
+          "barsSum": 368,
+          "barsCount": 18
+        },
+        "IMXUSDT": {
+          "signals": 8,
+          "filled": 8,
+          "wins": 7,
+          "hit4": 7,
+          "hit6": 6,
+          "barsSum": 120,
+          "barsCount": 7
+        },
+        "LINKUSDT": {
+          "signals": 20,
+          "filled": 20,
+          "wins": 17,
+          "hit4": 14,
+          "hit6": 12,
+          "barsSum": 123,
+          "barsCount": 17
+        },
+        "SOLUSDT": {
+          "signals": 15,
+          "filled": 15,
+          "wins": 12,
+          "hit4": 10,
+          "hit6": 7,
+          "barsSum": 134,
+          "barsCount": 12
+        },
+        "XRPUSDT": {
+          "signals": 14,
+          "filled": 14,
+          "wins": 12,
+          "hit4": 9,
+          "hit6": 9,
+          "barsSum": 137,
+          "barsCount": 12
+        }
+      }
+    },
+    "M15": {
+      "name": "Breaker Block retest (limit, độc lập ATRBot)",
+      "total": {
+        "signals": 176,
+        "filled": 50,
+        "wins": 50,
+        "hit4": 46,
+        "hit6": 36,
+        "barsSum": 265,
+        "barsCount": 50
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 12,
+          "filled": 6,
+          "wins": 6,
+          "hit4": 6,
+          "hit6": 4,
+          "barsSum": 6,
+          "barsCount": 6
+        },
+        "AVAXUSDT": {
+          "signals": 21,
+          "filled": 7,
+          "wins": 7,
+          "hit4": 7,
+          "hit6": 5,
+          "barsSum": 30,
+          "barsCount": 7
+        },
+        "BNBUSDT": {
+          "signals": 17,
+          "filled": 2,
+          "wins": 2,
+          "hit4": 2,
+          "hit6": 0,
+          "barsSum": 19,
+          "barsCount": 2
+        },
+        "BTCUSDT": {
+          "signals": 25,
+          "filled": 6,
+          "wins": 6,
+          "hit4": 6,
+          "hit6": 5,
+          "barsSum": 122,
+          "barsCount": 6
+        },
+        "DOGEUSDT": {
+          "signals": 13,
+          "filled": 5,
+          "wins": 5,
+          "hit4": 5,
+          "hit6": 5,
+          "barsSum": 22,
+          "barsCount": 5
+        },
+        "ETHUSDT": {
+          "signals": 17,
+          "filled": 5,
+          "wins": 5,
+          "hit4": 4,
+          "hit6": 2,
+          "barsSum": 7,
+          "barsCount": 5
+        },
+        "IMXUSDT": {
+          "signals": 20,
+          "filled": 6,
+          "wins": 6,
+          "hit4": 5,
+          "hit6": 5,
+          "barsSum": 9,
+          "barsCount": 6
+        },
+        "LINKUSDT": {
+          "signals": 11,
+          "filled": 1,
+          "wins": 1,
+          "hit4": 1,
+          "hit6": 0,
+          "barsSum": 18,
+          "barsCount": 1
+        },
+        "SOLUSDT": {
+          "signals": 18,
+          "filled": 5,
+          "wins": 5,
+          "hit4": 4,
+          "hit6": 4,
+          "barsSum": 8,
+          "barsCount": 5
+        },
+        "XRPUSDT": {
+          "signals": 22,
+          "filled": 7,
+          "wins": 7,
+          "hit4": 6,
+          "hit6": 6,
+          "barsSum": 24,
+          "barsCount": 7
+        }
+      }
+    },
+    "M16": {
+      "name": "ATRBot M1 + lọc khoảng cách Liquidity built-in (market)",
+      "total": {
+        "signals": 1881,
+        "filled": 1881,
+        "wins": 1607,
+        "hit4": 1364,
+        "hit6": 1082,
+        "barsSum": 141429,
+        "barsCount": 1607
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 215,
+          "filled": 215,
+          "wins": 181,
+          "hit4": 158,
+          "hit6": 120,
+          "barsSum": 15331,
+          "barsCount": 181
+        },
+        "AVAXUSDT": {
+          "signals": 214,
+          "filled": 214,
+          "wins": 186,
+          "hit4": 159,
+          "hit6": 123,
+          "barsSum": 12284,
+          "barsCount": 186
+        },
+        "BNBUSDT": {
+          "signals": 131,
+          "filled": 131,
+          "wins": 108,
+          "hit4": 93,
+          "hit6": 75,
+          "barsSum": 10317,
+          "barsCount": 108
+        },
+        "BTCUSDT": {
+          "signals": 115,
+          "filled": 115,
+          "wins": 93,
+          "hit4": 75,
+          "hit6": 53,
+          "barsSum": 17708,
+          "barsCount": 93
+        },
+        "DOGEUSDT": {
+          "signals": 206,
+          "filled": 206,
+          "wins": 177,
+          "hit4": 155,
+          "hit6": 130,
+          "barsSum": 14773,
+          "barsCount": 177
+        },
+        "ETHUSDT": {
+          "signals": 164,
+          "filled": 164,
+          "wins": 140,
+          "hit4": 109,
+          "hit6": 93,
+          "barsSum": 14478,
+          "barsCount": 140
+        },
+        "IMXUSDT": {
+          "signals": 261,
+          "filled": 261,
+          "wins": 229,
+          "hit4": 197,
+          "hit6": 156,
+          "barsSum": 12283,
+          "barsCount": 229
+        },
+        "LINKUSDT": {
+          "signals": 200,
+          "filled": 200,
+          "wins": 175,
+          "hit4": 151,
+          "hit6": 124,
+          "barsSum": 13615,
+          "barsCount": 175
+        },
+        "SOLUSDT": {
+          "signals": 200,
+          "filled": 200,
+          "wins": 171,
+          "hit4": 147,
+          "hit6": 110,
+          "barsSum": 11324,
+          "barsCount": 171
+        },
+        "XRPUSDT": {
+          "signals": 175,
+          "filled": 175,
+          "wins": 147,
+          "hit4": 120,
+          "hit6": 98,
+          "barsSum": 19316,
+          "barsCount": 147
+        }
+      }
+    },
+    "M17": {
+      "name": "ATRBot M1 chỉ trong phiên London+NY (market)",
+      "total": {
+        "signals": 2267,
+        "filled": 2267,
+        "wins": 1593,
+        "hit4": 1188,
+        "hit6": 865,
+        "barsSum": 107835,
+        "barsCount": 1593
+      },
+      "bySymbol": {
+        "ADAUSDT": {
+          "signals": 223,
+          "filled": 223,
+          "wins": 161,
+          "hit4": 120,
+          "hit6": 86,
+          "barsSum": 11776,
+          "barsCount": 161
+        },
+        "AVAXUSDT": {
+          "signals": 212,
+          "filled": 212,
+          "wins": 170,
+          "hit4": 133,
+          "hit6": 101,
+          "barsSum": 8359,
+          "barsCount": 170
+        },
+        "BNBUSDT": {
+          "signals": 236,
+          "filled": 236,
+          "wins": 133,
+          "hit4": 93,
+          "hit6": 65,
+          "barsSum": 12133,
+          "barsCount": 133
+        },
+        "BTCUSDT": {
+          "signals": 244,
+          "filled": 244,
+          "wins": 147,
+          "hit4": 88,
+          "hit6": 55,
+          "barsSum": 15652,
+          "barsCount": 147
+        },
+        "DOGEUSDT": {
+          "signals": 219,
+          "filled": 219,
+          "wins": 153,
+          "hit4": 117,
+          "hit6": 91,
+          "barsSum": 8071,
+          "barsCount": 153
+        },
+        "ETHUSDT": {
+          "signals": 235,
+          "filled": 235,
+          "wins": 155,
+          "hit4": 106,
+          "hit6": 75,
+          "barsSum": 10802,
+          "barsCount": 155
+        },
+        "IMXUSDT": {
+          "signals": 219,
+          "filled": 219,
+          "wins": 182,
+          "hit4": 144,
+          "hit6": 109,
+          "barsSum": 9090,
+          "barsCount": 182
+        },
+        "LINKUSDT": {
+          "signals": 236,
+          "filled": 236,
+          "wins": 176,
+          "hit4": 140,
+          "hit6": 102,
+          "barsSum": 10991,
+          "barsCount": 176
+        },
+        "SOLUSDT": {
+          "signals": 215,
+          "filled": 215,
+          "wins": 160,
+          "hit4": 129,
+          "hit6": 95,
+          "barsSum": 8769,
+          "barsCount": 160
+        },
+        "XRPUSDT": {
+          "signals": 228,
+          "filled": 228,
+          "wins": 156,
+          "hit4": 118,
+          "hit6": 86,
+          "barsSum": 12192,
+          "barsCount": 156
+        }
+      }
+    }
+  },
+  "summaryRows": [
+    {
+      "id": "M1",
+      "name": "ATRBot gốc (mult cố định, market)",
+      "signals": 4970,
+      "filled": 4970,
+      "fillRate": 100,
+      "winRate": 62.676056338028175,
+      "hit4Rate": 43.138832997987926,
+      "hit6Rate": 29.859154929577464,
+      "avgBars": 51.468057784911714
+    },
+    {
+      "id": "M2",
+      "name": "ATRBot M1 adaptive (market)",
+      "signals": 3335,
+      "filled": 3335,
+      "fillRate": 100,
+      "winRate": 70.94452773613193,
+      "hit4Rate": 52.353823088455776,
+      "hit6Rate": 38.3208395802099,
+      "avgBars": 66.2865595942519
+    },
+    {
+      "id": "M3",
+      "name": "ATRBot M1 + xác nhận BOS/CHOCH gốc (market)",
+      "signals": 479,
+      "filled": 479,
+      "fillRate": 100,
+      "winRate": 83.7160751565762,
+      "hit4Rate": 63.25678496868476,
+      "hit6Rate": 47.390396659707726,
+      "avgBars": 65.78802992518703
+    },
+    {
+      "id": "M4",
+      "name": "ATRBot trend + retest Order Block (limit)",
+      "signals": 330,
+      "filled": 330,
+      "fillRate": 100,
+      "winRate": 92.12121212121212,
+      "hit4Rate": 82.42424242424242,
+      "hit6Rate": 76.36363636363637,
+      "avgBars": 27.667763157894736
+    },
+    {
+      "id": "M5",
+      "name": "ATRBot trend + retest FVG (limit)",
+      "signals": 100246,
+      "filled": 100246,
+      "fillRate": 100,
+      "winRate": 19.088043413203522,
+      "hit4Rate": 9.949524170540471,
+      "hit6Rate": 6.785308141970751,
+      "avgBars": 8.428952181865691
+    },
+    {
+      "id": "M6",
+      "name": "Liquidity Sweep + Reject (market, độc lập ATRBot)",
+      "signals": 208,
+      "filled": 208,
+      "fillRate": 100,
+      "winRate": 81.25,
+      "hit4Rate": 65.38461538461539,
+      "hit6Rate": 55.28846153846154,
+      "avgBars": 12.42603550295858
+    },
+    {
+      "id": "M7",
+      "name": "BOS/CHOCH gốc breakout + chờ retest mức phá (limit)",
+      "signals": 11938,
+      "filled": 10629,
+      "fillRate": 89.03501424024125,
+      "winRate": 40.09784551698184,
+      "hit4Rate": 15.93752940069621,
+      "hit6Rate": 6.7739204064352245,
+      "avgBars": 17.879164711403096
+    },
+    {
+      "id": "M8",
+      "name": "Multi-entry DCA: OB+FVG hợp lưu, 2 lệnh (limit)",
+      "signals": 77,
+      "filled": 77,
+      "fillRate": 100,
+      "winRate": 85.71428571428571,
+      "hit4Rate": 76.62337662337663,
+      "hit6Rate": 63.63636363636363,
+      "avgBars": 38.72727272727273
+    },
+    {
+      "id": "M9",
+      "name": "Retracement 50% pullback theo trend ATRBot (market)",
+      "signals": 21699,
+      "filled": 21699,
+      "fillRate": 100,
+      "winRate": 50.80418452463247,
+      "hit4Rate": 36.03852712106549,
+      "hit6Rate": 26.36987879625789,
+      "avgBars": 67.88642960812773
+    },
+    {
+      "id": "M10",
+      "name": "ATRBot M1 + xác nhận StatefulBosChoch (market)",
+      "signals": 470,
+      "filled": 470,
+      "fillRate": 100,
+      "winRate": 83.40425531914893,
+      "hit4Rate": 62.97872340425532,
+      "hit6Rate": 47.23404255319149,
+      "avgBars": 64.26530612244898
+    },
+    {
+      "id": "M11",
+      "name": "StatefulBosChoch breakout + chờ retest mức phá (limit)",
+      "signals": 11614,
+      "filled": 10310,
+      "fillRate": 88.7721715171345,
+      "winRate": 40.81474296799224,
+      "hit4Rate": 16.39185257032008,
+      "hit6Rate": 6.993210475266731,
+      "avgBars": 17.833174904942965
+    },
+    {
+      "id": "M12",
+      "name": "ATRBot trend + retest Order Block (Dynamic Swing, limit)",
+      "signals": 260,
+      "filled": 260,
+      "fillRate": 100,
+      "winRate": 91.15384615384615,
+      "hit4Rate": 84.61538461538461,
+      "hit6Rate": 78.07692307692308,
+      "avgBars": 31.459915611814345
+    },
+    {
+      "id": "M13",
+      "name": "BOS/CHOCH breakout + retest (Dynamic Swing, limit)",
+      "signals": 6989,
+      "filled": 6162,
+      "fillRate": 88.16711975962225,
+      "winRate": 42.46997728010386,
+      "hit4Rate": 17.94871794871795,
+      "hit6Rate": 8.000649139889646,
+      "avgBars": 17.203668322506687
+    },
+    {
+      "id": "M14",
+      "name": "Liquidity Sweep + Reject (Dynamic Swing, market)",
+      "signals": 147,
+      "filled": 147,
+      "fillRate": 100,
+      "winRate": 82.99319727891157,
+      "hit4Rate": 69.38775510204081,
+      "hit6Rate": 55.78231292517006,
+      "avgBars": 11.385245901639344
+    },
+    {
+      "id": "M15",
+      "name": "Breaker Block retest (limit, độc lập ATRBot)",
+      "signals": 176,
+      "filled": 50,
+      "fillRate": 28.40909090909091,
+      "winRate": 100,
+      "hit4Rate": 92,
+      "hit6Rate": 72,
+      "avgBars": 5.3
+    },
+    {
+      "id": "M16",
+      "name": "ATRBot M1 + lọc khoảng cách Liquidity built-in (market)",
+      "signals": 1881,
+      "filled": 1881,
+      "fillRate": 100,
+      "winRate": 85.43328017012227,
+      "hit4Rate": 72.51461988304094,
+      "hit6Rate": 57.52259436469963,
+      "avgBars": 88.00808960796515
+    },
+    {
+      "id": "M17",
+      "name": "ATRBot M1 chỉ trong phiên London+NY (market)",
+      "signals": 2267,
+      "filled": 2267,
+      "fillRate": 100,
+      "winRate": 70.26907807675342,
+      "hit4Rate": 52.404058226731365,
+      "hit6Rate": 38.15615350683723,
+      "avgBars": 67.69303201506591
+    }
+  ],
+  "symbols": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "BNBUSDT",
+    "BTCUSDT",
+    "DOGEUSDT",
+    "ETHUSDT",
+    "IMXUSDT",
+    "LINKUSDT",
+    "SOLUSDT",
+    "XRPUSDT"
+  ]
+}

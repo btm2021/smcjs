@@ -400,6 +400,108 @@
   }
 
   /* -------------------------------------------------------------
+     REPLAY MODE (thanh điều khiển tua lại + banner chọn điểm bắt đầu)
+     ------------------------------------------------------------- */
+  #replayHint {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid var(--accent-blue);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 25;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  #replayHint.open { display: flex; }
+  #replayHintCancel {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  #replayBar {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: rgba(15, 20, 34, 0.94);
+    border: 1px solid var(--border-highlight);
+    border-radius: 10px;
+    padding: 8px 12px;
+    z-index: 25;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+  }
+  #replayBar.open { display: flex; }
+
+  .replay-btn {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s ease;
+  }
+  .replay-btn:hover { border-color: var(--accent-blue); background: var(--bg-card-hover); }
+  .replay-btn.play { background: rgba(56, 189, 248, 0.2); border-color: var(--accent-blue); }
+
+  #replaySlider {
+    width: 260px;
+    accent-color: var(--accent-blue);
+  }
+
+  #replayTimeLabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    min-width: 118px;
+  }
+
+  #replaySpeedSelect {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: 5px;
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+  #replayExitBtn {
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid var(--accent-red);
+    color: var(--accent-red);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #replayExitBtn:hover { background: var(--accent-red); color: #fff; }
+
+  /* -------------------------------------------------------------
      SETTINGS MODAL
      ------------------------------------------------------------- */
   .modal-backdrop {
@@ -643,6 +745,99 @@
     cursor: pointer;
   }
 
+  .ctrl-color {
+    width: 36px;
+    height: 24px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--bg-input);
+    cursor: pointer;
+  }
+  .style-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 2px;
+  }
+
+  /* Strategy List (card-strategy) — mỗi hàng sinh động từ SmcStrategies.list */
+  #strategy-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .strategy-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.015);
+  }
+  .strategy-row.active {
+    border-color: var(--border-highlight);
+    background: rgba(56, 189, 248, 0.06);
+  }
+  .strategy-row-main {
+    flex: 1;
+    min-width: 0;
+  }
+  .strategy-row-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .strategy-id-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #fff;
+  }
+  .strategy-badge-win {
+    font-size: 9.5px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-green);
+  }
+  .strategy-badge-win.low { color: var(--accent-red); }
+  .strategy-badge-risk {
+    font-size: 9.5px;
+    color: var(--accent-amber);
+    cursor: help;
+  }
+  .strategy-row-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+  .strategy-row-uses {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+  .strategy-row-uses span {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-right: 3px;
+  }
+
   .ctrl-input-num, .ctrl-select, .ctrl-input-text {
     background: var(--bg-input);
     border: 1px solid var(--border);
@@ -775,6 +970,12 @@
         <span id="wsBtnText">Live Ticker</span>
       </button>
 
+      <!-- Replay Mode: tua lại nến & tính chỉ báo real-time để backtest bằng tay -->
+      <button class="btn-action" id="replayBtn" title="Chế độ Replay: tua lại nến, chỉ báo tính đúng độ trễ thời gian thực để backtest bằng tay">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m10 14l-7-7 7-7"/></svg>
+        <span id="replayBtnText">Replay</span>
+      </button>
+
       <!-- Fit Chart Full View -->
       <button class="btn-icon" id="fitChartBtn" title="Khớp toàn bộ dữ liệu (Fit Chart)">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
@@ -798,6 +999,31 @@
       <p>15M · 15,000 NẾN · SMC.JS ENGINE</p>
     </div>
     <div id="chart"></div>
+
+    <!-- Replay Setup Hint -->
+    <div id="replayHint">
+      <span>Click vào 1 cây nến trên biểu đồ để chọn điểm bắt đầu Replay</span>
+      <button id="replayHintCancel">Hủy</button>
+    </div>
+
+    <!-- Replay Control Bar -->
+    <div id="replayBar">
+      <button class="replay-btn" id="replayStepBackBtn" title="Lùi 1 nến">⏮</button>
+      <button class="replay-btn play" id="replayPlayBtn" title="Play / Pause (Space)">▶</button>
+      <button class="replay-btn" id="replayStepFwdBtn" title="Tiến 1 nến (→)">⏭</button>
+      <input type="range" id="replaySlider" min="0" max="0" value="0" />
+      <span id="replayTimeLabel">--</span>
+      <select id="replaySpeedSelect" title="Tốc độ phát">
+        <option value="0">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="2">2x</option>
+        <option value="3">4x</option>
+        <option value="4">8x</option>
+        <option value="5">15x</option>
+        <option value="6">20x</option>
+      </select>
+      <button id="replayExitBtn" title="Thoát Replay, quay lại toàn bộ dữ liệu">Thoát Replay</button>
+    </div>
   </main>
 </div>
 
@@ -895,8 +1121,32 @@
         <span class="stat-badge" id="stat-atrbot" style="align-self: flex-start;">Đang tính toán...</span>
       </div>
 
+      <!-- S. Strategy List (17 mô hình entry, xem strategies.js + research/REPORT.md) -->
+      <div class="indicator-card card-featured" id="card-strategy" style="grid-column: span 2;">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#38bdf8;"></span>
+            <span>★ Chiến lược Entry (Strategies) — 17 mô hình từ research/REPORT.md</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="strategy-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div style="font-size:10px; color:var(--text-muted); line-height:1.5;">
+            Chọn 1 hoặc nhiều chiến lược để hiển thị điểm ▲/▼ Buy/Sell trên chart. Mọi chiến lược chỉ tính
+            trên dữ liệu <b>tính tới thời điểm hiện tại</b> (giống hệt cơ chế Replay Mode — không nhìn tương lai).
+            <span style="color:var(--accent-green);">🟢 Đã kiểm chứng 0 vi phạm repaint qua nhiều checkpoint</span> với các mô hình chỉ dùng ATRBot/BOS-CHOCH/FVG.
+            <span style="color:var(--accent-amber);">🟡 Còn rủi ro repaint dư</span> với các mô hình phụ thuộc Order Block/Liquidity gốc (nguồn gốc: <code>SMC.orderBlocks()</code>/<code>SMC.liquidity()</code> có thể xét lại dữ liệu rất cũ khi thêm nến mới — vùng đệm "Chống Repaint" bên dưới giảm tần suất nhưng không triệt tiêu hết, xem research/REPORT.md mục 6.1).
+          </div>
+          <div id="strategy-list-container"><!-- sinh động từ SmcStrategies.list bằng JS --></div>
+        </div>
+        <span class="stat-badge" id="stat-strategy" style="align-self: flex-start;">Chưa chọn chiến lược nào</span>
+      </div>
+
       <!-- 1. Swing Highs / Lows -->
-      <div class="indicator-card active" id="card-swing">
+      <div class="indicator-card active" id="card-swing" style="grid-column: span 2;">
         <div class="card-top">
           <div class="card-title">
             <span class="card-icon" style="background:#10b981;"></span>
@@ -909,7 +1159,7 @@
         </div>
         <div class="card-body">
           <div class="ctrl-row">
-            <span>swingLength (độ dài cửa sổ)</span>
+            <span>swingLength (độ dài cửa sổ cố định)</span>
             <input type="number" id="swing-length" class="ctrl-input-num" value="50" min="2" max="300" />
           </div>
           <div class="ctrl-row">
@@ -918,6 +1168,40 @@
           <div class="ctrl-row">
             <label><input type="checkbox" id="swing-show-labels" checked /> Nhãn phân loại HH / HL / LH / LL</label>
           </div>
+
+          <div class="ctrl-row" style="border-top:1px solid var(--border); padding-top:8px; margin-top:2px;">
+            <label><input type="checkbox" id="swing-dynamic" /> <b>Thử nghiệm:</b> Cửa sổ Swing ĐỘNG (theo nguyên lý ATRBot)</label>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted); margin:-4px 0 4px;">
+            swingLength ở trên = cửa sổ gốc (baseWindow). Cửa sổ thực tế co giãn theo percentile-rank của ATR%: thấp (choppy) → cửa sổ mở rộng lọc nhiễu; cao (breakout) → co lại gần baseWindow để phản ứng nhanh.
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 18px;">
+            <div class="ctrl-row">
+              <span>ATR Period</span>
+              <input type="number" id="swing-dyn-atrLength" class="ctrl-input-num" value="14" min="1" max="200" style="width:70px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Adaptive K (0=tắt, best≈1.5)</span>
+              <input type="number" id="swing-dyn-adaptiveK" class="ctrl-input-num" value="1.5" min="0" max="5" step="0.1" style="width:70px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Percentile Window (nến)</span>
+              <input type="number" id="swing-dyn-percentileWindow" class="ctrl-input-num" value="5000" min="100" max="20000" step="100" style="width:70px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Min Periods (trước khi bật adaptive)</span>
+              <input type="number" id="swing-dyn-minPeriods" class="ctrl-input-num" value="200" min="20" max="2000" step="10" style="width:70px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Min Bars (chặn dưới cửa sổ)</span>
+              <input type="number" id="swing-dyn-minBars" class="ctrl-input-num" value="10" min="2" max="300" style="width:70px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Max Bars (chặn trên cửa sổ)</span>
+              <input type="number" id="swing-dyn-maxBars" class="ctrl-input-num" value="150" min="2" max="1000" style="width:70px" />
+            </div>
+          </div>
+
           <span class="stat-badge" id="stat-swing">Đang nạp...</span>
         </div>
       </div>
@@ -944,6 +1228,12 @@
           <div class="ctrl-row">
             <label><input type="checkbox" id="bos-show-choch" checked /> Hiện CHOCH (Đổi tính chất xu hướng)</label>
           </div>
+          <div class="ctrl-row" style="border-top:1px solid var(--border); padding-top:8px; margin-top:2px;">
+            <label><input type="checkbox" id="bos-stateful" /> <b>Thử nghiệm:</b> BOS/CHOCH có bộ nhớ xu hướng (Stateful)</label>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted); margin:-4px 0 4px;">
+            Thuật toán gốc xét độc lập từng cụm 4 swing nên có thể "im lặng" khi đổi phe (xem giải thích). Chế độ này luôn nhớ xu hướng hiện tại: phá cùng chiều = BOS, phá ngược chiều = CHOCH và đổi luôn xu hướng đang nhớ — không còn khoảng trống giữa 2 BOS trái chiều.
+          </div>
           <span class="stat-badge" id="stat-bos">Đang nạp...</span>
         </div>
       </div>
@@ -966,6 +1256,47 @@
           </div>
           <div class="ctrl-row">
             <label><input type="checkbox" id="fvg-only-open" checked /> Chỉ hiện FVG chưa lấp (Unmitigated)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="fvg-show-bull" checked /> Hiện Bull FVG (Tăng)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="fvg-show-bear" checked /> Hiện Bear FVG (Giảm)</label>
+          </div>
+          <div class="style-section-label">Tuỳ chỉnh hiển thị hộp</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px;">
+            <div class="ctrl-row">
+              <span>Cỡ chữ nhãn (px)</span>
+              <input type="number" id="fvg-fontSize" class="ctrl-input-num" value="9" min="6" max="20" style="width:56px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Kiểu viền (khi mở)</span>
+              <select id="fvg-borderStyle" class="ctrl-select" style="width:80px">
+                <option value="solid">Liền</option>
+                <option value="dashed" selected>Đứt</option>
+                <option value="dotted">Chấm</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <span>Viền/Chữ Bull</span>
+              <input type="color" id="fvg-bullBorderColor" class="ctrl-color" value="#10b981" />
+            </div>
+            <div class="ctrl-row">
+              <span>Nền Bull</span>
+              <input type="color" id="fvg-bullBgColor" class="ctrl-color" value="#10b981" />
+            </div>
+            <div class="ctrl-row">
+              <span>Viền/Chữ Bear</span>
+              <input type="color" id="fvg-bearBorderColor" class="ctrl-color" value="#f43f5e" />
+            </div>
+            <div class="ctrl-row">
+              <span>Nền Bear</span>
+              <input type="color" id="fvg-bearBgColor" class="ctrl-color" value="#f43f5e" />
+            </div>
+            <div class="ctrl-row" style="grid-column: span 2;">
+              <span>Độ mờ nền (0–1)</span>
+              <input type="number" id="fvg-bgOpacity" class="ctrl-input-num" value="0.15" min="0" max="1" step="0.01" style="width:70px" />
+            </div>
           </div>
           <span class="stat-badge" id="stat-fvg">Đang nạp...</span>
         </div>
@@ -993,6 +1324,47 @@
           <div class="ctrl-row">
             <label><input type="checkbox" id="ob-show-pct" checked /> Hiện % mất cân bằng khối lượng</label>
           </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="ob-show-bull" checked /> Hiện Bull OB (Khối lệnh mua)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="ob-show-bear" checked /> Hiện Bear OB (Khối lệnh bán)</label>
+          </div>
+          <div class="style-section-label">Tuỳ chỉnh hiển thị hộp</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px;">
+            <div class="ctrl-row">
+              <span>Cỡ chữ nhãn (px)</span>
+              <input type="number" id="ob-fontSize" class="ctrl-input-num" value="9" min="6" max="20" style="width:56px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Kiểu viền (khi đã lấp)</span>
+              <select id="ob-borderStyle" class="ctrl-select" style="width:80px">
+                <option value="solid">Liền</option>
+                <option value="dashed">Đứt</option>
+                <option value="dotted" selected>Chấm</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <span>Viền/Chữ Bull</span>
+              <input type="color" id="ob-bullBorderColor" class="ctrl-color" value="#10b981" />
+            </div>
+            <div class="ctrl-row">
+              <span>Nền Bull</span>
+              <input type="color" id="ob-bullBgColor" class="ctrl-color" value="#10b981" />
+            </div>
+            <div class="ctrl-row">
+              <span>Viền/Chữ Bear</span>
+              <input type="color" id="ob-bearBorderColor" class="ctrl-color" value="#f43f5e" />
+            </div>
+            <div class="ctrl-row">
+              <span>Nền Bear</span>
+              <input type="color" id="ob-bearBgColor" class="ctrl-color" value="#f43f5e" />
+            </div>
+            <div class="ctrl-row" style="grid-column: span 2;">
+              <span>Độ mờ nền (0–1)</span>
+              <input type="number" id="ob-bgOpacity" class="ctrl-input-num" value="0.2" min="0" max="1" step="0.01" style="width:70px" />
+            </div>
+          </div>
           <span class="stat-badge" id="stat-ob">Đang nạp...</span>
         </div>
       </div>
@@ -1019,6 +1391,12 @@
           </div>
           <div class="ctrl-row">
             <label><input type="checkbox" id="liq-only-open" /> Chỉ hiện thanh khoản chưa quét (Open Only)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="liq-show-bsl" checked /> Hiện BSL (Thanh khoản mua - đỉnh)</label>
+          </div>
+          <div class="ctrl-row">
+            <label><input type="checkbox" id="liq-show-ssl" checked /> Hiện SSL (Thanh khoản bán - đáy)</label>
           </div>
           <span class="stat-badge" id="stat-liquidity">Đang nạp...</span>
         </div>
@@ -1085,6 +1463,33 @@
               <input type="text" id="sessions-end" placeholder="16:00" class="ctrl-input-text" style="width:50px" />
             </span>
           </div>
+          <div class="style-section-label">Tuỳ chỉnh hiển thị hộp</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px;">
+            <div class="ctrl-row">
+              <span>Cỡ chữ nhãn (px)</span>
+              <input type="number" id="sessions-fontSize" class="ctrl-input-num" value="9" min="6" max="20" style="width:56px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Kiểu viền</span>
+              <select id="sessions-borderStyle" class="ctrl-select" style="width:80px">
+                <option value="solid">Liền</option>
+                <option value="dashed" selected>Đứt</option>
+                <option value="dotted">Chấm</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <span>Viền/Chữ</span>
+              <input type="color" id="sessions-borderColor" class="ctrl-color" value="#14b8a6" />
+            </div>
+            <div class="ctrl-row">
+              <span>Nền</span>
+              <input type="color" id="sessions-bgColor" class="ctrl-color" value="#14b8a6" />
+            </div>
+            <div class="ctrl-row" style="grid-column: span 2;">
+              <span>Độ mờ nền (0–1)</span>
+              <input type="number" id="sessions-bgOpacity" class="ctrl-input-num" value="0.12" min="0" max="1" step="0.01" style="width:70px" />
+            </div>
+          </div>
           <span class="stat-badge empty" id="stat-sessions"></span>
         </div>
       </div>
@@ -1105,7 +1510,67 @@
           <div class="ctrl-row">
             <label><input type="checkbox" id="retr-show-eq" checked /> Hộp cân bằng 50% (Premium / Discount)</label>
           </div>
+          <div class="style-section-label">Tuỳ chỉnh hiển thị hộp</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px;">
+            <div class="ctrl-row">
+              <span>Cỡ chữ nhãn (px)</span>
+              <input type="number" id="retr-fontSize" class="ctrl-input-num" value="9" min="6" max="20" style="width:56px" />
+            </div>
+            <div class="ctrl-row">
+              <span>Kiểu viền</span>
+              <select id="retr-borderStyle" class="ctrl-select" style="width:80px">
+                <option value="solid" selected>Liền</option>
+                <option value="dashed">Đứt</option>
+                <option value="dotted">Chấm</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <span>Viền/Chữ Premium</span>
+              <input type="color" id="retr-premiumBorderColor" class="ctrl-color" value="#f43f5e" />
+            </div>
+            <div class="ctrl-row">
+              <span>Nền Premium</span>
+              <input type="color" id="retr-premiumBgColor" class="ctrl-color" value="#f43f5e" />
+            </div>
+            <div class="ctrl-row">
+              <span>Viền/Chữ Discount</span>
+              <input type="color" id="retr-discountBorderColor" class="ctrl-color" value="#10b981" />
+            </div>
+            <div class="ctrl-row">
+              <span>Nền Discount</span>
+              <input type="color" id="retr-discountBgColor" class="ctrl-color" value="#10b981" />
+            </div>
+            <div class="ctrl-row" style="grid-column: span 2;">
+              <span>Độ mờ nền (0–1)</span>
+              <input type="number" id="retr-bgOpacity" class="ctrl-input-num" value="0.08" min="0" max="1" step="0.01" style="width:70px" />
+            </div>
+          </div>
           <span class="stat-badge empty" id="stat-retracements"></span>
+        </div>
+      </div>
+
+      <!-- 9. Chống Repaint -->
+      <div class="indicator-card active" id="card-antirepaint" style="grid-column: span 2;">
+        <div class="card-top">
+          <div class="card-title">
+            <span class="card-icon" style="background:#22d3ee;"></span>
+            <span>9. Chống Repaint (Anti-Repaint)</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="antirepaint-enabled" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-body">
+          <div style="font-size:10px; color:var(--text-muted);">
+            swingHighsLows() có bước "fixed-point reduction": 1 swing đã hiện ra có thể bị loại bỏ về sau nếu phát hiện swing cùng loại "cực trị hơn" ở xa hơn. Bật tuỳ chọn này để ẩn Swing/BOS/CHOCH/OB/Liquidity/Retracement neo tại các nến còn NẰM TRONG vùng đệm gần rìa hiện tại.<br><br>
+            <b>Đã kiểm chứng bằng thực nghiệm:</b> với buffer mặc định (500), <b>Swing</b> và <b>BOS/CHOCH</b> (cả bản gốc lẫn Stateful) đạt <b>0 repaint tuyệt đối</b> trên toàn bộ dữ liệu test. <b>Order Blocks</b> giảm mạnh nhưng KHÔNG về 0 tuyệt đối; <b>Liquidity</b> có nguồn repaint khác bản chất (gom cụm theo khoảng GIÁ chứ không phải khoảng THỜI GIAN — 1 swing rất xa sau này về mặt thời gian nhưng gần về giá vẫn có thể gộp cụm) nên tăng buffer không giải quyết triệt để được. Nếu quyết định giao dịch dựa vào OB/Liquidity, cân nhắc rủi ro dư này.
+          </div>
+          <div class="ctrl-row">
+            <span>Vùng đệm an toàn (số nến từ rìa hiện tại)</span>
+            <input type="number" id="antirepaint-bufferBars" class="ctrl-input-num" value="500" min="0" max="5000" step="50" />
+          </div>
+          <span class="stat-badge" id="stat-antirepaint">Đang tính...</span>
         </div>
       </div>
     </div>
@@ -1139,6 +1604,9 @@
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"></script>
 <script src="../dist/smc.umd.js"></script>
 <script src="../indicator_atrbot_m1.js"></script>
+<script src="../dynamic_swing_hl.js"></script>
+<script src="../stateful_bos_choch.js"></script>
+<script src="../strategies.js"></script>
 <script>
 (function() {
   "use strict";
@@ -1163,6 +1631,18 @@
   const fitChartBtn = document.getElementById("fitChartBtn");
   const wsToggleBtn = document.getElementById("wsToggleBtn");
   const wsBtnText = document.getElementById("wsBtnText");
+  const replayBtn = document.getElementById("replayBtn");
+  const replayBtnText = document.getElementById("replayBtnText");
+  const replayHint = document.getElementById("replayHint");
+  const replayHintCancel = document.getElementById("replayHintCancel");
+  const replayBar = document.getElementById("replayBar");
+  const replayStepBackBtn = document.getElementById("replayStepBackBtn");
+  const replayPlayBtn = document.getElementById("replayPlayBtn");
+  const replayStepFwdBtn = document.getElementById("replayStepFwdBtn");
+  const replaySlider = document.getElementById("replaySlider");
+  const replayTimeLabel = document.getElementById("replayTimeLabel");
+  const replaySpeedSelect = document.getElementById("replaySpeedSelect");
+  const replayExitBtn = document.getElementById("replayExitBtn");
   const openSettingsBtn = document.getElementById("openSettingsBtn");
   const closeSettingsBtn = document.getElementById("closeSettingsBtn");
   const applySettingsBtn = document.getElementById("applySettingsBtn");
@@ -1219,6 +1699,22 @@
     }
   }
 
+  // Chuyển màu hex (#rrggbb) + độ mờ (0-1) thành chuỗi rgba() dùng cho fill hộp.
+  function hexToRgba(hex, alpha) {
+    if (!hex) return `rgba(255,255,255,${alpha})`;
+    let c = hex.replace("#", "");
+    if (c.length === 3) c = c.split("").map((x) => x + x).join("");
+    const num = parseInt(c, 16);
+    return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
+  }
+
+  // Map lựa chọn "kiểu viền" sang dash pattern cho BoxesPrimitive/LinesPrimitive.
+  function dashForStyle(style) {
+    if (style === "dashed") return [4, 4];
+    if (style === "dotted") return [1.5, 2.5];
+    return null; // liền
+  }
+
   // ---------------------------------------------------------------------
   // State & Indicator Default Options
   // ---------------------------------------------------------------------
@@ -1244,14 +1740,41 @@
       showSignals: true,
       showMultPanel: false,
     },
-    swing: { enabled: true, swingLength: 50, showZigzag: true, showLabels: true },
-    bos: { enabled: true, closeBreak: true, showBos: true, showChoch: true },
-    fvg: { enabled: true, joinConsecutive: false, onlyOpen: true },
-    ob: { enabled: true, closeMitigation: false, onlyOpen: true, showPct: true },
-    liquidity: { enabled: true, rangePercent: 1.0, showSwept: true, onlyOpen: false },
+    swing: {
+      enabled: true, swingLength: 50, showZigzag: true, showLabels: true,
+      dynamic: false, atrLength: 14, adaptiveK: 1.5, percentileWindow: 5000,
+      minPeriods: 200, minBars: 10, maxBars: 150,
+    },
+    bos: { enabled: true, closeBreak: true, showBos: true, showChoch: true, stateful: false },
+    fvg: {
+      enabled: true, joinConsecutive: false, onlyOpen: true, showBull: true, showBear: true,
+      fontSize: 9, borderStyle: "dashed",
+      bullBorderColor: "#10b981", bullBgColor: "#10b981",
+      bearBorderColor: "#f43f5e", bearBgColor: "#f43f5e",
+      bgOpacity: 0.15,
+    },
+    ob: {
+      enabled: true, closeMitigation: false, onlyOpen: true, showPct: true, showBull: true, showBear: true,
+      fontSize: 9, borderStyle: "dotted",
+      bullBorderColor: "#10b981", bullBgColor: "#10b981",
+      bearBorderColor: "#f43f5e", bearBgColor: "#f43f5e",
+      bgOpacity: 0.2,
+    },
+    liquidity: { enabled: true, rangePercent: 1.0, showSwept: true, onlyOpen: false, showBsl: true, showSsl: true },
     phl: { enabled: false, timeFrame: "4H" },
-    sessions: { enabled: false, session: "London", startTime: "", endTime: "", timeZone: "UTC" },
-    retracements: { enabled: false, showEq: true },
+    sessions: {
+      enabled: false, session: "London", startTime: "", endTime: "", timeZone: "UTC",
+      fontSize: 9, borderStyle: "dashed", borderColor: "#14b8a6", bgColor: "#14b8a6", bgOpacity: 0.12,
+    },
+    retracements: {
+      enabled: false, showEq: true,
+      fontSize: 9, borderStyle: "solid",
+      premiumBorderColor: "#f43f5e", premiumBgColor: "#f43f5e",
+      discountBorderColor: "#10b981", discountBgColor: "#10b981",
+      bgOpacity: 0.08,
+    },
+    antiRepaint: { enabled: true, bufferBars: 500 },
+    strategy: { enabled: true, active: {} },
   };
 
   let state = JSON.parse(JSON.stringify(defaultState));
@@ -1748,7 +2271,7 @@
               }
 
               if (b.label && rectW > 28 && rectH > 10) {
-                ctx.font = `${Math.round(9 * scope.verticalPixelRatio)}px 'JetBrains Mono', sans-serif`;
+                ctx.font = `${Math.round((b.fontSize || 9) * scope.verticalPixelRatio)}px 'JetBrains Mono', sans-serif`;
                 ctx.fillStyle = b.labelColor || "rgba(255,255,255,0.85)";
                 ctx.textAlign = b.labelAlign || "left";
                 ctx.textBaseline = "middle";
@@ -1919,6 +2442,9 @@
   candleSeries.attachPrimitive(liquidityPrimitive);
 
   const markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, []);
+  // Instance RIÊNG cho điểm Buy/Sell của Strategies — tách khỏi markersPlugin
+  // (đang dùng cho nhãn HH/HL/LH/LL của Swing) để 2 nguồn không ghi đè nhau.
+  const strategyMarkersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, []);
 
   // Previous High/Low Step Line Series
   const prevHighSeries = chart.addSeries(LightweightCharts.LineSeries, {
@@ -1942,7 +2468,8 @@
   // ---------------------------------------------------------------------
   // Indicator Computation Pipeline
   // ---------------------------------------------------------------------
-  let candles = [];
+  let allCandles = []; // toàn bộ dữ liệu đã tải (nguồn sự thật, không bị cắt bởi replay)
+  let candles = [];    // dữ liệu đang hiển thị/tính toán — bằng allCandles ở chế độ thường, hoặc 1 slice ở chế độ Replay
   let swingHL = [];
 
   // 0. ATRBot M1 Engine
@@ -1966,16 +2493,70 @@
   }
 
   // 1. Swing Highs / Lows
+  let lastDynamicWindow = null; // chỉ khác null khi state.swing.dynamic đang bật — dùng để hiện thống kê cửa sổ
+
   function recomputeSwingBase() {
     if (!candles.length) return;
-    swingHL = SMC.swingHighsLows(candles, { swingLength: state.swing.swingLength });
+
+    if (state.swing.dynamic && typeof DynamicSwingHL !== "undefined") {
+      const dyn = DynamicSwingHL.calculate(candles, {
+        baseWindow: state.swing.swingLength,
+        atrLength: state.swing.atrLength,
+        adaptiveK: state.swing.adaptiveK,
+        percentileWindow: state.swing.percentileWindow,
+        minPeriods: state.swing.minPeriods,
+        minBars: state.swing.minBars,
+        maxBars: state.swing.maxBars,
+      });
+      swingHL = dyn.swingHL;
+      lastDynamicWindow = dyn.windowArr;
+    } else {
+      swingHL = SMC.swingHighsLows(candles, { swingLength: state.swing.swingLength });
+      lastDynamicWindow = null;
+    }
+
+    // Chống repaint (1/2): bước "ép so le ở 2 đầu mảng" bên trong
+    // swingHighsLows() LUÔN gán cưỡng bức nến CUỐI CÙNG của mảng candles hiện
+    // tại thành 1 swing point — dù nến đó KHÔNG BAO GIỜ thực sự lọt qua cửa sổ
+    // xác nhận thật (cửa sổ raw-detect luôn loại trừ các nến ở rìa). Marker
+    // này chắc chắn biến mất/đổi ngay khi có thêm 1 nến mới (mỗi bước replay),
+    // nên phải xoá trước khi hiển thị hoặc dùng làm input cho BOS/CHOCH/OB/...
+    if (swingHL.length > 0) {
+      swingHL[swingHL.length - 1] = { highLow: null, level: null };
+    }
 
     let hi = 0, lo = 0;
     for (let i = 0; i < swingHL.length; i++) {
       if (swingHL[i].highLow === 1) hi++;
       else if (swingHL[i].highLow === -1) lo++;
     }
-    setStat("swing", `${hi} Đỉnh (H) · ${lo} Đáy (L)`);
+
+    let statMsg = `${hi} Đỉnh (H) · ${lo} Đáy (L)`;
+    if (lastDynamicWindow && lastDynamicWindow.length) {
+      let sum = 0, minW = Infinity, maxW = -Infinity;
+      for (let i = 0; i < lastDynamicWindow.length; i++) {
+        const w = lastDynamicWindow[i];
+        sum += w;
+        if (w < minW) minW = w;
+        if (w > maxW) maxW = w;
+      }
+      const avg = (sum / lastDynamicWindow.length).toFixed(1);
+      statMsg += ` · Cửa sổ động TB=${avg} nến (${minW}–${maxW})`;
+    }
+    setStat("swing", statMsg);
+  }
+
+  // Chống repaint (2/2): ngay cả sau khi xoá marker giả ở rìa mảng, bước
+  // "fixed-point reduction" bên trong swingHighsLows() vẫn có thể loại bỏ 1
+  // swing ĐÃ HIỂN THỊ nếu về sau phát hiện 1 swing cùng loại "cực trị hơn" ở
+  // xa hơn (đã kiểm chứng thực nghiệm: có thể xảy ra tới vài trăm nến sau).
+  // Đây là đặc tính vốn có của thuật toán, không thể triệt tiêu bằng 1 dòng
+  // sửa — nên dùng 1 vùng đệm: bất kỳ swing/BOS/CHOCH/OB/Liquidity nào neo
+  // tại nến còn nằm trong `bufferBars` nến gần rìa hiện tại đều bị ẩn khỏi
+  // hiển thị cho tới khi đủ xa để coi là đã chốt.
+  function isUnsettledAnchor(i) {
+    if (!state.antiRepaint.enabled || !candles.length) return false;
+    return i > candles.length - 1 - state.antiRepaint.bufferBars;
   }
 
   function recomputeSwingVisuals() {
@@ -1994,6 +2575,7 @@
     for (let i = 0; i < swingHL.length; i++) {
       const r = swingHL[i];
       if (r.highLow === null) continue;
+      if (isUnsettledAnchor(i)) continue;
 
       const isHigh = r.highLow === 1;
       const price = r.level;
@@ -2048,13 +2630,16 @@
       return;
     }
 
-    const res = SMC.bosChoch(candles, swingHL, { closeBreak: state.bos.closeBreak });
+    const res = (state.bos.stateful && typeof StatefulBosChoch !== "undefined")
+      ? StatefulBosChoch.calculate(candles, swingHL, { closeBreak: state.bos.closeBreak })
+      : SMC.bosChoch(candles, swingHL, { closeBreak: state.bos.closeBreak });
     const items = [];
     let countBos = 0, countChoch = 0;
 
     for (let i = 0; i < res.length; i++) {
       const r = res[i];
       if (r.bos === null && r.choch === null) continue;
+      if (isUnsettledAnchor(i)) continue;
 
       const isBos = r.bos !== null;
       if (isBos) {
@@ -2088,7 +2673,7 @@
     }
 
     bosChochPrimitive.setItems(items);
-    setStat("bos", `${countBos} BOS · ${countChoch} CHOCH`);
+    setStat("bos", `${countBos} BOS · ${countChoch} CHOCH${state.bos.stateful ? " (Stateful)" : ""}`);
   }
 
   // 3. Fair Value Gaps (FVG)
@@ -2114,18 +2699,24 @@
       if (state.fvg.onlyOpen && !isUnmitigated) continue;
 
       const isBull = r.fvg === 1;
+      if (isBull && !state.fvg.showBull) continue;
+      if (!isBull && !state.fvg.showBear) continue;
+
       const endIdx = r.mitigatedIndex ? Math.min(r.mitigatedIndex, candles.length - 1) : candles.length - 1;
+      const borderColor = isBull ? state.fvg.bullBorderColor : state.fvg.bearBorderColor;
+      const bgColor = isBull ? state.fvg.bullBgColor : state.fvg.bearBgColor;
 
       boxes.push({
         time1: candles[i].time,
         time2: isUnmitigated ? null : candles[endIdx].time,
         price1: r.top,
         price2: r.bottom,
-        fill: isBull ? "rgba(16, 185, 129, 0.15)" : "rgba(244, 63, 94, 0.15)",
-        border: isBull ? "rgba(16, 185, 129, 0.5)" : "rgba(244, 63, 94, 0.5)",
-        borderDash: isUnmitigated ? [3, 3] : null,
+        fill: hexToRgba(bgColor, state.fvg.bgOpacity),
+        border: borderColor,
+        borderDash: isUnmitigated ? dashForStyle(state.fvg.borderStyle) : null,
         label: isUnmitigated ? (isBull ? "BULL FVG (Open)" : "BEAR FVG (Open)") : "",
-        labelColor: isBull ? "#10b981" : "#f43f5e",
+        labelColor: borderColor,
+        fontSize: state.fvg.fontSize,
       });
     }
 
@@ -2148,6 +2739,7 @@
     for (let i = 0; i < res.length; i++) {
       const r = res[i];
       if (r.ob === null) continue;
+      if (isUnsettledAnchor(i)) continue;
 
       const isBull = r.ob === 1;
       if (isBull) bullCount++; else bearCount++;
@@ -2156,20 +2748,25 @@
       if (isUnmitigated) activeCount++;
 
       if (state.ob.onlyOpen && !isUnmitigated) continue;
+      if (isBull && !state.ob.showBull) continue;
+      if (!isBull && !state.ob.showBear) continue;
 
       const endIdx = r.mitigatedIndex ? Math.min(r.mitigatedIndex, candles.length - 1) : candles.length - 1;
       const pctLabel = (state.ob.showPct && r.percentage !== null) ? `${Math.round(r.percentage)}%` : "";
+      const borderColor = isBull ? state.ob.bullBorderColor : state.ob.bearBorderColor;
+      const bgColor = isBull ? state.ob.bullBgColor : state.ob.bearBgColor;
 
       boxes.push({
         time1: candles[i].time,
         time2: isUnmitigated ? null : candles[endIdx].time,
         price1: r.top,
         price2: r.bottom,
-        fill: isBull ? "rgba(16, 185, 129, 0.2)" : "rgba(244, 63, 94, 0.2)",
-        border: isBull ? "#10b981" : "#f43f5e",
-        borderDash: isUnmitigated ? null : [2, 2],
+        fill: hexToRgba(bgColor, state.ob.bgOpacity),
+        border: borderColor,
+        borderDash: isUnmitigated ? null : dashForStyle(state.ob.borderStyle),
         label: isBull ? `OB ${pctLabel}` : `OB ${pctLabel}`,
-        labelColor: isBull ? "#a7f3d0" : "#fecdd3",
+        labelColor: borderColor,
+        fontSize: state.ob.fontSize,
       });
     }
 
@@ -2192,6 +2789,7 @@
     for (let i = 0; i < res.length; i++) {
       const r = res[i];
       if (r.liquidity === null) continue;
+      if (isUnsettledAnchor(i)) continue;
       count++;
 
       const isBsl = r.liquidity === 1;
@@ -2201,6 +2799,8 @@
       else openCount++;
 
       if (state.liquidity.onlyOpen && isSwept) continue;
+      if (isBsl && !state.liquidity.showBsl) continue;
+      if (!isBsl && !state.liquidity.showSsl) continue;
 
       const baseColor = isBsl ? "#f97316" : "#a855f7";
       const tagText = isBsl ? "BSL $$$" : "SSL $$$";
@@ -2317,11 +2917,12 @@
         time2: candles[endIdx].time,
         price1: res[j].high,
         price2: res[j].low,
-        fill: "rgba(20, 184, 166, 0.12)",
-        border: "rgba(20, 184, 166, 0.4)",
-        borderDash: [3, 3],
+        fill: hexToRgba(state.sessions.bgColor, state.sessions.bgOpacity),
+        border: state.sessions.borderColor,
+        borderDash: dashForStyle(state.sessions.borderStyle),
         label: state.sessions.session,
-        labelColor: "rgba(20, 184, 166, 0.9)",
+        labelColor: state.sessions.borderColor,
+        fontSize: state.sessions.fontSize,
       });
 
       i = j + 1;
@@ -2342,7 +2943,7 @@
     if (state.retracements.showEq && swingHL.length >= 2) {
       let p2 = null, p1 = null;
       for (let k = swingHL.length - 1; k >= 0; k--) {
-        if (swingHL[k].highLow !== null) {
+        if (swingHL[k].highLow !== null && !isUnsettledAnchor(k)) {
           if (!p2) p2 = { idx: k, r: swingHL[k] };
           else if (!p1) { p1 = { idx: k, r: swingHL[k] }; break; }
         }
@@ -2353,26 +2954,31 @@
         const lowPrice = Math.min(p1.r.level, p2.r.level);
         const midPrice = (highPrice + lowPrice) / 2;
 
+        const dash = dashForStyle(state.retracements.borderStyle);
         eqPrimitive.setBoxes([
           {
             time1: candles[p1.idx].time,
             time2: null,
             price1: highPrice,
             price2: midPrice,
-            fill: "rgba(244, 63, 94, 0.08)",
-            border: "rgba(244, 63, 94, 0.3)",
+            fill: hexToRgba(state.retracements.premiumBgColor, state.retracements.bgOpacity),
+            border: state.retracements.premiumBorderColor,
+            borderDash: dash,
             label: "PREMIUM (50% - 100%)",
-            labelColor: "#f43f5e",
+            labelColor: state.retracements.premiumBorderColor,
+            fontSize: state.retracements.fontSize,
           },
           {
             time1: candles[p1.idx].time,
             time2: null,
             price1: midPrice,
             price2: lowPrice,
-            fill: "rgba(16, 185, 129, 0.08)",
-            border: "rgba(16, 185, 129, 0.3)",
+            fill: hexToRgba(state.retracements.discountBgColor, state.retracements.bgOpacity),
+            border: state.retracements.discountBorderColor,
+            borderDash: dash,
             label: "DISCOUNT (0% - 50%)",
-            labelColor: "#10b981",
+            labelColor: state.retracements.discountBorderColor,
+            fontSize: state.retracements.fontSize,
           },
         ]);
       }
@@ -2381,6 +2987,145 @@
     }
 
     setStat("retracements", "Equilibrium 50% Active");
+  }
+
+  function recomputeAntiRepaintStat() {
+    if (!state.antiRepaint.enabled || !candles.length) {
+      setStat("antirepaint", state.antiRepaint.enabled ? "Chưa có dữ liệu" : "Đang TẮT — có rủi ro repaint gần rìa hiện tại");
+      return;
+    }
+    const cutoff = Math.max(0, candles.length - 1 - state.antiRepaint.bufferBars);
+    // Cửa sổ swing lớn nhất đang dùng thực tế (cố định hoặc động) — kiểm chứng
+    // thực nghiệm cho thấy buffer cần ~10x cửa sổ này mới đủ an toàn.
+    const effectiveMaxWindow = state.swing.dynamic ? state.swing.maxBars : state.swing.swingLength;
+    const suggestedMin = effectiveMaxWindow * 10;
+    let msg = `Đang ẩn mọi tín hiệu neo sau nến #${cutoff} (${state.antiRepaint.bufferBars} nến gần rìa)`;
+    if (state.antiRepaint.bufferBars < suggestedMin) {
+      msg += ` — ⚠ nên tăng lên ≥${suggestedMin} (10× cửa sổ swing tối đa=${effectiveMaxWindow} đang dùng) để an toàn hơn`;
+    }
+    setStat("antirepaint", msg);
+  }
+
+  // ---------------------------------------------------------------------
+  // Strategy List (17 mô hình entry — xem strategies.js + research/REPORT.md)
+  // ---------------------------------------------------------------------
+  // Bảng màu cố định theo id để 1 strategy luôn giữ đúng 1 màu qua mọi phiên
+  // làm việc (không phụ thuộc thứ tự bật/tắt).
+  const STRATEGY_COLORS = {
+    M1: "#38bdf8", M2: "#0ea5e9", M3: "#a855f7", M4: "#10b981", M5: "#84cc16",
+    M6: "#f59e0b", M7: "#f97316", M8: "#22d3ee", M9: "#eab308", M10: "#c084fc",
+    M11: "#fb923c", M12: "#34d399", M13: "#fbbf24", M14: "#fdba74", M15: "#f43f5e",
+    M16: "#2dd4bf", M17: "#60a5fa",
+  };
+
+  // Sinh danh sách checkbox strategy TỰ ĐỘNG từ SmcStrategies.list — thêm 1
+  // strategy mới vào strategies.js (DETECTORS + LIST) là đủ để nó xuất hiện ở
+  // đây, không cần sửa gì trong file HTML này.
+  function buildStrategyListUI() {
+    const container = document.getElementById("strategy-list-container");
+    if (!container || typeof SmcStrategies === "undefined") return;
+    container.innerHTML = "";
+    for (const s of SmcStrategies.list) {
+      if (state.strategy.active[s.id] === undefined) state.strategy.active[s.id] = false;
+
+      const row = document.createElement("div");
+      row.className = "strategy-row";
+      row.id = "strategy-row-" + s.id;
+
+      const usesLabel = { atrbot: "ATRBot", bos: "BOS/CHOCH", ob: "Order Block", fvg: "FVG", liquidity: "Liquidity", retracements: "Retracement" };
+      const usesHtml = (s.uses || []).map((u) => `<span>${usesLabel[u] || u}</span>`).join("");
+      const winHtml = s.winRate !== null
+        ? `<span class="strategy-badge-win${s.winRate < 60 ? " low" : ""}">${s.winRate.toFixed(1)}% (n=${s.sampleSize})</span>`
+        : `<span class="strategy-badge-win low">n/a</span>`;
+      const riskHtml = s.repaintRisk === "ob-liquidity"
+        ? `<span class="strategy-badge-risk" title="Phụ thuộc Order Block/Liquidity gốc — vùng đệm Chống Repaint giảm nhưng không triệt tiêu hết rủi ro repaint dư (xem research/REPORT.md mục 6.1)">🟡 repaint dư</span>`
+        : `<span class="strategy-badge-risk" style="color:var(--accent-green);" title="Đã kiểm chứng 0 vi phạm repaint qua nhiều checkpoint (research/verify_strategies_no_repaint.mjs)">🟢 sạch</span>`;
+
+      row.innerHTML = `
+        <label style="cursor:pointer; padding-top:1px;">
+          <input type="checkbox" id="strategy-cb-${s.id}" ${state.strategy.active[s.id] ? "checked" : ""} />
+        </label>
+        <div class="strategy-row-main">
+          <div class="strategy-row-title">
+            <span class="strategy-id-tag" style="background:${STRATEGY_COLORS[s.id] || "#64748b"};">${s.id}</span>
+            <span>${s.name}</span>
+            ${winHtml}
+            ${riskHtml}
+          </div>
+          <div class="strategy-row-desc">${s.desc}</div>
+          <div class="strategy-row-uses">${usesHtml}</div>
+        </div>
+      `;
+      container.appendChild(row);
+
+      const cb = row.querySelector("input[type=checkbox]");
+      cb.addEventListener("change", () => {
+        state.strategy.active[s.id] = cb.checked;
+        row.classList.toggle("active", cb.checked);
+        if (cb.checked) {
+          // Tự động bật các indicator nền mà strategy này cần, để người dùng
+          // thấy đầy đủ bối cảnh (OB/FVG/Liquidity/ATRBot...) đứng sau mỗi
+          // điểm Buy/Sell thay vì chỉ 1 mũi tên trơ trọi.
+          for (const u of s.uses || []) {
+            if (state[u] && state[u].enabled === false) state[u].enabled = true;
+          }
+          syncSettingsUI();
+        }
+        recomputeAll();
+        saveSettingsToCache();
+      });
+      row.classList.toggle("active", !!state.strategy.active[s.id]);
+    }
+  }
+
+  function recomputeStrategies() {
+    const container = document.getElementById("strategy-list-container");
+    if (!state.strategy.enabled || typeof SmcStrategies === "undefined" || !candles.length) {
+      strategyMarkersPlugin.setMarkers([]);
+      setStat("strategy", state.strategy.enabled ? "Chưa có dữ liệu" : "Đang TẮT");
+      return;
+    }
+
+    const activeIds = SmcStrategies.list.map((s) => s.id).filter((id) => state.strategy.active[id]);
+    if (!activeIds.length) {
+      strategyMarkersPlugin.setMarkers([]);
+      setStat("strategy", "Chưa chọn chiến lược nào");
+      return;
+    }
+
+    const deps = {
+      SMC: SMC,
+      ATRBotM1Indicator: typeof ATRBotM1Indicator !== "undefined" ? ATRBotM1Indicator : null,
+      DynamicSwingHL: typeof DynamicSwingHL !== "undefined" ? DynamicSwingHL : null,
+      StatefulBosChoch: typeof StatefulBosChoch !== "undefined" ? StatefulBosChoch : null,
+    };
+    const raw = SmcStrategies.runMany(activeIds, candles, deps);
+
+    const markers = [];
+    const counts = {};
+    for (const id of activeIds) {
+      let n = 0;
+      for (const s of raw[id]) {
+        // Áp DÙNG CHUNG 1 chính sách chống-repaint với toàn bộ ứng dụng: bỏ
+        // qua mọi tín hiệu còn neo trong vùng đệm gần rìa hiện tại (xem
+        // isUnsettledAnchor() — cùng hàm dùng cho Swing/BOS/OB/Liquidity).
+        if (isUnsettledAnchor(s.index)) continue;
+        n++;
+        markers.push({
+          time: s.time,
+          position: s.direction === 1 ? "belowBar" : "aboveBar",
+          color: STRATEGY_COLORS[id] || "#94a3b8",
+          shape: s.direction === 1 ? "arrowUp" : "arrowDown",
+          text: id,
+        });
+      }
+      counts[id] = n;
+    }
+    markers.sort((a, b) => a.time - b.time);
+    strategyMarkersPlugin.setMarkers(markers);
+
+    const summary = activeIds.map((id) => `${id}: ${counts[id]}`).join(" · ");
+    setStat("strategy", `${activeIds.length} chiến lược đang bật — ${summary}`);
   }
 
   function recomputeAll() {
@@ -2394,6 +3139,8 @@
     recomputeSessions();
     recomputeRetracements();
     recomputeAtrBot();
+    recomputeStrategies();
+    recomputeAntiRepaintStat();
   }
 
   // ---------------------------------------------------------------------
@@ -2525,6 +3272,16 @@
     });
   }
 
+  function bindColor(id, obj, key, callback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      obj[key] = el.value;
+      saveSettingsToCache();
+      callback();
+    });
+  }
+
   // Đồng bộ giao diện Modal với State đã lưu trong cache
   function syncSettingsUI() {
     function setChecked(id, val) {
@@ -2538,6 +3295,17 @@
     function setCardActive(cardId, val) {
       const c = document.getElementById(cardId);
       if (c) c.classList.toggle("active", !!val);
+    }
+
+    // Strategy List
+    setChecked("strategy-enabled", state.strategy.enabled);
+    setCardActive("card-strategy", state.strategy.enabled);
+    if (typeof SmcStrategies !== "undefined") {
+      for (const s of SmcStrategies.list) {
+        setChecked("strategy-cb-" + s.id, state.strategy.active[s.id]);
+        const row = document.getElementById("strategy-row-" + s.id);
+        if (row) row.classList.toggle("active", !!state.strategy.active[s.id]);
+      }
     }
 
     // ATRBot M1
@@ -2564,6 +3332,13 @@
     setValue("swing-length", state.swing.swingLength);
     setChecked("swing-show-zigzag", state.swing.showZigzag);
     setChecked("swing-show-labels", state.swing.showLabels);
+    setChecked("swing-dynamic", state.swing.dynamic);
+    setValue("swing-dyn-atrLength", state.swing.atrLength);
+    setValue("swing-dyn-adaptiveK", state.swing.adaptiveK);
+    setValue("swing-dyn-percentileWindow", state.swing.percentileWindow);
+    setValue("swing-dyn-minPeriods", state.swing.minPeriods);
+    setValue("swing-dyn-minBars", state.swing.minBars);
+    setValue("swing-dyn-maxBars", state.swing.maxBars);
 
     // BOS
     setChecked("bos-enabled", state.bos.enabled);
@@ -2571,12 +3346,22 @@
     setChecked("bos-closeBreak", state.bos.closeBreak);
     setChecked("bos-show-bos", state.bos.showBos);
     setChecked("bos-show-choch", state.bos.showChoch);
+    setChecked("bos-stateful", state.bos.stateful);
 
     // FVG
     setChecked("fvg-enabled", state.fvg.enabled);
     setCardActive("card-fvg", state.fvg.enabled);
     setChecked("fvg-joinConsecutive", state.fvg.joinConsecutive);
     setChecked("fvg-only-open", state.fvg.onlyOpen);
+    setChecked("fvg-show-bull", state.fvg.showBull);
+    setChecked("fvg-show-bear", state.fvg.showBear);
+    setValue("fvg-fontSize", state.fvg.fontSize);
+    setValue("fvg-borderStyle", state.fvg.borderStyle);
+    setValue("fvg-bullBorderColor", state.fvg.bullBorderColor);
+    setValue("fvg-bullBgColor", state.fvg.bullBgColor);
+    setValue("fvg-bearBorderColor", state.fvg.bearBorderColor);
+    setValue("fvg-bearBgColor", state.fvg.bearBgColor);
+    setValue("fvg-bgOpacity", state.fvg.bgOpacity);
 
     // OB
     setChecked("ob-enabled", state.ob.enabled);
@@ -2584,6 +3369,15 @@
     setChecked("ob-closeMitigation", state.ob.closeMitigation);
     setChecked("ob-only-open", state.ob.onlyOpen);
     setChecked("ob-show-pct", state.ob.showPct);
+    setChecked("ob-show-bull", state.ob.showBull);
+    setChecked("ob-show-bear", state.ob.showBear);
+    setValue("ob-fontSize", state.ob.fontSize);
+    setValue("ob-borderStyle", state.ob.borderStyle);
+    setValue("ob-bullBorderColor", state.ob.bullBorderColor);
+    setValue("ob-bullBgColor", state.ob.bullBgColor);
+    setValue("ob-bearBorderColor", state.ob.bearBorderColor);
+    setValue("ob-bearBgColor", state.ob.bearBgColor);
+    setValue("ob-bgOpacity", state.ob.bgOpacity);
 
     // Liquidity
     setChecked("liq-enabled", state.liquidity.enabled);
@@ -2591,6 +3385,8 @@
     setValue("liq-rangePercent", state.liquidity.rangePercent);
     setChecked("liq-show-swept", state.liquidity.showSwept);
     setChecked("liq-only-open", state.liquidity.onlyOpen);
+    setChecked("liq-show-bsl", state.liquidity.showBsl);
+    setChecked("liq-show-ssl", state.liquidity.showSsl);
 
     // PHL
     setChecked("phl-enabled", state.phl.enabled);
@@ -2603,12 +3399,32 @@
     setValue("sessions-session", state.sessions.session);
     setValue("sessions-start", state.sessions.startTime);
     setValue("sessions-end", state.sessions.endTime);
+    setValue("sessions-fontSize", state.sessions.fontSize);
+    setValue("sessions-borderStyle", state.sessions.borderStyle);
+    setValue("sessions-borderColor", state.sessions.borderColor);
+    setValue("sessions-bgColor", state.sessions.bgColor);
+    setValue("sessions-bgOpacity", state.sessions.bgOpacity);
 
     // Retracements
     setChecked("retr-enabled", state.retracements.enabled);
     setCardActive("card-retr", state.retracements.enabled);
     setChecked("retr-show-eq", state.retracements.showEq);
+    setValue("retr-fontSize", state.retracements.fontSize);
+    setValue("retr-borderStyle", state.retracements.borderStyle);
+    setValue("retr-premiumBorderColor", state.retracements.premiumBorderColor);
+    setValue("retr-premiumBgColor", state.retracements.premiumBgColor);
+    setValue("retr-discountBorderColor", state.retracements.discountBorderColor);
+    setValue("retr-discountBgColor", state.retracements.discountBgColor);
+    setValue("retr-bgOpacity", state.retracements.bgOpacity);
+
+    // Chống Repaint
+    setChecked("antirepaint-enabled", state.antiRepaint.enabled);
+    setCardActive("card-antirepaint", state.antiRepaint.enabled);
+    setValue("antirepaint-bufferBars", state.antiRepaint.bufferBars);
   }
+
+  // S. Strategy List Bindings
+  bindCheckbox("strategy-enabled", state.strategy, "enabled", recomputeStrategies);
 
   // 0. ATRBot M1 Bindings
   bindCheckbox("atrbot-enabled", state.atrbot, "enabled", recomputeAtrBot);
@@ -2628,8 +3444,10 @@
   bindCheckbox("atrbot-showMultPanel", state.atrbot, "showMultPanel", recomputeAtrBot);
 
   // 1. Swing Highs/Lows
-  bindCheckbox("swing-enabled", state.swing, "enabled", recomputeSwingVisuals);
-  bindNumber("swing-length", state.swing, "swingLength", () => {
+  // swingLength và mọi tham số của chế độ Cửa sổ Động đều ảnh hưởng tới swingHL,
+  // nên phải recompute lại toàn bộ chuỗi phụ thuộc (BOS/CHOCH, OB, Liquidity,
+  // Retracements, ATRBot's liquidity filter) mỗi khi một trong số chúng đổi.
+  function recomputeSwingAndDependents() {
     recomputeSwingBase();
     recomputeSwingVisuals();
     recomputeBosChoch();
@@ -2637,31 +3455,64 @@
     recomputeLiquidity();
     recomputeRetracements();
     recomputeAtrBot();
-  });
+    recomputeAntiRepaintStat(); // cảnh báo buffer phụ thuộc swingLength/maxBars hiện hành
+  }
+
+  bindCheckbox("swing-enabled", state.swing, "enabled", recomputeSwingVisuals);
+  bindNumber("swing-length", state.swing, "swingLength", recomputeSwingAndDependents);
   bindCheckbox("swing-show-zigzag", state.swing, "showZigzag", recomputeSwingVisuals);
   bindCheckbox("swing-show-labels", state.swing, "showLabels", recomputeSwingVisuals);
+
+  bindCheckbox("swing-dynamic", state.swing, "dynamic", recomputeSwingAndDependents);
+  bindNumber("swing-dyn-atrLength", state.swing, "atrLength", recomputeSwingAndDependents);
+  bindNumber("swing-dyn-adaptiveK", state.swing, "adaptiveK", recomputeSwingAndDependents);
+  bindNumber("swing-dyn-percentileWindow", state.swing, "percentileWindow", recomputeSwingAndDependents);
+  bindNumber("swing-dyn-minPeriods", state.swing, "minPeriods", recomputeSwingAndDependents);
+  bindNumber("swing-dyn-minBars", state.swing, "minBars", recomputeSwingAndDependents);
+  bindNumber("swing-dyn-maxBars", state.swing, "maxBars", recomputeSwingAndDependents);
 
   // 2. BOS / CHOCH
   bindCheckbox("bos-enabled", state.bos, "enabled", recomputeBosChoch);
   bindCheckbox("bos-closeBreak", state.bos, "closeBreak", recomputeBosChoch);
   bindCheckbox("bos-show-bos", state.bos, "showBos", recomputeBosChoch);
   bindCheckbox("bos-show-choch", state.bos, "showChoch", recomputeBosChoch);
+  bindCheckbox("bos-stateful", state.bos, "stateful", recomputeBosChoch);
 
   // 3. FVG
   bindCheckbox("fvg-enabled", state.fvg, "enabled", recomputeFvg);
   bindCheckbox("fvg-joinConsecutive", state.fvg, "joinConsecutive", recomputeFvg);
   bindCheckbox("fvg-only-open", state.fvg, "onlyOpen", recomputeFvg);
+  bindCheckbox("fvg-show-bull", state.fvg, "showBull", recomputeFvg);
+  bindCheckbox("fvg-show-bear", state.fvg, "showBear", recomputeFvg);
+  bindNumber("fvg-fontSize", state.fvg, "fontSize", recomputeFvg);
+  bindSelect("fvg-borderStyle", state.fvg, "borderStyle", recomputeFvg);
+  bindColor("fvg-bullBorderColor", state.fvg, "bullBorderColor", recomputeFvg);
+  bindColor("fvg-bullBgColor", state.fvg, "bullBgColor", recomputeFvg);
+  bindColor("fvg-bearBorderColor", state.fvg, "bearBorderColor", recomputeFvg);
+  bindColor("fvg-bearBgColor", state.fvg, "bearBgColor", recomputeFvg);
+  bindNumber("fvg-bgOpacity", state.fvg, "bgOpacity", recomputeFvg);
 
   // 4. Order Blocks
   bindCheckbox("ob-enabled", state.ob, "enabled", recomputeOb);
   bindCheckbox("ob-closeMitigation", state.ob, "closeMitigation", recomputeOb);
   bindCheckbox("ob-only-open", state.ob, "onlyOpen", recomputeOb);
   bindCheckbox("ob-show-pct", state.ob, "showPct", recomputeOb);
+  bindCheckbox("ob-show-bull", state.ob, "showBull", recomputeOb);
+  bindCheckbox("ob-show-bear", state.ob, "showBear", recomputeOb);
+  bindNumber("ob-fontSize", state.ob, "fontSize", recomputeOb);
+  bindSelect("ob-borderStyle", state.ob, "borderStyle", recomputeOb);
+  bindColor("ob-bullBorderColor", state.ob, "bullBorderColor", recomputeOb);
+  bindColor("ob-bullBgColor", state.ob, "bullBgColor", recomputeOb);
+  bindColor("ob-bearBorderColor", state.ob, "bearBorderColor", recomputeOb);
+  bindColor("ob-bearBgColor", state.ob, "bearBgColor", recomputeOb);
+  bindNumber("ob-bgOpacity", state.ob, "bgOpacity", recomputeOb);
 
   // 5. Liquidity
   bindCheckbox("liq-enabled", state.liquidity, "enabled", recomputeLiquidity);
   bindNumber("liq-rangePercent", state.liquidity, "rangePercent", recomputeLiquidity);
   bindCheckbox("liq-show-swept", state.liquidity, "showSwept", recomputeLiquidity);
+  bindCheckbox("liq-show-bsl", state.liquidity, "showBsl", recomputeLiquidity);
+  bindCheckbox("liq-show-ssl", state.liquidity, "showSsl", recomputeLiquidity);
   bindCheckbox("liq-only-open", state.liquidity, "onlyOpen", recomputeLiquidity);
 
   // 6. Previous High/Low
@@ -2677,10 +3528,26 @@
   });
   bindText("sessions-start", state.sessions, "startTime", recomputeSessions);
   bindText("sessions-end", state.sessions, "endTime", recomputeSessions);
+  bindNumber("sessions-fontSize", state.sessions, "fontSize", recomputeSessions);
+  bindSelect("sessions-borderStyle", state.sessions, "borderStyle", recomputeSessions);
+  bindColor("sessions-borderColor", state.sessions, "borderColor", recomputeSessions);
+  bindColor("sessions-bgColor", state.sessions, "bgColor", recomputeSessions);
+  bindNumber("sessions-bgOpacity", state.sessions, "bgOpacity", recomputeSessions);
 
   // 8. Retracements
   bindCheckbox("retr-enabled", state.retracements, "enabled", recomputeRetracements);
   bindCheckbox("retr-show-eq", state.retracements, "showEq", recomputeRetracements);
+  bindNumber("retr-fontSize", state.retracements, "fontSize", recomputeRetracements);
+  bindSelect("retr-borderStyle", state.retracements, "borderStyle", recomputeRetracements);
+  bindColor("retr-premiumBorderColor", state.retracements, "premiumBorderColor", recomputeRetracements);
+  bindColor("retr-premiumBgColor", state.retracements, "premiumBgColor", recomputeRetracements);
+  bindColor("retr-discountBorderColor", state.retracements, "discountBorderColor", recomputeRetracements);
+  bindColor("retr-discountBgColor", state.retracements, "discountBgColor", recomputeRetracements);
+  bindNumber("retr-bgOpacity", state.retracements, "bgOpacity", recomputeRetracements);
+
+  // 9. Chống Repaint — ảnh hưởng tới mọi thứ neo vào swingHL, nên recompute toàn bộ
+  bindCheckbox("antirepaint-enabled", state.antiRepaint, "enabled", recomputeAll);
+  bindNumber("antirepaint-bufferBars", state.antiRepaint, "bufferBars", recomputeAll);
 
   // ---------------------------------------------------------------------
   // Modal Interactions
@@ -2718,6 +3585,7 @@
     if (e.key === "Escape") {
       if (settingsModal.classList.contains("open")) closeModal();
       if (symbolPopover.classList.contains("open")) symbolPopover.classList.remove("open");
+      if (replaySetupActive) cancelReplaySetup();
     }
   });
 
@@ -2786,6 +3654,10 @@
   let isWsActive = false;
 
   function toggleWebSocket() {
+    if (replayMode) {
+      showToast("Thoát Replay trước khi bật Live Ticker");
+      return;
+    }
     if (isWsActive) stopWebSocket();
     else startWebSocket();
   }
@@ -2817,21 +3689,25 @@
           volume: Number(k.v),
         };
 
-        candleSeries.update(candle);
-        updateOhlcBar(candle);
-
-        if (candles.length > 0) {
-          const last = candles[candles.length - 1];
+        if (allCandles.length > 0) {
+          const last = allCandles[allCandles.length - 1];
           if (last.time === candle.time) {
-            candles[candles.length - 1] = candle;
+            allCandles[allCandles.length - 1] = candle;
           } else if (candle.time > last.time) {
-            candles.push(candle);
-            if (candles.length > TARGET_CANDLES) candles.shift();
+            allCandles.push(candle);
+            if (allCandles.length > TARGET_CANDLES) allCandles.shift();
           }
         }
 
-        clearTimeout(ws._timer);
-        ws._timer = setTimeout(recomputeAll, 400);
+        // Ở chế độ Replay, dữ liệu live chỉ được ghi vào allCandles (nguồn sự thật)
+        // chứ không hiển thị ngay — tránh lộ thông tin tương lai vào phiên backtest tay.
+        if (!replayMode) {
+          candles = allCandles;
+          candleSeries.update(candle);
+          updateOhlcBar(candle);
+          clearTimeout(ws._timer);
+          ws._timer = setTimeout(recomputeAll, 400);
+        }
       } catch (err) {
         console.error("WS error:", err);
       }
@@ -2860,11 +3736,227 @@
   wsToggleBtn.addEventListener("click", toggleWebSocket);
 
   // ---------------------------------------------------------------------
+  // Replay Mode — tua lại lịch sử & tính chỉ báo đúng độ trễ thời gian thực
+  // ---------------------------------------------------------------------
+  // Nguyên lý: mọi hàm SMC.* (swingHighsLows, bosChoch, fvg, orderBlocks,
+  // liquidity...) là hàm thuần chỉ nhìn vào mảng candles được truyền vào.
+  // Bằng cách cho `candles` trỏ tới allCandles.slice(0, replayIndex + 1) và
+  // gọi lại recomputeAll(), các chỉ báo tự động chỉ "biết" đúng những gì đã
+  // xảy ra tới thời điểm đó — bao gồm cả độ trễ xác nhận swing (swingLength
+  // nến) và độ trễ xác nhận phá vỡ của BOS/CHOCH — chứ không bị lộ dữ liệu
+  // tương lai như khi xem toàn bộ 15.000 nến cùng lúc.
+  const REPLAY_MIN_INDEX = 5;
+  const REPLAY_SPEEDS = [
+    { label: "0.5x", ms: 800 },
+    { label: "1x", ms: 400 },
+    { label: "2x", ms: 200 },
+    { label: "4x", ms: 100 },
+    { label: "8x", ms: 50 },
+    { label: "15x", ms: 27 },
+    { label: "20x", ms: 20 },
+  ];
+
+  let replayMode = false;
+  let replaySetupActive = false;
+  let replayIndex = -1;
+  let replayPlaying = false;
+  let replayTimer = null;
+  let replaySpeedIdx = 1;
+
+  function formatReplayTime(ts) {
+    const d = new Date(ts * 1000);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+  }
+
+  function enterReplaySetup() {
+    if (!allCandles.length) {
+      showToast("Chưa có dữ liệu để Replay");
+      return;
+    }
+    if (isWsActive) stopWebSocket();
+    if (replayMode) {
+      exitReplay();
+      return;
+    }
+    replaySetupActive = true;
+    chartContainer.style.cursor = "crosshair";
+    replayHint.classList.add("open");
+    replayBtn.classList.add("btn-primary");
+  }
+
+  function cancelReplaySetup() {
+    replaySetupActive = false;
+    chartContainer.style.cursor = "";
+    replayHint.classList.remove("open");
+    if (!replayMode) replayBtn.classList.remove("btn-primary");
+  }
+
+  chart.subscribeClick((param) => {
+    if (!replaySetupActive || !param || param.time === undefined) return;
+    const idx = allCandles.findIndex((c) => c.time === param.time);
+    if (idx < 0) return;
+    startReplay(idx);
+  });
+
+  replayHintCancel.addEventListener("click", cancelReplaySetup);
+
+  function startReplay(startIdx) {
+    replaySetupActive = false;
+    chartContainer.style.cursor = "";
+    replayHint.classList.remove("open");
+
+    replayMode = true;
+    replayIndex = Math.max(REPLAY_MIN_INDEX, Math.min(startIdx, allCandles.length - 1));
+
+    replayBtn.classList.add("btn-primary");
+    replayBtnText.textContent = "Đang Replay";
+    replayBar.classList.add("open");
+    replaySlider.min = String(REPLAY_MIN_INDEX);
+    replaySlider.max = String(allCandles.length - 1);
+
+    updateReplayView();
+    // Cú click khởi động Replay cũng kích hoạt sự kiện crosshairMove của chính nó,
+    // có thể ghi đè OHLC header bằng nến liền kề ngay sau updateOhlcBar() ở trên
+    // (do thứ tự xử lý sự kiện của Lightweight Charts) — khẳng định lại giá trị
+    // đúng ở animation frame kế tiếp để tránh hiển thị sai trong khoảnh khắc đó.
+    requestAnimationFrame(() => {
+      if (candles.length) updateOhlcBar(candles[candles.length - 1]);
+    });
+    // Luôn định vị lại khung nhìn khi vừa chọn điểm bắt đầu — nếu không, chart
+    // giữ nguyên vùng zoom cũ (thường đang neo ở rìa phải của 15.000 nến), khiến
+    // nến vừa cắt bị "kéo dồn" ra sát mép phải thay vì làm điểm bắt đầu hợp lý.
+    positionReplayView(replayIndex, true);
+    showToast("Đã bắt đầu Replay — chỉ báo tính đúng độ trễ thời gian thực từ điểm này");
+  }
+
+  // Số nến lịch sử hiển thị bên trái điểm cắt / khoảng trống bên phải để
+  // nến mới xuất hiện dần khi play hoặc bấm tiến từng nến.
+  const REPLAY_HISTORY_BARS = 100;
+  const REPLAY_FUTURE_BARS = 150;
+
+  function positionReplayView(index, force) {
+    const ts = chart.timeScale();
+    if (!force) {
+      const range = ts.getVisibleLogicalRange();
+      // Vẫn còn nằm thoải mái trong khung nhìn hiện tại — không cần dịch chuyển,
+      // tránh giật hình mỗi lần bấm tiến/lùi 1 nến khi không cần thiết.
+      if (range && index >= range.from + 2 && index <= range.to - 5) return;
+    }
+    ts.setVisibleLogicalRange({
+      from: Math.max(0, index - REPLAY_HISTORY_BARS),
+      to: index + REPLAY_FUTURE_BARS,
+    });
+  }
+
+  function updateReplayView() {
+    candles = allCandles.slice(0, replayIndex + 1);
+    candleSeries.setData(candles);
+    recomputeAll();
+    if (candles.length) updateOhlcBar(candles[candles.length - 1]);
+    updateReplayBarUI();
+    positionReplayView(replayIndex, false);
+  }
+
+  function updateReplayBarUI() {
+    replaySlider.value = String(replayIndex);
+    const last = allCandles[replayIndex];
+    if (last) replayTimeLabel.textContent = formatReplayTime(last.time);
+    replayPlayBtn.textContent = replayPlaying ? "⏸" : "▶";
+  }
+
+  function replayStep(delta) {
+    if (!replayMode) return;
+    replayPause();
+    replayIndex = Math.min(allCandles.length - 1, Math.max(REPLAY_MIN_INDEX, replayIndex + delta));
+    updateReplayView();
+  }
+
+  function scheduleReplayTick() {
+    if (!replayPlaying) return;
+    if (replayIndex >= allCandles.length - 1) {
+      replayPause();
+      showToast("Replay đã tới nến cuối cùng");
+      return;
+    }
+    replayTimer = setTimeout(() => {
+      if (!replayPlaying) return;
+      replayIndex = Math.min(allCandles.length - 1, replayIndex + 1);
+      updateReplayView();
+      scheduleReplayTick();
+    }, REPLAY_SPEEDS[replaySpeedIdx].ms);
+  }
+
+  function replayPlayToggle() {
+    if (!replayMode) return;
+    if (replayPlaying) {
+      replayPause();
+    } else {
+      replayPlaying = true;
+      updateReplayBarUI();
+      scheduleReplayTick();
+    }
+  }
+
+  function replayPause() {
+    replayPlaying = false;
+    clearTimeout(replayTimer);
+    updateReplayBarUI();
+  }
+
+  function exitReplay() {
+    cancelReplaySetup();
+    replayPause();
+    if (!replayMode) return;
+    replayMode = false;
+    replayBar.classList.remove("open");
+    replayBtn.classList.remove("btn-primary");
+    replayBtnText.textContent = "Replay";
+    candles = allCandles;
+    candleSeries.setData(candles);
+    recomputeAll();
+    if (candles.length) updateOhlcBar(candles[candles.length - 1]);
+    chart.timeScale().fitContent();
+  }
+
+  replayBtn.addEventListener("click", enterReplaySetup);
+  replayExitBtn.addEventListener("click", exitReplay);
+  replayStepBackBtn.addEventListener("click", () => replayStep(-1));
+  replayStepFwdBtn.addEventListener("click", () => replayStep(1));
+  replayPlayBtn.addEventListener("click", replayPlayToggle);
+
+  replaySlider.addEventListener("input", () => {
+    // Đọc giá trị người dùng vừa kéo TRƯỚC KHI pause — replayPause() gọi
+    // updateReplayBarUI() và sẽ ghi đè replaySlider.value về replayIndex cũ,
+    // nên phải chốt giá trị mới lại rồi mới pause, tránh làm mất thao tác kéo.
+    const draggedIndex = parseInt(replaySlider.value, 10);
+    replayPause();
+    replayIndex = draggedIndex;
+    updateReplayView();
+    positionReplayView(replayIndex, true);
+  });
+
+  replaySpeedSelect.addEventListener("change", () => {
+    replaySpeedIdx = parseInt(replaySpeedSelect.value, 10);
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (!replayMode) return;
+    const tag = (document.activeElement && document.activeElement.tagName) || "";
+    if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+    if (e.key === "ArrowRight") { e.preventDefault(); replayStep(1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); replayStep(-1); }
+    else if (e.key === " ") { e.preventDefault(); replayPlayToggle(); }
+  });
+
+  // ---------------------------------------------------------------------
   // Boot Pipeline
   // ---------------------------------------------------------------------
   async function loadAndRender(forceRefresh = false) {
     try {
-      candles = await loadKlinesData(forceRefresh);
+      exitReplay();
+      allCandles = await loadKlinesData(forceRefresh);
+      candles = allCandles;
       candleSeries.setData(candles);
 
       resizeChart();
@@ -2894,6 +3986,7 @@
     });
   }
 
+  buildStrategyListUI();
   resizeChart();
   loadAndRender();
 })();
