@@ -501,6 +501,156 @@
   }
   #replayExitBtn:hover { background: var(--accent-red); color: #fff; }
 
+  /* Timeframe Selector (topbar) */
+  .tf-select {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+  }
+  .tf-select:hover { border-color: var(--accent-blue); }
+
+  /* Strategy Signals Panel — trượt vào từ bên phải chart, không co giãn chart */
+  #strategySignalsPanel {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: 330px;
+    background: rgba(15, 20, 34, 0.97);
+    border: 1px solid var(--border-highlight);
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    z-index: 24;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(calc(100% + 20px));
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  #strategySignalsPanel.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .ssp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  #sspCloseBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  #sspCloseBtn:hover { color: #fff; }
+  .ssp-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .ssp-empty {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 20px 8px;
+    line-height: 1.5;
+  }
+  .ssp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .ssp-row:hover {
+    border-color: var(--accent-blue);
+    background: rgba(56, 189, 248, 0.08);
+  }
+  .ssp-row-dir {
+    font-size: 13px;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .ssp-row-dir.up { color: var(--accent-green); }
+  .ssp-row-dir.down { color: var(--accent-red); }
+  .ssp-row-main {
+    flex: 1;
+    min-width: 0;
+  }
+  .ssp-row-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+  }
+  .ssp-row-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .ssp-row-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .ssp-row-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .ssp-status {
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .ssp-status.win { background: rgba(16, 185, 129, 0.18); color: var(--accent-green); }
+  .ssp-status.lose { background: rgba(244, 63, 94, 0.18); color: var(--accent-red); }
+  .ssp-status.open { background: rgba(245, 158, 11, 0.18); color: var(--accent-amber); }
+  .ssp-status.nofill { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
+  .ssp-row-stats {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .ssp-row-stats .pnl { color: var(--accent-green); }
+  .ssp-row-stats .sl { color: var(--accent-red); }
+
   /* -------------------------------------------------------------
      SETTINGS MODAL
      ------------------------------------------------------------- */
@@ -837,6 +987,14 @@
     padding: 1px 5px;
     margin-right: 3px;
   }
+  .strategy-row-live {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-blue);
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--border);
+  }
 
   .ctrl-input-num, .ctrl-select, .ctrl-input-text {
     background: var(--bg-input);
@@ -939,7 +1097,18 @@
         </div>
       </div>
 
-      <span class="data-badge">15M · 15K NẾN</span>
+      <!-- Timeframe Selector -->
+      <select class="tf-select" id="timeframeSelect" title="Chọn khung thời gian (khi đổi sẽ tải lại dữ liệu)">
+        <option value="1m">1m</option>
+        <option value="5m">5m</option>
+        <option value="15m" selected>15m</option>
+        <option value="30m">30m</option>
+        <option value="1h">1h</option>
+        <option value="4h">4h</option>
+        <option value="1d">1D</option>
+      </select>
+
+      <span class="data-badge" id="dataBadge">15M · 15K NẾN</span>
     </div>
 
     <!-- Live OHLCV Crosshair Display -->
@@ -976,6 +1145,12 @@
         <span id="replayBtnText">Replay</span>
       </button>
 
+      <!-- Bật/tắt Panel danh sách tín hiệu Buy/Sell của các Strategy đang chọn -->
+      <button class="btn-action" id="strategySignalsBtn" title="Bật/tắt danh sách tín hiệu Buy/Sell của các Strategy đang bật — click 1 dòng để kéo chart tới đó">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+        <span id="strategySignalsBtnText">Tín hiệu (0)</span>
+      </button>
+
       <!-- Fit Chart Full View -->
       <button class="btn-icon" id="fitChartBtn" title="Khớp toàn bộ dữ liệu (Fit Chart)">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
@@ -996,7 +1171,7 @@
   <main id="chartWrap">
     <div class="chart-watermark">
       <h2 id="watermarkSymbol">IMXUSDT</h2>
-      <p>15M · 15,000 NẾN · SMC.JS ENGINE</p>
+      <p id="watermarkTf">15M · 15,000 NẾN · SMC.JS ENGINE</p>
     </div>
     <div id="chart"></div>
 
@@ -1023,6 +1198,17 @@
         <option value="6">20x</option>
       </select>
       <button id="replayExitBtn" title="Thoát Replay, quay lại toàn bộ dữ liệu">Thoát Replay</button>
+    </div>
+
+    <!-- Panel danh sách tín hiệu Buy/Sell của các Strategy đang bật -->
+    <div id="strategySignalsPanel">
+      <div class="ssp-header">
+        <span>Tín hiệu Strategies (<span id="sspCount">0</span>)</span>
+        <button id="sspCloseBtn" title="Đóng">&times;</button>
+      </div>
+      <div class="ssp-list" id="sspList">
+        <div class="ssp-empty">Chưa có tín hiệu nào — bật ít nhất 1 Strategy ở Cài đặt SMC.</div>
+      </div>
     </div>
   </main>
 </div>
@@ -1585,7 +1771,7 @@
         <button class="btn-action" id="resetDefaultsBtn" title="Khôi phục thiết lập mặc định">
           <span>Khôi phục mặc định</span>
         </button>
-        <button class="btn-action" id="forceReloadBtn" title="Xóa cache và tải lại mới 15.000 nến từ máy chủ Binance">
+        <button class="btn-action" id="forceReloadBtn" title="Xóa cache và tải lại mới toàn bộ nến từ máy chủ Binance">
           <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Tải mới từ Server</span>
         </button>
@@ -1613,8 +1799,10 @@
 
   // Configuration
   let SYMBOL = localStorage.getItem("smc_selected_symbol") || "IMXUSDT";
-  const INTERVAL = "15m";
-  const TARGET_CANDLES = 15000;
+  const VALID_INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"];
+  let INTERVAL = localStorage.getItem("smc_selected_interval") || "15m";
+  if (!VALID_INTERVALS.includes(INTERVAL)) INTERVAL = "15m";
+  const TARGET_CANDLES = 50000;
   const KLINES_API = "https://fapi.binance.com/fapi/v1/klines";
   const PROXY_API = "/api/klines";
   const EXCHANGE_INFO_API = "https://fapi.binance.com/fapi/v1/exchangeInfo";
@@ -1643,6 +1831,14 @@
   const replayTimeLabel = document.getElementById("replayTimeLabel");
   const replaySpeedSelect = document.getElementById("replaySpeedSelect");
   const replayExitBtn = document.getElementById("replayExitBtn");
+  const timeframeSelect = document.getElementById("timeframeSelect");
+  const dataBadge = document.getElementById("dataBadge");
+  const strategySignalsBtn = document.getElementById("strategySignalsBtn");
+  const strategySignalsBtnText = document.getElementById("strategySignalsBtnText");
+  const strategySignalsPanel = document.getElementById("strategySignalsPanel");
+  const sspCloseBtn = document.getElementById("sspCloseBtn");
+  const sspList = document.getElementById("sspList");
+  const sspCount = document.getElementById("sspCount");
   const openSettingsBtn = document.getElementById("openSettingsBtn");
   const closeSettingsBtn = document.getElementById("closeSettingsBtn");
   const applySettingsBtn = document.getElementById("applySettingsBtn");
@@ -1651,6 +1847,7 @@
   const settingsModal = document.getElementById("settingsModal");
   const cacheStatusText = document.getElementById("cacheStatusText");
   const watermarkSymbol = document.getElementById("watermarkSymbol");
+  const watermarkTf = document.getElementById("watermarkTf");
   const toast = document.getElementById("toast");
 
   // Symbol Dropdown Elements
@@ -1967,7 +2164,7 @@
     }
 
     // 2. Tải mới từ Server Binance
-    setStatus(`Đang tải 15.000 nến ${SYMBOL}...`, "loading");
+    setStatus(`Đang tải ${TARGET_CANDLES.toLocaleString()} nến ${SYMBOL} (${INTERVAL})...`, "loading");
     setProgress(5);
     cacheStatusText.textContent = `Cache: Đang tải mới từ server...`;
 
@@ -2126,6 +2323,30 @@
     renderSymbolList(filtered);
   }
 
+  function updateDataBadge() {
+    const countLabel = TARGET_CANDLES >= 1000 ? `${Math.round(TARGET_CANDLES / 1000)}K` : String(TARGET_CANDLES);
+    dataBadge.textContent = `${INTERVAL.toUpperCase()} · ${countLabel} NẾN`;
+    watermarkTf.textContent = `${INTERVAL.toUpperCase()} · ${TARGET_CANDLES.toLocaleString()} NẾN · SMC.JS ENGINE`;
+  }
+
+  function selectInterval(newInterval) {
+    if (newInterval === INTERVAL || !VALID_INTERVALS.includes(newInterval)) return;
+    INTERVAL = newInterval;
+    localStorage.setItem("smc_selected_interval", INTERVAL);
+    timeframeSelect.value = INTERVAL;
+    updateDataBadge();
+
+    // Reconnect Live WebSocket với stream khung thời gian mới nếu đang bật
+    if (isWsActive) {
+      startWebSocket();
+    }
+
+    loadAndRender();
+  }
+
+  timeframeSelect.addEventListener("change", (e) => selectInterval(e.target.value));
+  timeframeSelect.value = INTERVAL;
+
   function selectSymbol(newSymbol) {
     if (newSymbol === SYMBOL) {
       symbolPopover.classList.remove("open");
@@ -2166,6 +2387,7 @@
 
   currentSymbolText.textContent = SYMBOL;
   watermarkSymbol.textContent = SYMBOL;
+  updateDataBadge();
   loadFuturesSymbols();
 
   // ---------------------------------------------------------------------
@@ -3035,8 +3257,8 @@
       const usesLabel = { atrbot: "ATRBot", bos: "BOS/CHOCH", ob: "Order Block", fvg: "FVG", liquidity: "Liquidity", retracements: "Retracement" };
       const usesHtml = (s.uses || []).map((u) => `<span>${usesLabel[u] || u}</span>`).join("");
       const winHtml = s.winRate !== null
-        ? `<span class="strategy-badge-win${s.winRate < 60 ? " low" : ""}">${s.winRate.toFixed(1)}% (n=${s.sampleSize})</span>`
-        : `<span class="strategy-badge-win low">n/a</span>`;
+        ? `<span class="strategy-badge-win${s.winRate < 60 ? " low" : ""}" title="Số liệu THAM CHIẾU gốc: 10 symbol Binance Futures x 100.500 nến (research/REPORT.md), KHÔNG phải dữ liệu đang xem">Tham chiếu: ${s.winRate.toFixed(1)}% (n=${s.sampleSize})</span>`
+        : `<span class="strategy-badge-win low">Tham chiếu: n/a</span>`;
       const riskHtml = s.repaintRisk === "ob-liquidity"
         ? `<span class="strategy-badge-risk" title="Phụ thuộc Order Block/Liquidity gốc — vùng đệm Chống Repaint giảm nhưng không triệt tiêu hết rủi ro repaint dư (xem research/REPORT.md mục 6.1)">🟡 repaint dư</span>`
         : `<span class="strategy-badge-risk" style="color:var(--accent-green);" title="Đã kiểm chứng 0 vi phạm repaint qua nhiều checkpoint (research/verify_strategies_no_repaint.mjs)">🟢 sạch</span>`;
@@ -3054,6 +3276,7 @@
           </div>
           <div class="strategy-row-desc">${s.desc}</div>
           <div class="strategy-row-uses">${usesHtml}</div>
+          <div class="strategy-row-live" id="strategy-live-${s.id}">⏳ Đang tính trên dữ liệu hiện tại...</div>
         </div>
       `;
       container.appendChild(row);
@@ -3078,11 +3301,80 @@
     }
   }
 
+  // ---------------------------------------------------------------------
+  // Backtest TRỰC TIẾP (live) trên đúng dữ liệu symbol/khung thời gian đang
+  // xem — chạy LẦN LƯỢT từng strategy (không phải tất cả cùng lúc) để: (1)
+  // người dùng thấy kết quả hiện dần ra thay vì màn hình đứng hình vài giây,
+  // (2) nhường luồng chính (main thread) vẽ lại UI giữa các bước. Luôn dùng
+  // `allCandles` (toàn bộ dữ liệu đã tải) — KHÔNG dùng `candles` bị cắt bởi
+  // Replay — vì đây là số liệu tham khảo tổng thể, không phải "tại thời điểm
+  // replay". `liveStatsRunToken` dùng để huỷ 1 lượt tính đang dở nếu người
+  // dùng đổi symbol/timeframe giữa chừng (tránh hiển thị lẫn số liệu 2 symbol).
+  // ---------------------------------------------------------------------
+  let liveStatsRunToken = 0;
+
+  function setLiveStrategyBadge(id, html) {
+    const el = document.getElementById("strategy-live-" + id);
+    if (el) el.innerHTML = html;
+  }
+
+  function renderLiveStrategyBadge(id, summary) {
+    if (!summary.filled) {
+      setLiveStrategyBadge(id, `<span style="color:var(--text-muted);">Chưa đủ tín hiệu khớp lệnh trên dữ liệu hiện tại</span>`);
+      return;
+    }
+    const winRateStr = summary.winRate != null ? summary.winRate.toFixed(1) + "%" : "n/a";
+    const winColor = summary.winRate == null ? "var(--text-muted)" : (summary.winRate >= 60 ? "var(--accent-green)" : "var(--accent-red)");
+    const openNote = summary.open ? ` · <span style="color:var(--accent-amber);">${summary.open} đang chạy</span>` : "";
+    setLiveStrategyBadge(id,
+      `📡 LIVE (dữ liệu hiện tại): <b>${summary.closed}</b> lệnh đã đóng · Win <b style="color:${winColor};">${winRateStr}</b>${openNote} · ` +
+      `MFE TB <b>${summary.avgMfe != null ? summary.avgMfe.toFixed(2) : "—"}%</b> (max ${summary.maxMfe != null ? summary.maxMfe.toFixed(2) : "—"}%) · ` +
+      `MAE TB <b>${summary.avgMae != null ? summary.avgMae.toFixed(2) : "—"}%</b> (max ${summary.maxMae != null ? summary.maxMae.toFixed(2) : "—"}%)`
+    );
+  }
+
+  async function runLiveStrategyStats() {
+    if (typeof SmcStrategies === "undefined" || !allCandles.length) return;
+    const runToken = ++liveStatsRunToken;
+    const deps = {
+      SMC: SMC,
+      ATRBotM1Indicator: typeof ATRBotM1Indicator !== "undefined" ? ATRBotM1Indicator : null,
+      DynamicSwingHL: typeof DynamicSwingHL !== "undefined" ? DynamicSwingHL : null,
+      StatefulBosChoch: typeof StatefulBosChoch !== "undefined" ? StatefulBosChoch : null,
+    };
+    for (const s of SmcStrategies.list) {
+      setLiveStrategyBadge(s.id, "⏳ Đang tính trên dữ liệu hiện tại...");
+    }
+    // Xây context 1 lần, dùng lười (lazy) qua từng vòng lặp — mỗi strategy
+    // chỉ tính thêm đúng phần chỉ báo nó cần mà các strategy trước chưa tính.
+    const ctx = SmcStrategies.buildContext(allCandles, deps);
+    for (const s of SmcStrategies.list) {
+      if (runToken !== liveStatsRunToken) return; // có lượt tính mới hơn đã bắt đầu, dừng lượt cũ
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      try {
+        const raw = SmcStrategies.runWithContext(s.id, ctx);
+        const evaluated = SmcStrategies.evaluateSignals(allCandles, raw, 2);
+        const summary = SmcStrategies.summarize(evaluated);
+        if (runToken !== liveStatsRunToken) return;
+        renderLiveStrategyBadge(s.id, summary);
+      } catch (e) {
+        console.warn("Live backtest lỗi cho", s.id, e);
+        if (runToken === liveStatsRunToken) setLiveStrategyBadge(s.id, `<span style="color:var(--accent-red);">Lỗi tính toán</span>`);
+      }
+    }
+  }
+
+  // Bản sao "phẳng" (đã lọc chống-repaint) của mọi tín hiệu đang hiển thị —
+  // dùng để vẽ marker VÀ để hiển thị trong Panel danh sách tín hiệu, đảm bảo
+  // panel luôn khớp 1-1 với những gì thực sự có trên chart.
+  let lastStrategySignals = [];
+
   function recomputeStrategies() {
-    const container = document.getElementById("strategy-list-container");
     if (!state.strategy.enabled || typeof SmcStrategies === "undefined" || !candles.length) {
       strategyMarkersPlugin.setMarkers([]);
       setStat("strategy", state.strategy.enabled ? "Chưa có dữ liệu" : "Đang TẮT");
+      lastStrategySignals = [];
+      renderStrategySignalsPanel();
       return;
     }
 
@@ -3090,6 +3382,8 @@
     if (!activeIds.length) {
       strategyMarkersPlugin.setMarkers([]);
       setStat("strategy", "Chưa chọn chiến lược nào");
+      lastStrategySignals = [];
+      renderStrategySignalsPanel();
       return;
     }
 
@@ -3102,15 +3396,17 @@
     const raw = SmcStrategies.runMany(activeIds, candles, deps);
 
     const markers = [];
-    const counts = {};
+    const signals = [];
+    const summaries = {};
     for (const id of activeIds) {
-      let n = 0;
-      for (const s of raw[id]) {
-        // Áp DÙNG CHUNG 1 chính sách chống-repaint với toàn bộ ứng dụng: bỏ
-        // qua mọi tín hiệu còn neo trong vùng đệm gần rìa hiện tại (xem
-        // isUnsettledAnchor() — cùng hàm dùng cho Swing/BOS/OB/Liquidity).
-        if (isUnsettledAnchor(s.index)) continue;
-        n++;
+      // Lọc chống-repaint TRƯỚC KHI đo thắng/thua (đỡ tốn công đo những tín
+      // hiệu còn neo trong vùng đệm gần rìa hiện tại — dù sao cũng sẽ bị ẩn).
+      // Cùng chính sách với Swing/BOS/OB/Liquidity (isUnsettledAnchor()).
+      const settled = raw[id].filter((s) => !isUnsettledAnchor(s.index));
+      const evaluated = SmcStrategies.evaluateSignals(candles, settled, 2);
+      summaries[id] = SmcStrategies.summarize(evaluated);
+
+      for (const s of evaluated) {
         markers.push({
           time: s.time,
           position: s.direction === 1 ? "belowBar" : "aboveBar",
@@ -3118,15 +3414,114 @@
           shape: s.direction === 1 ? "arrowUp" : "arrowDown",
           text: id,
         });
+        signals.push({
+          id: id, index: s.index, time: s.time, direction: s.direction, kind: s.kind, price: s.price, label: s.label,
+          filled: s.filled, closed: s.closed, win: s.win, mfe: s.mfe, mae: s.mae,
+        });
       }
-      counts[id] = n;
     }
     markers.sort((a, b) => a.time - b.time);
     strategyMarkersPlugin.setMarkers(markers);
 
-    const summary = activeIds.map((id) => `${id}: ${counts[id]}`).join(" · ");
-    setStat("strategy", `${activeIds.length} chiến lược đang bật — ${summary}`);
+    signals.sort((a, b) => b.time - a.time); // mới nhất trước
+    lastStrategySignals = signals;
+    renderStrategySignalsPanel();
+
+    const summaryText = activeIds.map((id) => {
+      const sm = summaries[id];
+      const wr = sm.winRate != null ? sm.winRate.toFixed(0) + "%" : "n/a";
+      return `${id}: ${sm.total} lệnh (Win ${wr})`;
+    }).join(" · ");
+    setStat("strategy", `${activeIds.length} chiến lược đang bật — ${summaryText}`);
   }
+
+  // ---------------------------------------------------------------------
+  // Strategy Signals Panel — bật/tắt qua nút topbar, click 1 dòng để kéo
+  // chart tới đúng nến hình thành tín hiệu đó.
+  // ---------------------------------------------------------------------
+  // Giới hạn số dòng THỰC SỰ render trong panel — 1 strategy tần suất cao
+  // (vd M5 Retest FVG) có thể sinh hàng chục nghìn tín hiệu trên 50.000 nến,
+  // dựng ngần ấy DOM node + listener sẽ làm treo trình duyệt. Marker trên
+  // CHART vẫn vẽ đầy đủ (Lightweight Charts xử lý tốt số lượng lớn), chỉ
+  // panel danh sách mới bị giới hạn hiển thị.
+  const MAX_PANEL_ROWS = 300;
+
+  function renderStrategySignalsPanel() {
+    strategySignalsBtnText.textContent = `Tín hiệu (${lastStrategySignals.length})`;
+    sspCount.textContent = String(lastStrategySignals.length);
+
+    if (!lastStrategySignals.length) {
+      sspList.innerHTML = `<div class="ssp-empty">Chưa có tín hiệu nào — bật ít nhất 1 Strategy ở Cài đặt SMC.</div>`;
+      return;
+    }
+
+    const truncated = lastStrategySignals.length > MAX_PANEL_ROWS;
+    const visible = truncated ? lastStrategySignals.slice(0, MAX_PANEL_ROWS) : lastStrategySignals;
+
+    const rowsHtml = visible.map((s, i) => {
+      const isUp = s.direction === 1;
+      const timeStr = formatReplayTime(s.time);
+      const priceStr = s.price != null ? s.price.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") : (s.kind === "market" ? "Market" : "—");
+
+      let statusHtml;
+      if (!s.filled) {
+        statusHtml = `<span class="ssp-status nofill">Chưa khớp</span>`;
+      } else if (!s.closed) {
+        statusHtml = `<span class="ssp-status open">Đang chạy</span>`;
+      } else if (s.win) {
+        statusHtml = `<span class="ssp-status win">WIN</span>`;
+      } else {
+        statusHtml = `<span class="ssp-status lose">LOSE</span>`;
+      }
+      const statsHtml = s.filled
+        ? `<div class="ssp-row-stats">Max PnL <b class="pnl">+${s.mfe.toFixed(2)}%</b> · Max SL <b class="sl">-${s.mae.toFixed(2)}%</b></div>`
+        : "";
+
+      return `
+        <div class="ssp-row" data-idx="${i}">
+          <span class="ssp-row-dir ${isUp ? "up" : "down"}">${isUp ? "▲" : "▼"}</span>
+          <div class="ssp-row-main">
+            <div class="ssp-row-top">
+              <span class="ssp-row-tag" style="background:${STRATEGY_COLORS[s.id] || "#64748b"};">${s.id}</span>
+              <span class="ssp-row-price">${priceStr}</span>
+              ${statusHtml}
+            </div>
+            <div class="ssp-row-time">${timeStr} · ${s.kind === "limit" ? "Limit" : "Market"}</div>
+            ${statsHtml}
+          </div>
+        </div>
+      `;
+    }).join("");
+    sspList.innerHTML = truncated
+      ? rowsHtml + `<div class="ssp-empty">... còn ${lastStrategySignals.length - MAX_PANEL_ROWS} tín hiệu nữa (đã ẩn bớt để không treo trình duyệt — vẫn đủ trên chart).</div>`
+      : rowsHtml;
+
+    sspList.querySelectorAll(".ssp-row").forEach((row) => {
+      row.addEventListener("click", () => {
+        const sig = visible[Number(row.dataset.idx)];
+        if (sig) jumpToSignal(sig);
+      });
+    });
+  }
+
+  // Kéo/định vị chart tới đúng nến hình thành 1 tín hiệu, kèm hiệu ứng nhấp
+  // nháy ngắn tại đúng thanh nến đó để dễ nhận ra trong biển nến.
+  function jumpToSignal(sig) {
+    const idx = sig.index;
+    if (idx < 0 || idx >= candles.length) return;
+    chart.timeScale().setVisibleLogicalRange({
+      from: Math.max(0, idx - 40),
+      to: Math.min(candles.length - 1, idx + 40),
+    });
+    showToast(`Đã kéo chart tới tín hiệu ${sig.id} lúc ${formatReplayTime(sig.time)}`);
+  }
+
+  strategySignalsBtn.addEventListener("click", () => {
+    strategySignalsPanel.classList.toggle("open");
+  });
+  sspCloseBtn.addEventListener("click", () => {
+    strategySignalsPanel.classList.remove("open");
+  });
 
   function recomputeAll() {
     recomputeSwingBase();
@@ -3594,7 +3989,7 @@
     try {
       const cacheKey = `${SYMBOL}_${INTERVAL}_${TARGET_CANDLES}`;
       await clearCachedKlines(cacheKey);
-      showToast(`Đang tải mới 15.000 nến ${SYMBOL} từ Binance Server...`);
+      showToast(`Đang tải mới ${TARGET_CANDLES.toLocaleString()} nến ${SYMBOL} (${INTERVAL}) từ Binance Server...`);
       await loadAndRender(true);
       closeModal();
     } catch (err) {
@@ -3968,6 +4363,11 @@
       if (candles.length > 0) {
         updateOhlcBar(candles[candles.length - 1]);
       }
+
+      // Chạy nền, không await — không chặn phần còn lại của boot pipeline.
+      // Tự huỷ (qua liveStatsRunToken) nếu người dùng đổi symbol/timeframe
+      // trước khi lượt tính này xong.
+      runLiveStrategyStats();
     } catch (err) {
       console.error(err);
       setStatus("Lỗi tải dữ liệu: " + err.message, "error");

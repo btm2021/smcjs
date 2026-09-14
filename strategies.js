@@ -1,13 +1,13 @@
 /**
- * SmcStrategies — thư viện phát hiện tín hiệu Entry (thử nghiệm — KHÔNG thuộc
- * thư viện lõi SMC.js, không cần giữ parity với bản Python gốc).
+ * SmcStrategies — thư viện phát hiện tín hiệu Entry + đo thắng/thua thực tế
+ * (thử nghiệm — KHÔNG thuộc thư viện lõi SMC.js, không cần giữ parity với
+ * bản Python gốc).
  *
- * Đây là bản port lại phần "phát hiện tín hiệu" (KHÔNG gồm phần mô phỏng khớp
- * lệnh / đo thắng-thua MFE) của 17 mô hình đã backtest trong
- * research/backtest_multi.mjs (xem research/REPORT.md để biết đầy đủ số liệu
- * win-rate trên 10 symbol x 100.500 nến). Dùng chung 1 file cho cả 2 nơi
- * (research backtest chạy bằng Node, demo/index.html chạy trên trình duyệt)
- * để đảm bảo logic phát hiện tín hiệu GIỐNG HỆT nhau — không viết lại 2 lần.
+ * Đây là bản port lại 17 mô hình đã backtest trong research/backtest_multi.mjs
+ * (xem research/REPORT.md để biết số liệu win-rate gốc trên 10 symbol x
+ * 100.500 nến) — dùng chung 1 file cho cả 2 nơi (research chạy bằng Node,
+ * demo/index.html chạy trên trình duyệt) để đảm bảo logic phát hiện tín hiệu
+ * VÀ logic đo thắng-thua GIỐNG HỆT nhau, không viết lại 2 lần.
  *
  * THIẾT KẾ CHỐNG REPAINT (quan trọng — đọc trước khi thêm strategy mới):
  *   - Mọi strategy CHỈ nhận `candles` làm input (không có biến toàn cục nào
@@ -26,16 +26,25 @@
  *     `run()` với `candles` bị cắt ngắn hơn (kết thúc đúng tại hoặc sau
  *     `sig.index`) luôn cho lại đúng tín hiệu đó ở đúng vị trí — đây chính là
  *     tính chất bắt buộc để đảm bảo KHÔNG REPAINT khi kết hợp với vùng đệm ở
- *     tầng UI (đã kiểm chứng bằng research/verify scripts, xem cách kiểm tra
- *     ở cuối file này).
+ *     tầng UI (đã kiểm chứng bằng research/verify scripts).
  *
- * Output signal shape: { index, time, direction: 1|-1, kind: 'market'|'limit',
- *   price: number|null, label: string }
- *   - `index` = vị trí trong mảng `candles` nơi tín hiệu HÌNH THÀNH (không
- *     phải nơi khớp lệnh — với lệnh limit, giá có thể khớp muộn hơn hoặc
- *     không bao giờ khớp; file này chỉ báo hiệu điểm hình thành để hiển thị).
- *   - `price` chỉ có ý nghĩa tham khảo (vùng/mức giá gợi ý) với các mô hình
- *     dạng limit; null với market.
+ * Output signal shape (trước khi evaluate): { index, time, direction: 1|-1,
+ *   kind: 'market'|'limit', price: number|null, label: string, deadlineIndex }
+ *   - `index` = vị trí trong mảng `candles` nơi tín hiệu HÌNH THÀNH.
+ *   - `price` chỉ có ý nghĩa tham khảo (vùng/mức giá gợi ý) với mô hình dạng
+ *     limit; null với market (market khớp tại open nến kế tiếp).
+ *   - `deadlineIndex` = biên "vòng đời" lệnh (dùng để đo MFE/MAE) — GIỐNG HỆT
+ *     quy ước trong research/backtest_multi.mjs (tới tín hiệu ATRBot ngược
+ *     hướng kế tiếp, hoặc tới khi vùng OB/FVG/BOS bị vô hiệu, hoặc 1 số nến cố
+ *     định — tuỳ mô hình), fallback về N-1 nếu chưa xảy ra trong dữ liệu hiện
+ *     có (tức "lệnh còn đang chạy tính tới nến cuối").
+ *
+ * evaluateSignals(candles, signals, targetPct) mô phỏng khớp lệnh + đo
+ * thắng-thua theo ĐÚNG quy tắc đã dùng trong research/REPORT.md: không phí,
+ * limit khớp khi râu chạm, market khớp ở open nến kế tiếp, WIN nếu MFE (mức
+ * đi xa nhất thuận hướng) đạt >= targetPct% (mặc định 2%) trong "vòng đời"
+ * lệnh; đồng thời trả về MAE (mức đi xa nhất NGƯỢC hướng — dùng làm ước lượng
+ * "Max SL" cần chịu nếu muốn giữ lệnh tới khi thắng).
  */
 (function (root, factory) {
   const globalObj = root || (typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : (typeof self !== 'undefined' ? self : null)));
@@ -59,6 +68,7 @@
   const RETEST_DEADLINE_BARS = 50;
   const LIQ_SWEEP_DEADLINE_BARS = 96;
   const BREAKER_DEADLINE_BARS = 100;
+  const DEFAULT_TARGET_PCT = 2;
   // Vùng khởi động: bỏ qua mọi tín hiệu neo quá gần đầu mảng `candles`. Không
   // liên quan tới vùng đệm chống-repaint ở rìa PHẢI (tương lai) — đây là rìa
   // TRÁI (quá khứ xa của chính prefix đang xét). Lý do cần có: retracements()
@@ -97,7 +107,7 @@
   /**
    * Tạo 1 context tính-lười (lazy): mỗi chỉ báo nền chỉ được tính khi có ít
    * nhất 1 strategy thực sự cần tới nó (qua `ctx.xxx()`), và chỉ tính 1 lần
-   * dù nhiều strategy cùng gọi trong 1 lượt `runMany()`.
+   * dù nhiều strategy cùng dùng chung 1 `ctx` (xem `runWithContext`).
    */
   function buildContext(candles, deps) {
     const N = candles.length;
@@ -138,22 +148,38 @@
     return ctx;
   }
 
+  // Trả về INDEX của tín hiệu ATRBot đầu tiên NGƯỢC hướng sau `fromIndex`
+  // (hoặc N-1 nếu tới cuối `candles` vẫn chưa có) — dùng làm deadline "vòng
+  // đời" cho các mô hình theo regime ATRBot, đúng quy ước research/backtest_multi.mjs.
   function nextOppositeAtrSignal(atrArr, N, fromIndex, direction) {
     for (let k = fromIndex + 1; k < N; k++) {
-      if (direction === 1 && atrArr[k].isSell) return true;
-      if (direction === -1 && atrArr[k].isBuy) return true;
+      if (direction === 1 && atrArr[k].isSell) return k;
+      if (direction === -1 && atrArr[k].isBuy) return k;
     }
-    return false;
+    return N - 1;
   }
 
-  function sig(index, candles, direction, kind, price, label) {
-    return { index, time: candles[index].time, direction, kind, price: price != null ? price : null, label };
+  // Trả về INDEX đầu tiên sau `fromIndex` mà giá phá vỡ 1 mức cho trước theo
+  // hướng vô hiệu hoá (dùng để giới hạn "vòng đời" của 1 vùng OB/breaker) —
+  // hoặc N-1 nếu không xảy ra trong dữ liệu hiện có.
+  function invalidationIndex(candles, N, fromIndex, level, isTop) {
+    for (let k = fromIndex + 1; k < N; k++) {
+      if (isTop ? candles[k].high > level : candles[k].low < level) return k;
+    }
+    return N - 1;
+  }
+
+  function sig(index, candles, direction, kind, price, label, deadlineIndex) {
+    return {
+      index, time: candles[index].time, direction, kind,
+      price: price != null ? price : null, label,
+      deadlineIndex: Math.max(index, Math.min(deadlineIndex, candles.length - 1)),
+    };
   }
 
   // ---------------------------------------------------------------------
-  // 17 mô hình — mỗi hàm CHỈ trả về điểm HÌNH THÀNH tín hiệu (không mô
-  // phỏng khớp lệnh/MFE, xem research/backtest_multi.mjs nếu cần bản đầy đủ
-  // có đo thắng-thua).
+  // 17 mô hình — mỗi hàm trả về điểm HÌNH THÀNH tín hiệu KÈM deadlineIndex
+  // (biên đo MFE/MAE) — dùng chung cho cả hiển thị lẫn evaluateSignals().
   // ---------------------------------------------------------------------
   const DETECTORS = {
     M1(ctx) {
@@ -161,8 +187,8 @@
       const a = atrFixed();
       const out = [];
       for (let i = 0; i < N; i++) {
-        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M1'));
-        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M1'));
+        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M1', nextOppositeAtrSignal(a, N, i, 1)));
+        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M1', nextOppositeAtrSignal(a, N, i, -1)));
       }
       return out;
     },
@@ -171,8 +197,8 @@
       const a = atrAdaptive();
       const out = [];
       for (let i = 0; i < N; i++) {
-        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M2'));
-        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M2'));
+        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M2', nextOppositeAtrSignal(a, N, i, 1)));
+        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M2', nextOppositeAtrSignal(a, N, i, -1)));
       }
       return out;
     },
@@ -188,7 +214,7 @@
           const r = b[k];
           if ((direction === 1 && (r.bos === 1 || r.choch === 1)) || (direction === -1 && (r.bos === -1 || r.choch === -1))) { confirmed = true; break; }
         }
-        if (confirmed) out.push(sig(i, candles, direction, 'market', null, 'M3'));
+        if (confirmed) out.push(sig(i, candles, direction, 'market', null, 'M3', nextOppositeAtrSignal(a, N, i, direction)));
       }
       return out;
     },
@@ -197,8 +223,13 @@
       const a = atrAdaptive(), o = ob();
       const out = [];
       for (let i = 0; i < N; i++) {
-        if (o[i].ob === 1 && a[i].trend === 1) out.push(sig(i, candles, 1, 'limit', o[i].top, 'M4'));
-        else if (o[i].ob === -1 && a[i].trend === -1) out.push(sig(i, candles, -1, 'limit', o[i].bottom, 'M4'));
+        if (o[i].ob === 1 && a[i].trend === 1) {
+          const deadline = Math.min(invalidationIndex(candles, N, i, o[i].bottom, false), nextOppositeAtrSignal(a, N, i, 1));
+          out.push(sig(i, candles, 1, 'limit', o[i].top, 'M4', deadline));
+        } else if (o[i].ob === -1 && a[i].trend === -1) {
+          const deadline = Math.min(invalidationIndex(candles, N, i, o[i].top, true), nextOppositeAtrSignal(a, N, i, -1));
+          out.push(sig(i, candles, -1, 'limit', o[i].bottom, 'M4', deadline));
+        }
       }
       return out;
     },
@@ -207,8 +238,13 @@
       const a = atrAdaptive(), f = fvg();
       const out = [];
       for (let i = 0; i < N; i++) {
-        if (f[i].fvg === 1 && a[i].trend === 1) out.push(sig(i, candles, 1, 'limit', f[i].top, 'M5'));
-        else if (f[i].fvg === -1 && a[i].trend === -1) out.push(sig(i, candles, -1, 'limit', f[i].bottom, 'M5'));
+        if (f[i].fvg === 1 && a[i].trend === 1) {
+          const deadline = Math.min(f[i].mitigatedIndex || N - 1, nextOppositeAtrSignal(a, N, i, 1)) || N - 1;
+          out.push(sig(i, candles, 1, 'limit', f[i].top, 'M5', deadline));
+        } else if (f[i].fvg === -1 && a[i].trend === -1) {
+          const deadline = Math.min(f[i].mitigatedIndex || N - 1, nextOppositeAtrSignal(a, N, i, -1)) || N - 1;
+          out.push(sig(i, candles, -1, 'limit', f[i].bottom, 'M5', deadline));
+        }
       }
       return out;
     },
@@ -219,10 +255,10 @@
       for (let i = 0; i < N; i++) {
         if (l[i].liquidity === -1 && l[i].swept) {
           const k = l[i].swept;
-          if (k > 0 && k < N && candles[k].close > l[i].level) out.push(sig(k, candles, 1, 'market', null, 'M6'));
+          if (k > 0 && k < N && candles[k].close > l[i].level) out.push(sig(k, candles, 1, 'market', null, 'M6', k + LIQ_SWEEP_DEADLINE_BARS));
         } else if (l[i].liquidity === 1 && l[i].swept) {
           const k = l[i].swept;
-          if (k > 0 && k < N && candles[k].close < l[i].level) out.push(sig(k, candles, -1, 'market', null, 'M6'));
+          if (k > 0 && k < N && candles[k].close < l[i].level) out.push(sig(k, candles, -1, 'market', null, 'M6', k + LIQ_SWEEP_DEADLINE_BARS));
         }
       }
       return out;
@@ -236,8 +272,8 @@
         if (r.brokenIndex === null || r.brokenIndex === undefined) continue;
         const j = r.brokenIndex;
         if (j < i || j >= N) continue;
-        if (r.bos === 1 || r.choch === 1) out.push(sig(j, candles, 1, 'limit', r.level, 'M7'));
-        else if (r.bos === -1 || r.choch === -1) out.push(sig(j, candles, -1, 'limit', r.level, 'M7'));
+        if (r.bos === 1 || r.choch === 1) out.push(sig(j, candles, 1, 'limit', r.level, 'M7', j + RETEST_DEADLINE_BARS));
+        else if (r.bos === -1 || r.choch === -1) out.push(sig(j, candles, -1, 'limit', r.level, 'M7', j + RETEST_DEADLINE_BARS));
       }
       return out;
     },
@@ -256,10 +292,16 @@
       for (let i = 0; i < N; i++) {
         if (o[i].ob === 1 && a[i].trend === 1) {
           const fz = findConfluentFvg(i, 1, o[i].top, o[i].bottom);
-          if (fz) out.push(sig(i, candles, 1, 'limit', (fz.top + o[i].top) / 2, 'M8'));
+          if (fz) {
+            const deadline = Math.min(invalidationIndex(candles, N, i, o[i].bottom, false), nextOppositeAtrSignal(a, N, i, 1));
+            out.push(sig(i, candles, 1, 'limit', (fz.top + o[i].top) / 2, 'M8', deadline));
+          }
         } else if (o[i].ob === -1 && a[i].trend === -1) {
           const fz = findConfluentFvg(i, -1, o[i].top, o[i].bottom);
-          if (fz) out.push(sig(i, candles, -1, 'limit', (fz.bottom + o[i].bottom) / 2, 'M8'));
+          if (fz) {
+            const deadline = Math.min(invalidationIndex(candles, N, i, o[i].top, true), nextOppositeAtrSignal(a, N, i, -1));
+            out.push(sig(i, candles, -1, 'limit', (fz.bottom + o[i].bottom) / 2, 'M8', deadline));
+          }
         }
       }
       return out;
@@ -271,10 +313,10 @@
       for (let i = 1; i < N; i++) {
         const prev = r[i - 1], cur = r[i];
         if (cur.direction === 1 && a[i].trend === 1 && prev.currentRetracementPct < 50 && cur.currentRetracementPct >= 50) {
-          out.push(sig(i, candles, 1, 'market', null, 'M9'));
+          out.push(sig(i, candles, 1, 'market', null, 'M9', nextOppositeAtrSignal(a, N, i, 1)));
         }
         if (cur.direction === -1 && a[i].trend === -1 && prev.currentRetracementPct < 50 && cur.currentRetracementPct >= 50) {
-          out.push(sig(i, candles, -1, 'market', null, 'M9'));
+          out.push(sig(i, candles, -1, 'market', null, 'M9', nextOppositeAtrSignal(a, N, i, -1)));
         }
       }
       return out;
@@ -291,7 +333,7 @@
           const r = b[k];
           if ((direction === 1 && (r.bos === 1 || r.choch === 1)) || (direction === -1 && (r.bos === -1 || r.choch === -1))) { confirmed = true; break; }
         }
-        if (confirmed) out.push(sig(i, candles, direction, 'market', null, 'M10'));
+        if (confirmed) out.push(sig(i, candles, direction, 'market', null, 'M10', nextOppositeAtrSignal(a, N, i, direction)));
       }
       return out;
     },
@@ -304,8 +346,8 @@
         if (r.brokenIndex === null || r.brokenIndex === undefined) continue;
         const j = r.brokenIndex;
         if (j < i || j >= N) continue;
-        if (r.bos === 1 || r.choch === 1) out.push(sig(j, candles, 1, 'limit', r.level, 'M11'));
-        else if (r.bos === -1 || r.choch === -1) out.push(sig(j, candles, -1, 'limit', r.level, 'M11'));
+        if (r.bos === 1 || r.choch === 1) out.push(sig(j, candles, 1, 'limit', r.level, 'M11', j + RETEST_DEADLINE_BARS));
+        else if (r.bos === -1 || r.choch === -1) out.push(sig(j, candles, -1, 'limit', r.level, 'M11', j + RETEST_DEADLINE_BARS));
       }
       return out;
     },
@@ -314,8 +356,13 @@
       const a = atrAdaptive(), o = obDynamic();
       const out = [];
       for (let i = 0; i < N; i++) {
-        if (o[i].ob === 1 && a[i].trend === 1) out.push(sig(i, candles, 1, 'limit', o[i].top, 'M12'));
-        else if (o[i].ob === -1 && a[i].trend === -1) out.push(sig(i, candles, -1, 'limit', o[i].bottom, 'M12'));
+        if (o[i].ob === 1 && a[i].trend === 1) {
+          const deadline = Math.min(invalidationIndex(candles, N, i, o[i].bottom, false), nextOppositeAtrSignal(a, N, i, 1));
+          out.push(sig(i, candles, 1, 'limit', o[i].top, 'M12', deadline));
+        } else if (o[i].ob === -1 && a[i].trend === -1) {
+          const deadline = Math.min(invalidationIndex(candles, N, i, o[i].top, true), nextOppositeAtrSignal(a, N, i, -1));
+          out.push(sig(i, candles, -1, 'limit', o[i].bottom, 'M12', deadline));
+        }
       }
       return out;
     },
@@ -328,8 +375,8 @@
         if (r.brokenIndex === null || r.brokenIndex === undefined) continue;
         const j = r.brokenIndex;
         if (j < i || j >= N) continue;
-        if (r.bos === 1 || r.choch === 1) out.push(sig(j, candles, 1, 'limit', r.level, 'M13'));
-        else if (r.bos === -1 || r.choch === -1) out.push(sig(j, candles, -1, 'limit', r.level, 'M13'));
+        if (r.bos === 1 || r.choch === 1) out.push(sig(j, candles, 1, 'limit', r.level, 'M13', j + RETEST_DEADLINE_BARS));
+        else if (r.bos === -1 || r.choch === -1) out.push(sig(j, candles, -1, 'limit', r.level, 'M13', j + RETEST_DEADLINE_BARS));
       }
       return out;
     },
@@ -340,10 +387,10 @@
       for (let i = 0; i < N; i++) {
         if (l[i].liquidity === -1 && l[i].swept) {
           const k = l[i].swept;
-          if (k > 0 && k < N && candles[k].close > l[i].level) out.push(sig(k, candles, 1, 'market', null, 'M14'));
+          if (k > 0 && k < N && candles[k].close > l[i].level) out.push(sig(k, candles, 1, 'market', null, 'M14', k + LIQ_SWEEP_DEADLINE_BARS));
         } else if (l[i].liquidity === 1 && l[i].swept) {
           const k = l[i].swept;
-          if (k > 0 && k < N && candles[k].close < l[i].level) out.push(sig(k, candles, -1, 'market', null, 'M14'));
+          if (k > 0 && k < N && candles[k].close < l[i].level) out.push(sig(k, candles, -1, 'market', null, 'M14', k + LIQ_SWEEP_DEADLINE_BARS));
         }
       }
       return out;
@@ -360,8 +407,8 @@
       const o = ob();
       const out = [];
       for (let i = 0; i < N; i++) {
-        if (o[i].ob === 1 && o[i].mitigatedIndex) out.push(sig(o[i].mitigatedIndex, candles, -1, 'limit', o[i].top, 'M15⚠'));
-        if (o[i].ob === -1 && o[i].mitigatedIndex) out.push(sig(o[i].mitigatedIndex, candles, 1, 'limit', o[i].bottom, 'M15⚠'));
+        if (o[i].ob === 1 && o[i].mitigatedIndex) out.push(sig(o[i].mitigatedIndex, candles, -1, 'limit', o[i].top, 'M15⚠', o[i].mitigatedIndex + BREAKER_DEADLINE_BARS));
+        if (o[i].ob === -1 && o[i].mitigatedIndex) out.push(sig(o[i].mitigatedIndex, candles, 1, 'limit', o[i].bottom, 'M15⚠', o[i].mitigatedIndex + BREAKER_DEADLINE_BARS));
       }
       return out;
     },
@@ -370,8 +417,8 @@
       const a = atrAdaptiveLiqFiltered();
       const out = [];
       for (let i = 0; i < N; i++) {
-        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M16'));
-        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M16'));
+        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M16', nextOppositeAtrSignal(a, N, i, 1)));
+        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M16', nextOppositeAtrSignal(a, N, i, -1)));
       }
       return out;
     },
@@ -381,8 +428,8 @@
       const out = [];
       for (let i = 0; i < N; i++) {
         if (!s[i]) continue;
-        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M17'));
-        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M17'));
+        if (a[i].isBuy) out.push(sig(i, candles, 1, 'market', null, 'M17', nextOppositeAtrSignal(a, N, i, 1)));
+        else if (a[i].isSell) out.push(sig(i, candles, -1, 'market', null, 'M17', nextOppositeAtrSignal(a, N, i, -1)));
       }
       return out;
     },
@@ -400,6 +447,11 @@
   //   dần nhưng không về 0, xem research/REPORT.md mục 6.1 và log kiểm chứng).
   //   Vùng đệm chống-repaint (`state.antiRepaint`) làm GIẢM tần suất nhưng
   //   KHÔNG đảm bảo tuyệt đối với nhóm này — hiển thị cảnh báo rõ trong UI.
+  //
+  // winRate/sampleSize dưới đây là số liệu THAM CHIẾU gốc (10 symbol Binance
+  // Futures x 100.500 nến, xem research/REPORT.md) — demo hiển thị SONG SONG
+  // số liệu "trực tiếp" (live) tính lại trên đúng dữ liệu symbol/khung thời
+  // gian đang xem qua evaluateSignals()/summarize() bên dưới.
   const LIST = [
     { id: 'M1', name: 'ATRBot gốc (mult cố định)', kind: 'market', group: 'ATRBot', winRate: 62.68, sampleSize: 4970, uses: ['atrbot'], repaintRisk: 'none', desc: 'Tín hiệu đảo chiều regime của ATRBot với atrMult cố định — baseline, không dùng SMC.' },
     { id: 'M2', name: 'ATRBot M1 Adaptive', kind: 'market', group: 'ATRBot', winRate: 70.94, sampleSize: 3335, uses: ['atrbot'], repaintRisk: 'none', desc: 'Như M1 nhưng atrMult co giãn theo percentile ATR% (giảm whipsaw ở vùng biến động thấp).' },
@@ -424,25 +476,117 @@
     return signals.filter((s) => s.index >= WARMUP_BARS);
   }
 
-  function run(id, candles, deps) {
+  function runWithContext(id, ctx) {
     const fn = DETECTORS[id];
     if (!fn) throw new Error('Unknown strategy id: ' + id);
-    const resolvedDeps = resolveDeps(deps);
-    const ctx = buildContext(candles, resolvedDeps);
     return applyWarmup(fn(ctx));
   }
 
+  function run(id, candles, deps) {
+    const ctx = buildContext(candles, resolveDeps(deps));
+    return runWithContext(id, ctx);
+  }
+
   function runMany(ids, candles, deps) {
-    const resolvedDeps = resolveDeps(deps);
-    const ctx = buildContext(candles, resolvedDeps);
+    const ctx = buildContext(candles, resolveDeps(deps));
     const out = {};
     for (const id of ids) {
-      const fn = DETECTORS[id];
-      if (!fn) continue;
-      out[id] = applyWarmup(fn(ctx));
+      if (!DETECTORS[id]) continue;
+      out[id] = runWithContext(id, ctx);
     }
     return out;
   }
 
-  return { list: LIST, run: run, runMany: runMany, buildContext: buildContext, _detectors: DETECTORS };
+  /**
+   * Mô phỏng khớp lệnh + đo thắng-thua cho 1 danh sách tín hiệu (đã có
+   * `deadlineIndex`, xem đầu file). Trả về BẢN SAO mỗi tín hiệu kèm thêm:
+   *   - filled: lệnh limit có khớp trước deadline không (market luôn true trừ
+   *     khi tín hiệu nằm ở nến cuối cùng, không còn nến kế tiếp để khớp).
+   *   - fillIndex/fillPrice: nơi/giá thực sự vào lệnh.
+   *   - mfe: Maximum Favorable Excursion (%) — "Max PnL" đạt được trong vòng
+   *     đời lệnh (kể cả khi cuối cùng không tới đích).
+   *   - mae: Maximum Adverse Excursion (%) — "Max SL" cần chịu đựng, tức mức
+   *     đi ngược hướng xa nhất trước khi (nếu) hồi lại đạt đích.
+   *   - win: mfe >= targetPct (mặc định 2, đúng quy tắc research/REPORT.md).
+   *   - closed: true nếu deadline đã thực sự xảy ra (tín hiệu ngược chiều
+   *     ATRBot / vùng bị vô hiệu / hết số nến cố định) trong phạm vi
+   *     `candles` hiện có; false nếu deadline chỉ đang tạm chốt ở nến cuối
+   *     cùng vì "vòng đời" chưa kết thúc (lệnh vẫn còn đang chạy — win/mfe/mae
+   *     vẫn đúng tính tới hiện tại, chỉ chưa phải kết quả CUỐI CÙNG).
+   */
+  function evaluateSignals(candles, signals, targetPct) {
+    targetPct = targetPct == null ? DEFAULT_TARGET_PCT : targetPct;
+    const N = candles.length;
+    return signals.map((s) => {
+      const deadlineIndex = Math.min(s.deadlineIndex, N - 1);
+      const closed = deadlineIndex < N - 1;
+      let fillIndex = -1, fillPrice = null;
+
+      if (s.kind === 'market') {
+        fillIndex = s.index + 1;
+        if (fillIndex > deadlineIndex || fillIndex >= N) {
+          return Object.assign({}, s, { filled: false, closed, deadlineIndex });
+        }
+        fillPrice = candles[fillIndex].open;
+      } else {
+        for (let k = s.index + 1; k <= deadlineIndex; k++) {
+          const touched = s.direction === 1 ? candles[k].low <= s.price : candles[k].high >= s.price;
+          if (touched) { fillIndex = k; break; }
+        }
+        if (fillIndex === -1) {
+          return Object.assign({}, s, { filled: false, closed, deadlineIndex });
+        }
+        fillPrice = s.price;
+      }
+
+      let mfe = 0, mae = 0;
+      for (let k = fillIndex + 1; k <= deadlineIndex; k++) {
+        const fav = s.direction === 1
+          ? (candles[k].high - fillPrice) / fillPrice * 100
+          : (fillPrice - candles[k].low) / fillPrice * 100;
+        const adv = s.direction === 1
+          ? (fillPrice - candles[k].low) / fillPrice * 100
+          : (candles[k].high - fillPrice) / fillPrice * 100;
+        if (fav > mfe) mfe = fav;
+        if (adv > mae) mae = adv;
+      }
+
+      return Object.assign({}, s, {
+        filled: true, closed, deadlineIndex, fillIndex, fillPrice,
+        mfe: mfe, mae: mae, win: mfe >= targetPct,
+      });
+    });
+  }
+
+  /** Tổng hợp thống kê từ kết quả evaluateSignals() — dùng cho stat label. */
+  function summarize(evaluated) {
+    const filled = evaluated.filter((s) => s.filled);
+    const closedFilled = filled.filter((s) => s.closed);
+    const wins = closedFilled.filter((s) => s.win).length;
+    const sumMfe = filled.reduce((a, s) => a + s.mfe, 0);
+    const sumMae = filled.reduce((a, s) => a + s.mae, 0);
+    return {
+      total: evaluated.length,
+      filled: filled.length,
+      open: filled.length - closedFilled.length,
+      closed: closedFilled.length,
+      wins: wins,
+      winRate: closedFilled.length ? (wins / closedFilled.length * 100) : null,
+      avgMfe: filled.length ? (sumMfe / filled.length) : null,
+      avgMae: filled.length ? (sumMae / filled.length) : null,
+      maxMfe: filled.length ? Math.max(...filled.map((s) => s.mfe)) : null,
+      maxMae: filled.length ? Math.max(...filled.map((s) => s.mae)) : null,
+    };
+  }
+
+  return {
+    list: LIST,
+    run: run,
+    runMany: runMany,
+    runWithContext: runWithContext,
+    buildContext: buildContext,
+    evaluateSignals: evaluateSignals,
+    summarize: summarize,
+    _detectors: DETECTORS,
+  };
 }));
