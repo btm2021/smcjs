@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SMC.js — Renko + Nến thường (Đồng bộ)</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-main: #090c14;
+    --bg-card: #0f1422;
+    --bg-card-hover: #151d30;
+    --bg-input: #07090f;
+    --border: #1c2436;
+    --border-highlight: #2c3954;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #38bdf8;
+    --accent-green: #10b981;
+    --accent-red: #f43f5e;
+    --accent-amber: #f59e0b;
+    --accent-purple: #a855f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg-main); color: var(--text-primary); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; }
+  input, select, button { font-family: inherit; font-size: inherit; }
+  #app { display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden; }
+
+  #topbar { height: 48px; min-height: 48px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 14px; z-index: 10; }
+  .topbar-left, .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .brand-badge { background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; }
+  .nav-link { color: var(--text-secondary); font-size: 11.5px; text-decoration: none; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--border); }
+  .nav-link:hover { color: #fff; border-color: var(--accent-blue); }
+
+  .symbol-select-wrap { position: relative; }
+  .symbol-btn { display: flex; align-items: center; gap: 8px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; color: #fff; cursor: pointer; }
+  .symbol-btn:hover { border-color: var(--accent-blue); background: var(--bg-card-hover); }
+  .symbol-name { font-weight: 700; font-size: 12px; }
+  .symbol-badge { font-size: 9px; background: rgba(56,189,248,0.15); color: var(--accent-blue); padding: 1px 5px; border-radius: 4px; }
+  .symbol-popover { position: absolute; top: calc(100% + 6px); left: 0; width: 260px; max-height: 360px; background: var(--bg-card); border: 1px solid var(--border-highlight); border-radius: 8px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 40; display: none; flex-direction: column; overflow: hidden; }
+  .symbol-popover.open { display: flex; }
+  .symbol-search-box { display: flex; align-items: center; gap: 6px; padding: 8px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+  .symbol-search-box input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px; color: #fff; font-size: 11.5px; }
+  .symbol-list { overflow-y: auto; }
+  .symbol-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; cursor: pointer; font-size: 11.5px; }
+  .symbol-item:hover, .symbol-item.active { background: var(--bg-card-hover); }
+  .symbol-item-quote { color: var(--text-muted); font-size: 10px; }
+
+  .tf-select, .ctrl-select { background: var(--bg-input); border: 1px solid var(--border); color: #fff; border-radius: 6px; padding: 5px 8px; font-size: 11.5px; font-weight: 600; font-family: 'JetBrains Mono', monospace; cursor: pointer; }
+  .tf-select:hover { border-color: var(--accent-blue); }
+  .data-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--accent-blue); background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); padding: 3px 8px; border-radius: 5px; }
+  .brick-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--accent-purple); background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); padding: 3px 8px; border-radius: 5px; }
+
+  .status-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 10px; border-radius: 20px; background: var(--bg-input); border: 1px solid var(--border); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-amber); }
+  .status-pill.ready .status-dot { background: var(--accent-green); }
+  .status-pill.error .status-dot { background: var(--accent-red); }
+
+  .btn-action { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-action:hover { border-color: var(--accent-blue); background: var(--bg-card-hover); }
+  .btn-action.btn-primary { background: rgba(56,189,248,0.15); border-color: var(--accent-blue); color: var(--accent-blue); }
+  .btn-icon { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-secondary); width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .btn-icon:hover { border-color: var(--accent-blue); color: #fff; }
+
+  #progressBarWrap { height: 2px; background: transparent; }
+  #progressBar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.2s ease; }
+
+  /* -------------------------------------------------------------
+     CHART CHÍNH (nến thường) — Renko chỉ hiện qua dialog khi click
+     ------------------------------------------------------------- */
+  #stackWrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .chart-panel { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; }
+  .chart-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px; background: var(--bg-card); border-bottom: 1px solid var(--border); font-size: 11px; z-index: 5; gap: 14px; }
+  .chart-panel-title { font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .chart-panel-title .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .chart-panel-ohlc { font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); font-size: 10.5px; display: flex; gap: 10px; }
+  .chart-panel-hint { color: var(--accent-purple); font-size: 10.5px; flex: 1; text-align: center; }
+  .chart-panel-stat { color: var(--text-muted); font-size: 10px; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+  .chart-container { flex: 1; min-height: 0; }
+
+  /* -------------------------------------------------------------
+     CÔNG CỤ VẼ (thước đo / line / rectangle) — toolbar nổi ở góc trên-trái
+     mỗi chart, hoạt động độc lập trên từng chart (top vs dialog Renko).
+     ------------------------------------------------------------- */
+  .draw-toolbar {
+    position: absolute;
+    top: 40px;
+    left: 8px;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background: rgba(15, 20, 34, 0.9);
+    border: 1px solid var(--border-highlight);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  }
+  .draw-tool-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  .draw-tool-btn:hover { background: var(--bg-card-hover); color: #fff; }
+  .draw-tool-btn.active { background: rgba(56,189,248,0.2); border-color: var(--accent-blue); color: var(--accent-blue); }
+  .draw-tool-btn[data-tool="clear"] { border-top: 1px solid var(--border); margin-top: 2px; padding-top: 4px; border-radius: 0 0 5px 5px; }
+  .draw-tool-btn[data-tool="clear"]:hover { color: var(--accent-red); }
+
+  /* -------------------------------------------------------------
+     TOAST
+     ------------------------------------------------------------- */
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(15,20,34,0.96); border: 1px solid var(--border-highlight); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 12px; z-index: 100; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+
+  /* -------------------------------------------------------------
+     SETTINGS MODAL
+     ------------------------------------------------------------- */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 50; display: none; align-items: center; justify-content: center; }
+  .modal-backdrop.open { display: flex; }
+  .modal-dialog { width: min(920px, 94vw); max-height: 88vh; background: var(--bg-card); border: 1px solid var(--border-highlight); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.6); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .modal-title { font-size: 14px; font-weight: 700; }
+  .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; line-height: 1; }
+  .modal-close:hover { color: #fff; }
+  .modal-body { flex: 1; overflow-y: auto; padding: 16px 18px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .modal-footer { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  .indicator-card { background: rgba(13,17,26,0.8); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .indicator-card.active { border-color: var(--border-highlight); }
+  .indicator-card.card-featured { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.05); }
+  .card-top { display: flex; align-items: center; justify-content: space-between; }
+  .card-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; }
+  .card-icon { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .card-body { display: flex; flex-direction: column; gap: 8px; font-size: 11px; color: var(--text-secondary); }
+  .ctrl-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .ctrl-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .ctrl-input-num, .ctrl-input-text { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); border-radius: 5px; padding: 4px 8px; font-size: 11px; width: 90px; font-family: 'JetBrains Mono', monospace; }
+  .stat-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--accent-blue); background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); border-radius: 4px; padding: 3px 7px; }
+  .stat-badge.empty { display: none; }
+
+  .toggle-switch { position: relative; display: inline-block; width: 34px; height: 18px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-switch .slider { position: absolute; inset: 0; background: var(--bg-input); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; transition: 0.2s; }
+  .toggle-switch .slider:before { content: ""; position: absolute; width: 12px; height: 12px; left: 2px; top: 2px; background: var(--text-muted); border-radius: 50%; transition: 0.2s; }
+  .toggle-switch input:checked + .slider { background: rgba(56,189,248,0.25); border-color: var(--accent-blue); }
+  .toggle-switch input:checked + .slider:before { transform: translateX(16px); background: var(--accent-blue); }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-highlight); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="topbar-left">
+      <span class="brand-badge">SMC.JS</span>
+      <a class="nav-link" href="index.html" title="Quay lại biểu đồ chính">← Chart chính</a>
+
+      <div class="symbol-select-wrap">
+        <button class="symbol-btn" id="symbolBtn" title="Chọn cặp giao dịch Binance Futures">
+          <span class="symbol-name" id="currentSymbolText">IMXUSDT</span>
+          <span class="symbol-badge">PERP</span>
+        </button>
+        <div class="symbol-popover" id="symbolPopover">
+          <div class="symbol-search-box">
+            <input type="text" id="symbolSearchInput" placeholder="Tìm symbol..." autocomplete="off" />
+          </div>
+          <div class="symbol-list" id="symbolList">
+            <div style="padding:12px; text-align:center; color:var(--text-muted);">Đang nạp danh sách...</div>
+          </div>
+        </div>
+      </div>
+
+      <select class="tf-select" id="timeframeSelect" title="Khung thời gian">
+        <option value="1m">1m</option>
+        <option value="5m">5m</option>
+        <option value="15m" selected>15m</option>
+        <option value="30m">30m</option>
+        <option value="1h">1h</option>
+        <option value="4h">4h</option>
+        <option value="1d">1D</option>
+      </select>
+
+      <span class="data-badge" id="dataBadge">15M · 15K NẾN</span>
+      <span class="brick-badge" id="brickBadge">Brick: —</span>
+    </div>
+    <div class="topbar-right">
+      <div class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">Khởi tạo...</span></div>
+      <button class="btn-action btn-primary" id="openSettingsBtn">⚙ Cài đặt SMC & Renko</button>
+      <button class="btn-icon" id="fitChartBtn" title="Khớp toàn bộ dữ liệu (cả 2 chart)">⛶</button>
+    </div>
+  </header>
+
+  <div id="progressBarWrap"><div id="progressBar"></div></div>
+
+  <div id="stackWrap">
+    <div class="chart-panel" id="panelTop">
+      <div class="chart-panel-header">
+        <span class="chart-panel-title"><span class="dot" style="background:var(--accent-blue);"></span>Nến thường (Candlestick)</span>
+        <span class="chart-panel-ohlc" id="ohlcTop">O: — H: — L: — C: —</span>
+        <span class="chart-panel-hint">🧱 Click vào 1 nến để xem Renko tại thời điểm đó</span>
+        <span class="chart-panel-stat" id="statTop">—</span>
+      </div>
+      <div class="chart-container" id="chartTop"></div>
+      <div class="draw-toolbar" id="drawToolbarTop">
+        <button class="draw-tool-btn active" data-tool="cursor" title="Con trỏ (thoát chế độ vẽ — phím Esc)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l7 17 2-7 7-2z"/></svg></button>
+        <button class="draw-tool-btn" data-tool="measure" title="Thước đo: kéo giữa 2 điểm để xem chênh lệch giá/%/số nến"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M7 9v2M11 9v3M15 9v2M19 9v3"/></svg></button>
+        <button class="draw-tool-btn" data-tool="line" title="Vẽ đường thẳng: kéo giữa 2 điểm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/></svg></button>
+        <button class="draw-tool-btn" data-tool="rect" title="Vẽ hình chữ nhật: kéo từ góc này sang góc kia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
+        <button class="draw-tool-btn" data-tool="clear" title="Xoá tất cả hình đã vẽ trên chart này"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0l1 12a1 1 0 001 1h6a1 1 0 001-1l1-12"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Renko Dialog — mở khi click vào 1 nến trên chart chính -->
+<div class="modal-backdrop" id="renkoDialog">
+  <div class="modal-dialog" style="width:min(1100px, 94vw);">
+    <div class="modal-header">
+      <div class="modal-title">🧱 Renko tại <span id="renkoDialogTime">—</span></div>
+      <button class="modal-close" id="renkoDialogClose">&times;</button>
+    </div>
+    <div id="renkoDialogStat" style="padding:8px 18px; font-size:11px; color:var(--text-secondary); border-bottom:1px solid var(--border);">—</div>
+    <div style="position:relative; height:560px;">
+      <div id="renkoDialogChart" style="width:100%; height:100%;"></div>
+      <div class="draw-toolbar" id="drawToolbarDialog" style="top:8px;">
+        <button class="draw-tool-btn active" data-tool="cursor" title="Con trỏ (thoát chế độ vẽ — phím Esc)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l7 17 2-7 7-2z"/></svg></button>
+        <button class="draw-tool-btn" data-tool="measure" title="Thước đo: kéo giữa 2 điểm để xem chênh lệch giá/%/số brick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M7 9v2M11 9v3M15 9v2M19 9v3"/></svg></button>
+        <button class="draw-tool-btn" data-tool="line" title="Vẽ đường thẳng"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/></svg></button>
+        <button class="draw-tool-btn" data-tool="rect" title="Vẽ hình chữ nhật"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
+        <button class="draw-tool-btn" data-tool="clear" title="Xoá tất cả hình đã vẽ trên dialog này"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0l1 12a1 1 0 001 1h6a1 1 0 001-1l1-12"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-backdrop" id="settingsModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title">Cài đặt SMC, ATRBot M1 & Renko</div>
+      <button class="modal-close" id="closeSettingsBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <!-- Renko -->
+      <div class="indicator-card card-featured" id="card-renko" style="grid-column: span 2;">
+        <div class="card-top">
+          <div class="card-title"><span class="card-icon" style="background:var(--accent-purple);"></span><span>★ Renko — Brick Size (theo ATR)</span></div>
+        </div>
+        <div class="card-body">
+          <div style="font-size:10px; color:var(--text-muted); line-height:1.5;">
+            Click vào 1 nến trên chart chính để mở dialog Renko tại đúng thời điểm đó (dùng dữ liệu TRƯỚC điểm click, không nhìn tương lai). Brick size = ATR(chu kỳ) × hệ số, tính 1 LẦN khi tải dữ liệu (không tự tính lại theo từng nến — nếu không, brick size sẽ khác nhau giữa các lần click, khó so sánh). Bấm "Tính lại" sau khi đổi tham số.
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:8px 18px;">
+            <div class="ctrl-row"><span>Chu kỳ ATR</span><input type="number" id="renko-atrPeriod" class="ctrl-input-num" value="14" min="2" max="200" style="width:70px" /></div>
+            <div class="ctrl-row"><span>Hệ số nhân</span><input type="number" id="renko-atrMult" class="ctrl-input-num" value="3.0" min="0.1" max="10" step="0.1" style="width:70px" /></div>
+            <div class="ctrl-row"><span>Cửa sổ dữ liệu (nến)</span><input type="number" id="renko-windowSize" class="ctrl-input-num" value="3000" min="200" max="15000" step="100" style="width:70px" /></div>
+          </div>
+          <button class="btn-action" id="recalcBrickBtn" style="align-self:flex-start;">↻ Tính lại Brick Size</button>
+        </div>
+        <span class="stat-badge" id="stat-renko">—</span>
+      </div>
+
+      <!-- ATRBot -->
+      <div class="indicator-card card-featured active" id="card-atrbot" style="grid-column: span 2;">
+        <div class="card-top">
+          <div class="card-title"><span class="card-icon" style="background:var(--accent-purple);"></span><span>ATRBot M1 (Adaptive)</span></div>
+          <label class="toggle-switch"><input type="checkbox" id="atrbot-enabled" checked /><span class="slider"></span></label>
+        </div>
+        <div class="card-body">
+          <div style="display:grid; grid-template-columns: repeat(2,1fr); gap:8px 18px;">
+            <div class="ctrl-row"><span>ATR Period / Base Mult</span><span style="display:flex; gap:4px;"><input type="number" id="atrbot-atrLength" class="ctrl-input-num" style="width:50px" value="14" /><input type="number" id="atrbot-baseAtrMult" class="ctrl-input-num" style="width:50px" value="2.0" step="0.1" /></span></div>
+            <div class="ctrl-row"><span>Adaptive K</span><input type="number" id="atrbot-adaptiveK" class="ctrl-input-num" style="width:70px" value="1.5" step="0.1" /></div>
+          </div>
+          <div class="ctrl-row"><label><input type="checkbox" id="atrbot-showRibbon" checked /> Ribbon Cloud</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="atrbot-showVidyaLine" checked /> VIDYA Line</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="atrbot-showStopLine" checked /> Trailing Stop</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="atrbot-showSignals" checked /> Tín hiệu ▲BUY/▼SELL</label></div>
+        </div>
+        <span class="stat-badge" id="stat-atrbot">—</span>
+      </div>
+
+      <!-- Swing -->
+      <div class="indicator-card active" id="card-swing">
+        <div class="card-top">
+          <div class="card-title"><span class="card-icon" style="background:var(--accent-green);"></span><span>Swing Highs/Lows</span></div>
+          <label class="toggle-switch"><input type="checkbox" id="swing-enabled" checked /><span class="slider"></span></label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row"><span>swingLength</span><input type="number" id="swing-length" class="ctrl-input-num" value="50" min="2" max="300" /></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="swing-show-zigzag" checked /> Đường Zigzag</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="swing-show-labels" checked /> Nhãn HH/HL/LH/LL</label></div>
+        </div>
+        <span class="stat-badge" id="stat-swing">—</span>
+      </div>
+
+      <!-- BOS/CHOCH -->
+      <div class="indicator-card active" id="card-bos">
+        <div class="card-top">
+          <div class="card-title"><span class="card-icon" style="background:#06b6d4;"></span><span>BOS / CHOCH</span></div>
+          <label class="toggle-switch"><input type="checkbox" id="bos-enabled" checked /><span class="slider"></span></label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row"><label><input type="checkbox" id="bos-closeBreak" checked /> Xác nhận bằng giá đóng cửa</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="bos-show-bos" checked /> Hiện BOS</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="bos-show-choch" checked /> Hiện CHOCH</label></div>
+        </div>
+        <span class="stat-badge" id="stat-bos">—</span>
+      </div>
+
+      <!-- FVG -->
+      <div class="indicator-card active" id="card-fvg">
+        <div class="card-top">
+          <div class="card-title"><span class="card-icon" style="background:#10b981;"></span><span>Fair Value Gap</span></div>
+          <label class="toggle-switch"><input type="checkbox" id="fvg-enabled" checked /><span class="slider"></span></label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row"><label><input type="checkbox" id="fvg-only-open" checked /> Chỉ hiện vùng chưa lấp</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="fvg-show-bull" checked /> Bull FVG</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="fvg-show-bear" checked /> Bear FVG</label></div>
+        </div>
+        <span class="stat-badge" id="stat-fvg">—</span>
+      </div>
+
+      <!-- OB -->
+      <div class="indicator-card active" id="card-ob">
+        <div class="card-top">
+          <div class="card-title"><span class="card-icon" style="background:#f59e0b;"></span><span>Order Blocks</span></div>
+          <label class="toggle-switch"><input type="checkbox" id="ob-enabled" checked /><span class="slider"></span></label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row"><label><input type="checkbox" id="ob-only-open" checked /> Chỉ hiện vùng chưa hoà giải</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="ob-show-bull" checked /> Bull OB</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="ob-show-bear" checked /> Bear OB</label></div>
+        </div>
+        <span class="stat-badge" id="stat-ob">—</span>
+      </div>
+
+      <!-- Liquidity -->
+      <div class="indicator-card active" id="card-liquidity">
+        <div class="card-top">
+          <div class="card-title"><span class="card-icon" style="background:#a855f7;"></span><span>Liquidity</span></div>
+          <label class="toggle-switch"><input type="checkbox" id="liquidity-enabled" checked /><span class="slider"></span></label>
+        </div>
+        <div class="card-body">
+          <div class="ctrl-row"><span>Range % gộp cụm</span><input type="number" id="liquidity-rangePercent" class="ctrl-input-num" value="1.0" step="0.1" /></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="liquidity-show-bsl" checked /> BSL (đỉnh)</label></div>
+          <div class="ctrl-row"><label><input type="checkbox" id="liquidity-show-ssl" checked /> SSL (đáy)</label></div>
+        </div>
+        <span class="stat-badge" id="stat-liquidity">—</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action" id="forceReloadBtn">↻ Tải mới từ Server</button>
+      <button class="btn-action btn-primary" id="applySettingsBtn">Áp dụng</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"></script>
+<script src="../dist/smc.umd.js"></script>
+<script src="../indicator_atrbot_m1.js"></script>
+<script src="../renko.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------------
+  // Config
+  // ---------------------------------------------------------------------
+  const VALID_INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"];
+  let SYMBOL = localStorage.getItem("smc_selected_symbol") || "IMXUSDT";
+  let INTERVAL = localStorage.getItem("smc_selected_interval") || "15m";
+  if (!VALID_INTERVALS.includes(INTERVAL)) INTERVAL = "15m";
+  const TARGET_CANDLES = 15000;
+  const KLINES_API = "https://fapi.binance.com/fapi/v1/klines";
+  const PROXY_API = "/api/klines";
+  const EXCHANGE_INFO_API = "https://fapi.binance.com/fapi/v1/exchangeInfo";
+  const PROXY_EXCHANGE_INFO_API = "/api/exchangeInfo";
+  const SYMBOLS_CACHE_KEY = "smc_futures_symbols";
+
+  const statusPill = document.getElementById("statusPill");
+  const statusText = document.getElementById("statusText");
+  const progressBar = document.getElementById("progressBar");
+  const dataBadge = document.getElementById("dataBadge");
+  const brickBadge = document.getElementById("brickBadge");
+  const toast = document.getElementById("toast");
+  const symbolBtn = document.getElementById("symbolBtn");
+  const symbolPopover = document.getElementById("symbolPopover");
+  const symbolSearchInput = document.getElementById("symbolSearchInput");
+  const symbolList = document.getElementById("symbolList");
+  const currentSymbolText = document.getElementById("currentSymbolText");
+  const timeframeSelect = document.getElementById("timeframeSelect");
+  const openSettingsBtn = document.getElementById("openSettingsBtn");
+  const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+  const applySettingsBtn = document.getElementById("applySettingsBtn");
+  const forceReloadBtn = document.getElementById("forceReloadBtn");
+  const recalcBrickBtn = document.getElementById("recalcBrickBtn");
+  const settingsModal = document.getElementById("settingsModal");
+  const fitChartBtn = document.getElementById("fitChartBtn");
+
+  function showToast(msg, duration = 3000) {
+    toast.textContent = msg;
+    toast.style.display = "flex";
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.style.display = "none"; }, duration);
+  }
+  function setStatus(msg, type = "loading") {
+    statusText.textContent = msg;
+    statusPill.className = "status-pill " + type;
+  }
+  function setProgress(pct) {
+    progressBar.style.width = Math.max(0, Math.min(100, pct)) + "%";
+    if (pct >= 100) setTimeout(() => { progressBar.style.width = "0%"; }, 500);
+  }
+  function setStat(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.toggle("empty", !msg);
+  }
+
+  function updateDataBadge() {
+    const countLabel = TARGET_CANDLES >= 1000 ? `${Math.round(TARGET_CANDLES / 1000)}K` : String(TARGET_CANDLES);
+    dataBadge.textContent = `${INTERVAL.toUpperCase()} · ${countLabel} NẾN`;
+  }
+
+  // ---------------------------------------------------------------------
+  // IndexedDB cache — DÙNG CHUNG với demo/index.html (cùng origin, cùng
+  // DB_NAME/STORE_NAME/cache-key convention) nên đổi symbol/timeframe đã
+  // tải ở 1 trong 2 trang sẽ có sẵn cache ở trang còn lại.
+  // ---------------------------------------------------------------------
+  const DB_NAME = "SMC_Chart_DB_v2";
+  const DB_VERSION = 1;
+  const STORE_NAME = "klines";
+
+  function openDb() {
+    return new Promise((resolve, reject) => {
+      try {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (db.objectStoreNames.contains(STORE_NAME)) db.deleteObjectStore(STORE_NAME);
+          db.createObjectStore(STORE_NAME);
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+        req.onblocked = () => resolve(null);
+      } catch (err) { reject(err); }
+    });
+  }
+  async function getCachedKlines(key) {
+    try {
+      const db = await openDb();
+      if (!db) return null;
+      return new Promise((resolve) => {
+        try {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const req = tx.objectStore(STORE_NAME).get(key);
+          req.onsuccess = () => {
+            const res = req.result;
+            resolve(res && typeof res === "object" && "data" in res ? res.data : (res || null));
+          };
+          req.onerror = () => resolve(null);
+        } catch { resolve(null); }
+      });
+    } catch { return null; }
+  }
+  async function saveCachedKlines(key, data) {
+    try {
+      const db = await openDb();
+      if (!db) return false;
+      return new Promise((resolve) => {
+        try {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          const store = tx.objectStore(STORE_NAME);
+          if (store.keyPath) store.put({ [store.keyPath]: key, data });
+          else store.put(data, key);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        } catch { resolve(false); }
+      });
+    } catch { return false; }
+  }
+  async function clearCachedKlines(key) {
+    try {
+      const db = await openDb();
+      if (!db) return false;
+      return new Promise((resolve) => {
+        try {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.objectStore(STORE_NAME).delete(key);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        } catch { resolve(false); }
+      });
+    } catch { return false; }
+  }
+
+  async function fetchKlinesBatch(symbol, interval, endTime, limit = 1500) {
+    const params = new URLSearchParams({ symbol, interval, limit: String(limit) });
+    if (endTime) params.set("endTime", String(endTime));
+    try {
+      const res = await fetch(`${KLINES_API}?${params.toString()}`);
+      if (res.ok) return await res.json();
+    } catch (e) { console.warn("Direct Binance fetch failed, trying proxy...", e); }
+    const proxyRes = await fetch(`${PROXY_API}?${params.toString()}`);
+    if (!proxyRes.ok) throw new Error("Binance API error: " + proxyRes.status);
+    return await proxyRes.json();
+  }
+
+  async function loadKlinesData(forceRefresh = false) {
+    const cacheKey = `${SYMBOL}_${INTERVAL}_${TARGET_CANDLES}`;
+    if (!forceRefresh) {
+      const cached = await getCachedKlines(cacheKey);
+      if (cached && Array.isArray(cached) && cached.length > 0) {
+        setStatus(`${cached.length.toLocaleString()} nến (Từ Cache ⚡)`, "ready");
+        showToast(`Đã nạp ${cached.length.toLocaleString()} nến ${SYMBOL} từ cache`);
+        return cached;
+      }
+    }
+    setStatus(`Đang tải ${TARGET_CANDLES.toLocaleString()} nến ${SYMBOL} (${INTERVAL})...`, "loading");
+    setProgress(5);
+    let all = [];
+    let endTime = undefined;
+    let guard = 0;
+    const maxBatches = Math.ceil(TARGET_CANDLES / 1500) + 2;
+    while (all.length < TARGET_CANDLES && guard < maxBatches) {
+      guard++;
+      const batch = await fetchKlinesBatch(SYMBOL, INTERVAL, endTime, 1500);
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      all = batch.concat(all);
+      endTime = batch[0][0] - 1;
+      setProgress(Math.min(95, Math.round((all.length / TARGET_CANDLES) * 90) + 5));
+      setStatus(`Đang tải nến... ${all.length.toLocaleString()} / ${TARGET_CANDLES.toLocaleString()}`, "loading");
+      if (batch.length < 1500) break;
+    }
+    if (all.length > TARGET_CANDLES) all = all.slice(all.length - TARGET_CANDLES);
+    const formatted = all.map((k) => ({ time: Math.floor(k[0] / 1000), open: Number(k[1]), high: Number(k[2]), low: Number(k[3]), close: Number(k[4]), volume: Number(k[5]) }));
+    formatted.sort((a, b) => a.time - b.time);
+    const unique = [];
+    for (let i = 0; i < formatted.length; i++) if (i === 0 || formatted[i].time > formatted[i - 1].time) unique.push(formatted[i]);
+    setProgress(100);
+    try { await saveCachedKlines(cacheKey, unique); } catch (e) { console.warn("cache save failed", e); }
+    setStatus(`${unique.length.toLocaleString()} nến (${SYMBOL})`, "ready");
+    showToast(`Đã tải thành công ${unique.length.toLocaleString()} nến ${SYMBOL}!`);
+    return unique;
+  }
+
+  // ---------------------------------------------------------------------
+  // Symbol Selector
+  // ---------------------------------------------------------------------
+  let allSymbols = [];
+  async function loadFuturesSymbols() {
+    try {
+      const cached = localStorage.getItem(SYMBOLS_CACHE_KEY);
+      if (cached) { allSymbols = JSON.parse(cached); renderSymbolList(allSymbols); return; }
+    } catch {}
+    try {
+      let data = null;
+      try { const res = await fetch(EXCHANGE_INFO_API); if (res.ok) data = await res.json(); } catch {}
+      if (!data) { const proxyRes = await fetch(PROXY_EXCHANGE_INFO_API); if (proxyRes.ok) data = await proxyRes.json(); }
+      if (data && data.symbols) {
+        allSymbols = data.symbols.filter((s) => s.status === "TRADING" && s.quoteAsset === "USDT" && s.contractType === "PERPETUAL")
+          .map((s) => ({ symbol: s.symbol, baseAsset: s.baseAsset }))
+          .sort((a, b) => a.symbol.localeCompare(b.symbol));
+        localStorage.setItem(SYMBOLS_CACHE_KEY, JSON.stringify(allSymbols));
+        renderSymbolList(allSymbols);
+      }
+    } catch (e) { console.warn("load symbols failed", e); }
+  }
+  function renderSymbolList(symbols) {
+    symbolList.innerHTML = "";
+    if (!symbols.length) { symbolList.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);">Không tìm thấy</div>'; return; }
+    const frag = document.createDocumentFragment();
+    symbols.forEach((s) => {
+      const item = document.createElement("div");
+      item.className = "symbol-item" + (s.symbol === SYMBOL ? " active" : "");
+      item.innerHTML = `<span>${s.symbol}</span><span class="symbol-item-quote">${s.baseAsset} · PERP</span>`;
+      item.addEventListener("click", () => selectSymbol(s.symbol));
+      frag.appendChild(item);
+    });
+    symbolList.appendChild(frag);
+  }
+  function filterSymbols(q) {
+    q = q.trim().toUpperCase();
+    renderSymbolList(!q ? allSymbols : allSymbols.filter((s) => s.symbol.includes(q) || s.baseAsset.includes(q)));
+  }
+  function selectSymbol(newSymbol) {
+    if (newSymbol === SYMBOL) { symbolPopover.classList.remove("open"); return; }
+    SYMBOL = newSymbol;
+    localStorage.setItem("smc_selected_symbol", SYMBOL);
+    currentSymbolText.textContent = SYMBOL;
+    symbolPopover.classList.remove("open");
+    renderSymbolList(allSymbols);
+    loadAndRender();
+  }
+  symbolBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    symbolPopover.classList.toggle("open");
+    if (symbolPopover.classList.contains("open")) symbolSearchInput.focus();
+  });
+  symbolSearchInput.addEventListener("input", (e) => filterSymbols(e.target.value));
+  document.addEventListener("click", (e) => {
+    if (!symbolPopover.contains(e.target) && !symbolBtn.contains(e.target)) symbolPopover.classList.remove("open");
+  });
+  currentSymbolText.textContent = SYMBOL;
+
+  function selectInterval(newInterval) {
+    if (newInterval === INTERVAL || !VALID_INTERVALS.includes(newInterval)) return;
+    INTERVAL = newInterval;
+    localStorage.setItem("smc_selected_interval", INTERVAL);
+    timeframeSelect.value = INTERVAL;
+    updateDataBadge();
+    loadAndRender();
+  }
+  timeframeSelect.addEventListener("change", (e) => selectInterval(e.target.value));
+  timeframeSelect.value = INTERVAL;
+  updateDataBadge();
+  loadFuturesSymbols();
+
+  // ---------------------------------------------------------------------
+  // Drawing Primitives (giống hệt demo/index.html — BoxesPrimitive,
+  // LinesPrimitive, ATRBotPrimitive — copy nguyên bản vì đây là các class
+  // hiển thị thuần, không phụ thuộc dữ liệu cụ thể của trang nào).
+  // ---------------------------------------------------------------------
+  class BoxesPrimitive {
+    constructor() { this._boxes = []; this._chart = null; this._series = null; this._requestUpdate = null; }
+    attached({ chart, series, requestUpdate }) { this._chart = chart; this._series = series; this._requestUpdate = requestUpdate; }
+    detached() { this._chart = null; this._series = null; }
+    setBoxes(boxes) { this._boxes = boxes; if (this._requestUpdate) this._requestUpdate(); }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const boxes = this._boxes, chart = this._chart, series = this._series;
+      return { draw(target) {
+        if (!chart || !series || !boxes.length) return;
+        target.useBitmapCoordinateSpace((scope) => {
+          const ctx = scope.context, ts = chart.timeScale();
+          const width = scope.bitmapSize.width, height = scope.bitmapSize.height;
+          for (let i = 0; i < boxes.length; i++) {
+            const b = boxes[i];
+            const x1 = ts.timeToCoordinate(b.time1);
+            const x2 = b.time2 ? ts.timeToCoordinate(b.time2) : width;
+            const y1 = series.priceToCoordinate(b.price1);
+            const y2 = series.priceToCoordinate(b.price2);
+            if (x1 === null || y1 === null || y2 === null) continue;
+            const coordX2 = x2 === null ? width : x2;
+            const left = Math.min(x1, coordX2) * scope.horizontalPixelRatio;
+            const right = Math.max(x1, coordX2) * scope.horizontalPixelRatio;
+            const top = Math.min(y1, y2) * scope.verticalPixelRatio;
+            const bottom = Math.max(y1, y2) * scope.verticalPixelRatio;
+            if (right < 0 || left > width || bottom < 0 || top > height) continue;
+            const rectW = Math.max(right - left, 1), rectH = Math.max(bottom - top, 1);
+            ctx.fillStyle = b.fill || "rgba(255,255,255,0.1)";
+            ctx.fillRect(left, top, rectW, rectH);
+            if (b.border) {
+              ctx.strokeStyle = b.border;
+              ctx.lineWidth = (b.borderWidth || 1) * scope.verticalPixelRatio;
+              ctx.setLineDash(b.borderDash ? b.borderDash.map((d) => d * scope.horizontalPixelRatio) : []);
+              ctx.strokeRect(left, top, rectW, rectH);
+            }
+            if (b.label && rectW > 28 && rectH > 10) {
+              ctx.font = `${Math.round((b.fontSize || 9) * scope.verticalPixelRatio)}px 'JetBrains Mono', sans-serif`;
+              ctx.fillStyle = b.labelColor || "rgba(255,255,255,0.85)";
+              ctx.textAlign = "left"; ctx.textBaseline = "middle";
+              ctx.fillText(b.label, left + 6 * scope.horizontalPixelRatio, (top + bottom) / 2);
+            }
+          }
+        });
+      } };
+    }
+  }
+
+  class LinesPrimitive {
+    constructor() { this._items = []; this._chart = null; this._series = null; this._requestUpdate = null; }
+    attached({ chart, series, requestUpdate }) { this._chart = chart; this._series = series; this._requestUpdate = requestUpdate; }
+    detached() { this._chart = null; this._series = null; }
+    setItems(items) { this._items = items; if (this._requestUpdate) this._requestUpdate(); }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const items = this._items, chart = this._chart, series = this._series;
+      return { draw(target) {
+        if (!chart || !series || !items.length) return;
+        target.useBitmapCoordinateSpace((scope) => {
+          const ctx = scope.context, ts = chart.timeScale();
+          const width = scope.bitmapSize.width, height = scope.bitmapSize.height;
+          for (let i = 0; i < items.length; i++) {
+            const it = items[i];
+            const x1 = ts.timeToCoordinate(it.time1);
+            const x2 = it.time2 ? ts.timeToCoordinate(it.time2) : width;
+            const y1 = series.priceToCoordinate(it.price1);
+            const y2 = series.priceToCoordinate(it.price2);
+            if (x1 === null || y1 === null) continue;
+            const targetX2 = x2 === null ? width : x2, targetY2 = y2 === null ? y1 : y2;
+            const X1 = x1 * scope.horizontalPixelRatio, X2 = targetX2 * scope.horizontalPixelRatio;
+            const Y1 = y1 * scope.verticalPixelRatio, Y2 = targetY2 * scope.verticalPixelRatio;
+            const minX = Math.min(X1, X2), maxX = Math.max(X1, X2), minY = Math.min(Y1, Y2), maxY = Math.max(Y1, Y2);
+            if (maxX < 0 || minX > width || maxY < 0 || minY > height) continue;
+            ctx.strokeStyle = it.color || "#fff";
+            ctx.lineWidth = (it.width || 1.5) * scope.verticalPixelRatio;
+            ctx.setLineDash(it.dash ? it.dash.map((d) => d * scope.horizontalPixelRatio) : []);
+            ctx.beginPath(); ctx.moveTo(X1, Y1); ctx.lineTo(X2, Y2); ctx.stroke();
+            if (it.label) {
+              const fontSize = Math.round(9.5 * scope.verticalPixelRatio);
+              ctx.font = `600 ${fontSize}px 'JetBrains Mono', sans-serif`;
+              const tm = ctx.measureText(it.label);
+              const padH = 4 * scope.horizontalPixelRatio, padV = 2 * scope.verticalPixelRatio;
+              const boxW = tm.width + padH * 2, boxH = fontSize + padV * 2;
+              let labelX = X2 + 4 * scope.horizontalPixelRatio, labelY = Y2 - boxH / 2;
+              if (labelX + boxW > width) labelX = width - boxW - 8 * scope.horizontalPixelRatio;
+              ctx.fillStyle = it.labelBg || "rgba(15,20,34,0.9)";
+              ctx.fillRect(labelX, labelY, boxW, boxH);
+              ctx.strokeStyle = it.color || "#38bdf8";
+              ctx.lineWidth = 1 * scope.verticalPixelRatio;
+              ctx.setLineDash([]);
+              ctx.strokeRect(labelX, labelY, boxW, boxH);
+              ctx.fillStyle = it.labelColor || it.color || "#fff";
+              ctx.textAlign = "left"; ctx.textBaseline = "middle";
+              ctx.fillText(it.label, labelX + padH, labelY + boxH / 2);
+            }
+          }
+        });
+      } };
+    }
+  }
+
+  class ATRBotPrimitive {
+    constructor() { this._data = []; this._style = {}; this._chart = null; this._series = null; this._requestUpdate = null; }
+    attached({ chart, series, requestUpdate }) { this._chart = chart; this._series = series; this._requestUpdate = requestUpdate; }
+    detached() { this._chart = null; this._series = null; }
+    setData(data, style) { this._data = data; this._style = style || {}; if (this._requestUpdate) this._requestUpdate(); }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const data = this._data, style = this._style, chart = this._chart, series = this._series;
+      return { draw(target) {
+        if (!chart || !series || !data || data.length < 2) return;
+        target.useBitmapCoordinateSpace((scope) => {
+          const ctx = scope.context, ts = chart.timeScale();
+          const helpers = {
+            getX: (t) => { const c = ts.timeToCoordinate(t); return c === null ? null : c * scope.horizontalPixelRatio; },
+            getY: (p) => { const c = series.priceToCoordinate(p); return c === null ? null : c * scope.verticalPixelRatio; },
+            fromTime: 0, toTime: Infinity,
+          };
+          if (typeof ATRBotM1Indicator !== "undefined" && ATRBotM1Indicator.renderCanvas) ATRBotM1Indicator.renderCanvas(ctx, data, style, helpers);
+        });
+      } };
+    }
+  }
+
+  // Công cụ vẽ: thước đo (measure) / đường thẳng (line) / hình chữ nhật (rect).
+  // 1 primitive DUY NHẤT vẽ cả 3 loại — mỗi item có `type` riêng. Toạ độ lưu
+  // dưới dạng (time, price) — giống mọi primitive khác trong file này — nên
+  // hình vẽ tự trôi đúng theo chart khi pan/zoom, không cần tính lại thủ công.
+  class DrawingsPrimitive {
+    constructor() { this._items = []; this._chart = null; this._series = null; this._requestUpdate = null; }
+    attached({ chart, series, requestUpdate }) { this._chart = chart; this._series = series; this._requestUpdate = requestUpdate; }
+    detached() { this._chart = null; this._series = null; }
+    setItems(items) { this._items = items; if (this._requestUpdate) this._requestUpdate(); }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const items = this._items, chart = this._chart, series = this._series;
+      return { draw(target) {
+        if (!chart || !series || !items.length) return;
+        target.useBitmapCoordinateSpace((scope) => {
+          const ctx = scope.context, ts = chart.timeScale();
+          const width = scope.bitmapSize.width;
+          for (const it of items) {
+            const x1 = ts.timeToCoordinate(it.time1), x2 = ts.timeToCoordinate(it.time2);
+            const y1 = series.priceToCoordinate(it.price1), y2 = series.priceToCoordinate(it.price2);
+            if (x1 === null || x2 === null || y1 === null || y2 === null) continue;
+            const X1 = x1 * scope.horizontalPixelRatio, X2 = x2 * scope.horizontalPixelRatio;
+            const Y1 = y1 * scope.verticalPixelRatio, Y2 = y2 * scope.verticalPixelRatio;
+            const left = Math.min(X1, X2), right = Math.max(X1, X2), top = Math.min(Y1, Y2), bottom = Math.max(Y1, Y2);
+
+            if (it.type === "rect") {
+              ctx.fillStyle = "rgba(56,189,248,0.12)";
+              ctx.fillRect(left, top, Math.max(right - left, 1), Math.max(bottom - top, 1));
+              ctx.strokeStyle = "#38bdf8";
+              ctx.lineWidth = 1.5 * scope.verticalPixelRatio;
+              ctx.setLineDash([]);
+              ctx.strokeRect(left, top, Math.max(right - left, 1), Math.max(bottom - top, 1));
+            } else if (it.type === "line") {
+              ctx.strokeStyle = "#f59e0b";
+              ctx.lineWidth = 1.8 * scope.verticalPixelRatio;
+              ctx.setLineDash([]);
+              ctx.beginPath(); ctx.moveTo(X1, Y1); ctx.lineTo(X2, Y2); ctx.stroke();
+              ctx.fillStyle = "#f59e0b";
+              const r = 3 * scope.verticalPixelRatio;
+              ctx.beginPath(); ctx.arc(X1, Y1, r, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.arc(X2, Y2, r, 0, Math.PI * 2); ctx.fill();
+            } else if (it.type === "measure") {
+              const priceDiff = it.price2 - it.price1;
+              const pctDiff = it.price1 !== 0 ? (priceDiff / it.price1) * 100 : 0;
+              const up = priceDiff >= 0;
+              const color = up ? "#10b981" : "#f43f5e";
+              ctx.fillStyle = up ? "rgba(16,185,129,0.15)" : "rgba(244,63,94,0.15)";
+              ctx.fillRect(left, top, Math.max(right - left, 1), Math.max(bottom - top, 1));
+              ctx.strokeStyle = color;
+              ctx.lineWidth = 1.5 * scope.verticalPixelRatio;
+              ctx.setLineDash([5 * scope.horizontalPixelRatio, 4 * scope.horizontalPixelRatio]);
+              ctx.strokeRect(left, top, Math.max(right - left, 1), Math.max(bottom - top, 1));
+              ctx.setLineDash([]);
+              ctx.beginPath(); ctx.moveTo(X1, Y1); ctx.lineTo(X2, Y2); ctx.stroke();
+
+              const barLabel = it.barCount != null ? ` · ${it.barCount} nến` : "";
+              const label = `${up ? "+" : ""}${priceDiff.toFixed(6)} (${up ? "+" : ""}${pctDiff.toFixed(2)}%)${barLabel}`;
+              const fontSize = Math.round(10.5 * scope.verticalPixelRatio);
+              ctx.font = `700 ${fontSize}px 'JetBrains Mono', sans-serif`;
+              const tm = ctx.measureText(label);
+              const padH = 6 * scope.horizontalPixelRatio, padV = 4 * scope.verticalPixelRatio;
+              const boxW = tm.width + padH * 2, boxH = fontSize + padV * 2;
+              const labelX = Math.min(Math.max(X1, X2), width - boxW - 4 * scope.horizontalPixelRatio);
+              const labelY = Y2 < Y1 ? top - boxH - 4 * scope.verticalPixelRatio : bottom + 4 * scope.verticalPixelRatio;
+              ctx.fillStyle = color;
+              ctx.fillRect(labelX, labelY, boxW, boxH);
+              ctx.fillStyle = "#fff";
+              ctx.textAlign = "left"; ctx.textBaseline = "middle";
+              ctx.fillText(label, labelX + padH, labelY + boxH / 2);
+            }
+          }
+        });
+      } };
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Panel factory — 1 chart hoàn chỉnh (candle series + mọi primitive SMC)
+  // ---------------------------------------------------------------------
+  function createPanel(containerId) {
+    const container = document.getElementById(containerId);
+    const chart = LightweightCharts.createChart(container, {
+      layout: { background: { color: "#090c14" }, textColor: "#94a3b8", fontFamily: "'JetBrains Mono', monospace", fontSize: 11 },
+      grid: { vertLines: { color: "#141a29" }, horzLines: { color: "#141a29" } },
+      timeScale: { timeVisible: true, secondsVisible: false, borderColor: "#1c2436", barSpacing: 8, minBarSpacing: 2 },
+      rightPriceScale: { borderColor: "#1c2436", scaleMargins: { top: 0.08, bottom: 0.08 } },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { color: "#38bdf8", width: 1, style: 3, labelBackgroundColor: "#0f1422" }, horzLine: { color: "#38bdf8", width: 1, style: 3, labelBackgroundColor: "#0f1422" } },
+    });
+    const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+      upColor: "#10b981", downColor: "#f43f5e", borderVisible: false, wickUpColor: "#10b981", wickDownColor: "#f43f5e",
+      priceFormat: { type: "price", precision: 4, minMove: 0.0001 },
+    });
+    const zigzagPrimitive = new LinesPrimitive();
+    const bosChochPrimitive = new LinesPrimitive();
+    const liquidityPrimitive = new LinesPrimitive();
+    const fvgPrimitive = new BoxesPrimitive();
+    const obPrimitive = new BoxesPrimitive();
+    const atrBotPrimitive = new ATRBotPrimitive();
+    const drawingsPrimitive = new DrawingsPrimitive();
+    candleSeries.attachPrimitive(atrBotPrimitive);
+    candleSeries.attachPrimitive(fvgPrimitive);
+    candleSeries.attachPrimitive(obPrimitive);
+    candleSeries.attachPrimitive(zigzagPrimitive);
+    candleSeries.attachPrimitive(bosChochPrimitive);
+    candleSeries.attachPrimitive(liquidityPrimitive);
+    candleSeries.attachPrimitive(drawingsPrimitive);
+    const markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, []);
+    return { chart, candleSeries, containerId, zigzagPrimitive, bosChochPrimitive, liquidityPrimitive, fvgPrimitive, obPrimitive, atrBotPrimitive, drawingsPrimitive, markersPlugin, candles: [] };
+  }
+
+  const topPanel = createPanel("chartTop");
+  // Chart Renko trong dialog được tạo SẴN (ẩn tới khi mở) để tái dùng 1 chart
+  // instance duy nhất qua nhiều lần click, thay vì tạo/huỷ mỗi lần.
+  const renkoDialogPanel = createPanel("renkoDialogChart");
+  const renkoDialogEl = document.getElementById("renkoDialog");
+  // Markers plugin RIÊNG cho mũi tên đánh dấu điểm click — tách khỏi
+  // renkoDialogPanel.markersPlugin (đang dùng cho nhãn HH/HL/LH/LL của
+  // Swing) để 2 nguồn không ghi đè nhau mỗi lần recomputePanel() chạy lại.
+  const dialogClickMarkers = LightweightCharts.createSeriesMarkers(renkoDialogPanel.candleSeries, []);
+
+  // ---------------------------------------------------------------------
+  // Công cụ vẽ: thước đo / line / rectangle — dùng chung cho MỌI panel.
+  // `getStorageKey` là 1 hàm trả về key hiện hành (đọc SYMBOL/INTERVAL LÚC
+  // GỌI, không phải lúc gắn — để đổi symbol/timeframe tự chuyển sang đúng bộ
+  // hình vẽ của cặp đó) — trả về null/falsy nghĩa là KHÔNG lưu (dùng cho
+  // dialog Renko: mỗi lần click mở là 1 cửa sổ dữ liệu Renko KHÁC nhau nên
+  // hình vẽ cũ không còn ý nghĩa, tự xoá qua clearAll() mỗi lần mở dialog
+  // mới — xem openRenkoDialog()).
+  // ---------------------------------------------------------------------
+  function attachDrawingTools(panel, toolbarId, getStorageKey) {
+    let items = [];
+
+    function persist() {
+      const key = getStorageKey();
+      if (!key) return;
+      try { localStorage.setItem(key, JSON.stringify(items)); } catch (e) { console.warn(e); }
+    }
+
+    function reload() {
+      const key = getStorageKey();
+      items = [];
+      if (key) {
+        try {
+          const saved = localStorage.getItem(key);
+          if (saved) items = JSON.parse(saved);
+        } catch (e) { console.warn("load drawings failed", e); }
+      }
+      panel.drawingsPrimitive.setItems(items);
+    }
+    reload();
+
+    const container = document.getElementById(panel.containerId);
+    const toolbar = document.getElementById(toolbarId);
+    const buttons = Array.from(toolbar.querySelectorAll("[data-tool]"));
+    let tool = "cursor";
+    let dragging = null;
+
+    function setTool(next) {
+      tool = next;
+      buttons.forEach((b) => b.classList.toggle("active", b.dataset.tool === tool));
+      const interactive = tool !== "cursor";
+      panel.chart.applyOptions({ handleScroll: !interactive, handleScale: !interactive });
+      container.style.cursor = interactive ? "crosshair" : "default";
+    }
+
+    buttons.forEach((b) => {
+      b.addEventListener("click", () => {
+        if (b.dataset.tool === "clear") {
+          items = [];
+          panel.drawingsPrimitive.setItems(items);
+          persist();
+          return;
+        }
+        setTool(b.dataset.tool === tool ? "cursor" : b.dataset.tool);
+      });
+    });
+
+    function toPoint(clientX, clientY) {
+      const rect = container.getBoundingClientRect();
+      const x = clientX - rect.left, y = clientY - rect.top;
+      const time = panel.chart.timeScale().coordinateToTime(x);
+      const price = panel.candleSeries.coordinateToPrice(y);
+      return { time, price };
+    }
+
+    // Dùng capture-phase cho mousedown để chắc chắn bắt được sự kiện TRƯỚC
+    // khi Lightweight Charts xử lý (thư viện có thể dùng sự kiện này cho
+    // thao tác pan mặc định) — kết hợp việc tắt handleScroll/handleScale khi
+    // đang ở chế độ vẽ để tránh xung đột kéo-để-pan.
+    container.addEventListener("mousedown", (e) => {
+      if (tool === "cursor") return;
+      const p = toPoint(e.clientX, e.clientY);
+      if (p.time == null || p.price == null) return;
+      dragging = { type: tool, time1: p.time, price1: p.price, time2: p.time, price2: p.price };
+      e.preventDefault();
+    }, true);
+
+    container.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      const p = toPoint(e.clientX, e.clientY);
+      if (p.time != null) dragging.time2 = p.time;
+      if (p.price != null) dragging.price2 = p.price;
+      panel.drawingsPrimitive.setItems(items.concat([dragging]));
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!dragging) return;
+      if (dragging.type === "measure") {
+        const i1 = panel.candles.findIndex((c) => c.time === dragging.time1);
+        const i2 = panel.candles.findIndex((c) => c.time === dragging.time2);
+        dragging.barCount = (i1 >= 0 && i2 >= 0) ? Math.abs(i2 - i1) : null;
+      }
+      items.push(dragging);
+      panel.drawingsPrimitive.setItems(items);
+      persist();
+      dragging = null;
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setTool("cursor");
+    });
+
+    return {
+      clearAll() { items = []; panel.drawingsPrimitive.setItems(items); persist(); },
+      resetTool() { setTool("cursor"); },
+      isActive() { return tool !== "cursor"; },
+      reload,
+    };
+  }
+
+  const topDrawTools = attachDrawingTools(topPanel, "drawToolbarTop", () => `smc_renko_drawings_${SYMBOL}_${INTERVAL}`);
+  const dialogDrawTools = attachDrawingTools(renkoDialogPanel, "drawToolbarDialog", () => null);
+
+  function resizeCharts() {
+    const elTop = document.getElementById("chartTop");
+    if (elTop) topPanel.chart.applyOptions({ width: elTop.clientWidth, height: elTop.clientHeight });
+    if (renkoDialogEl.classList.contains("open")) {
+      const elD = document.getElementById("renkoDialogChart");
+      renkoDialogPanel.chart.applyOptions({ width: elD.clientWidth, height: elD.clientHeight });
+    }
+  }
+  new ResizeObserver(resizeCharts).observe(document.getElementById("stackWrap"));
+  window.addEventListener("resize", resizeCharts);
+
+  function bindOhlcReadout(panel, elId) {
+    const el = document.getElementById(elId);
+    panel.chart.subscribeCrosshairMove((param) => {
+      const bar = param.time ? param.seriesData.get(panel.candleSeries) : null;
+      if (!bar) { if (panel.candles.length) updateOhlcEl(el, panel.candles[panel.candles.length - 1]); return; }
+      updateOhlcEl(el, bar);
+    });
+  }
+  function updateOhlcEl(el, bar) {
+    if (!bar || !el) return;
+    el.textContent = `O: ${bar.open.toFixed(4)} H: ${bar.high.toFixed(4)} L: ${bar.low.toFixed(4)} C: ${bar.close.toFixed(4)}`;
+  }
+  bindOhlcReadout(topPanel, "ohlcTop");
+
+  fitChartBtn.addEventListener("click", () => {
+    topPanel.chart.timeScale().fitContent();
+  });
+
+  // ---------------------------------------------------------------------
+  // Click vào 1 nến trên chart chính -> mở dialog Renko tại đúng thời điểm
+  // đó. Chỉ dùng dữ liệu TỪ TRƯỚC tới điểm click (allCandles.slice(start,
+  // clickIndex+1), giới hạn cửa sổ state.renko.windowSize nến gần nhất để
+  // dialog vẫn gọn) — không có nghĩa "nhìn tương lai" nào ở đây.
+  // ---------------------------------------------------------------------
+  function formatDialogTime(ts) {
+    const d = new Date(ts * 1000);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+  }
+
+  function openRenkoDialog(clickIndex) {
+    if (!allCandles.length || typeof Renko === "undefined") return;
+    if (!state.renko.brickSize) recalcBrickSize();
+
+    const windowSize = state.renko.windowSize || 3000;
+    const start = Math.max(0, clickIndex - windowSize);
+    const windowCandles = allCandles.slice(start, clickIndex + 1);
+    const renkoResult = Renko.calculate(windowCandles, { brickSize: state.renko.brickSize });
+
+    document.getElementById("renkoDialogTime").textContent = formatDialogTime(allCandles[clickIndex].time);
+    document.getElementById("renkoDialogStat").textContent =
+      `${renkoResult.bricks.length.toLocaleString()} brick từ ${windowCandles.length.toLocaleString()} nến trước đó (cửa sổ ${windowSize.toLocaleString()} nến) · brickSize=${state.renko.brickSize.toFixed(6)}`;
+
+    // Mỗi dialog là 1 cửa sổ dữ liệu Renko khác nhau — hình vẽ của lần mở
+    // trước không còn ý nghĩa, xoá sạch + về chế độ con trỏ mỗi lần mở mới.
+    dialogDrawTools.clearAll();
+    dialogDrawTools.resetTool();
+
+    renkoDialogEl.classList.add("open");
+    requestAnimationFrame(() => {
+      const el = document.getElementById("renkoDialogChart");
+      renkoDialogPanel.chart.applyOptions({ width: el.clientWidth, height: el.clientHeight });
+      recomputePanel(renkoDialogPanel, renkoResult.bricks, false);
+
+      // Đánh dấu mũi tên tại brick cuối cùng — đúng vị trí "hiện tại" của
+      // giá tính tới đúng thời điểm vừa click, để phân biệt với các brick
+      // lịch sử phía trước.
+      const lastBrick = renkoResult.bricks[renkoResult.bricks.length - 1];
+      dialogClickMarkers.setMarkers(lastBrick ? [{
+        time: lastBrick.time,
+        position: "belowBar",
+        color: "#38bdf8",
+        shape: "arrowUp",
+        text: "Điểm click",
+      }] : []);
+
+      // Chừa thêm vài cột trống bên phải — nếu không, mũi tên "Điểm click"
+      // (luôn nằm ở brick cuối cùng) bị dồn sát mép phải và dễ bị cắt chữ.
+      // fitContent() phải chạy TRƯỚC vì bản thân nó cũng set lại rightOffset.
+      renkoDialogPanel.chart.timeScale().fitContent();
+      renkoDialogPanel.chart.timeScale().applyOptions({ rightOffset: 6 });
+    });
+  }
+
+  topPanel.chart.subscribeClick((param) => {
+    // Bỏ qua nếu đang ở chế độ vẽ (thước đo/line/rect) — tránh click để kết
+    // thúc 1 hình vẽ lại vô tình mở luôn dialog Renko.
+    if (topDrawTools.isActive()) return;
+    if (!param.time) return;
+    const idx = allCandles.findIndex((c) => c.time === param.time);
+    if (idx < 0) return;
+    openRenkoDialog(idx);
+  });
+
+  document.getElementById("renkoDialogClose").addEventListener("click", () => { dialogDrawTools.resetTool(); renkoDialogEl.classList.remove("open"); });
+  renkoDialogEl.addEventListener("click", (e) => { if (e.target === renkoDialogEl) { dialogDrawTools.resetTool(); renkoDialogEl.classList.remove("open"); } });
+
+  // ---------------------------------------------------------------------
+  // State — CHUNG cho cả 2 chart (cùng 1 bộ tham số SMC/ATRBot áp cho cả
+  // nến thường lẫn Renko, chỉ khác nhau ở CHUỖI CANDLE đưa vào).
+  // ---------------------------------------------------------------------
+  const defaultState = {
+    renko: { atrPeriod: 14, atrMult: 3.0, brickSize: 0, windowSize: 3000 },
+    atrbot: {
+      enabled: true, maType: "VIDYA", cmoLength: 14, maLength: 21, atrLength: 14, baseAtrMult: 2.0,
+      percentileWindow: 5000, minPeriods: 200, adaptiveK: 1.5, liqSweepFilterPct: 0,
+      showRibbon: true, bullCloudColor: "#10b981", bearCloudColor: "#f43f5e",
+      showVidyaLine: true, vidyaColor: "#a855f7", showStopLine: true, stopColor: "#f59e0b",
+      showSignals: true, showMultPanel: false,
+    },
+    swing: { enabled: true, swingLength: 50, showZigzag: true, showLabels: true },
+    bos: { enabled: true, closeBreak: true, showBos: true, showChoch: true },
+    fvg: { enabled: true, onlyOpen: true, showBull: true, showBear: true },
+    ob: { enabled: true, onlyOpen: true, showPct: true, showBull: true, showBear: true },
+    liquidity: { enabled: true, rangePercent: 1.0, showBsl: true, showSsl: true },
+  };
+  const SETTINGS_CACHE_KEY = "smc_renko_options";
+  let state = JSON.parse(JSON.stringify(defaultState));
+  try {
+    const saved = localStorage.getItem(SETTINGS_CACHE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      for (const [k, v] of Object.entries(parsed)) {
+        if (state[k] && typeof v === "object") Object.assign(state[k], v);
+      }
+    }
+  } catch (e) { console.warn("load renko settings failed", e); }
+  function saveSettings() {
+    try { localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(state)); } catch (e) { console.warn(e); }
+  }
+
+  function syncSettingsUI() {
+    document.getElementById("renko-atrPeriod").value = state.renko.atrPeriod;
+    document.getElementById("renko-atrMult").value = state.renko.atrMult;
+    document.getElementById("renko-windowSize").value = state.renko.windowSize;
+    document.getElementById("atrbot-enabled").checked = state.atrbot.enabled;
+    document.getElementById("atrbot-atrLength").value = state.atrbot.atrLength;
+    document.getElementById("atrbot-baseAtrMult").value = state.atrbot.baseAtrMult;
+    document.getElementById("atrbot-adaptiveK").value = state.atrbot.adaptiveK;
+    document.getElementById("atrbot-showRibbon").checked = state.atrbot.showRibbon;
+    document.getElementById("atrbot-showVidyaLine").checked = state.atrbot.showVidyaLine;
+    document.getElementById("atrbot-showStopLine").checked = state.atrbot.showStopLine;
+    document.getElementById("atrbot-showSignals").checked = state.atrbot.showSignals;
+    document.getElementById("swing-enabled").checked = state.swing.enabled;
+    document.getElementById("swing-length").value = state.swing.swingLength;
+    document.getElementById("swing-show-zigzag").checked = state.swing.showZigzag;
+    document.getElementById("swing-show-labels").checked = state.swing.showLabels;
+    document.getElementById("bos-enabled").checked = state.bos.enabled;
+    document.getElementById("bos-closeBreak").checked = state.bos.closeBreak;
+    document.getElementById("bos-show-bos").checked = state.bos.showBos;
+    document.getElementById("bos-show-choch").checked = state.bos.showChoch;
+    document.getElementById("fvg-enabled").checked = state.fvg.enabled;
+    document.getElementById("fvg-only-open").checked = state.fvg.onlyOpen;
+    document.getElementById("fvg-show-bull").checked = state.fvg.showBull;
+    document.getElementById("fvg-show-bear").checked = state.fvg.showBear;
+    document.getElementById("ob-enabled").checked = state.ob.enabled;
+    document.getElementById("ob-only-open").checked = state.ob.onlyOpen;
+    document.getElementById("ob-show-bull").checked = state.ob.showBull;
+    document.getElementById("ob-show-bear").checked = state.ob.showBear;
+    document.getElementById("liquidity-enabled").checked = state.liquidity.enabled;
+    document.getElementById("liquidity-rangePercent").value = state.liquidity.rangePercent;
+    document.getElementById("liquidity-show-bsl").checked = state.liquidity.showBsl;
+    document.getElementById("liquidity-show-ssl").checked = state.liquidity.showSsl;
+  }
+
+  function bindNumber(id, obj, key, cb) {
+    document.getElementById(id).addEventListener("change", (e) => {
+      const v = parseFloat(e.target.value);
+      if (!Number.isNaN(v)) { obj[key] = v; saveSettings(); if (cb) cb(); }
+    });
+  }
+  function bindCheckbox(id, obj, key, cb) {
+    document.getElementById(id).addEventListener("change", (e) => { obj[key] = e.target.checked; saveSettings(); if (cb) cb(); });
+  }
+
+  bindNumber("renko-atrPeriod", state.renko, "atrPeriod");
+  bindNumber("renko-atrMult", state.renko, "atrMult");
+  bindNumber("renko-windowSize", state.renko, "windowSize");
+  bindCheckbox("atrbot-enabled", state.atrbot, "enabled", recomputeAll);
+  bindNumber("atrbot-atrLength", state.atrbot, "atrLength", recomputeAll);
+  bindNumber("atrbot-baseAtrMult", state.atrbot, "baseAtrMult", recomputeAll);
+  bindNumber("atrbot-adaptiveK", state.atrbot, "adaptiveK", recomputeAll);
+  bindCheckbox("atrbot-showRibbon", state.atrbot, "showRibbon", recomputeAll);
+  bindCheckbox("atrbot-showVidyaLine", state.atrbot, "showVidyaLine", recomputeAll);
+  bindCheckbox("atrbot-showStopLine", state.atrbot, "showStopLine", recomputeAll);
+  bindCheckbox("atrbot-showSignals", state.atrbot, "showSignals", recomputeAll);
+  bindCheckbox("swing-enabled", state.swing, "enabled", recomputeAll);
+  bindNumber("swing-length", state.swing, "swingLength", recomputeAll);
+  bindCheckbox("swing-show-zigzag", state.swing, "showZigzag", recomputeAll);
+  bindCheckbox("swing-show-labels", state.swing, "showLabels", recomputeAll);
+  bindCheckbox("bos-enabled", state.bos, "enabled", recomputeAll);
+  bindCheckbox("bos-closeBreak", state.bos, "closeBreak", recomputeAll);
+  bindCheckbox("bos-show-bos", state.bos, "showBos", recomputeAll);
+  bindCheckbox("bos-show-choch", state.bos, "showChoch", recomputeAll);
+  bindCheckbox("fvg-enabled", state.fvg, "enabled", recomputeAll);
+  bindCheckbox("fvg-only-open", state.fvg, "onlyOpen", recomputeAll);
+  bindCheckbox("fvg-show-bull", state.fvg, "showBull", recomputeAll);
+  bindCheckbox("fvg-show-bear", state.fvg, "showBear", recomputeAll);
+  bindCheckbox("ob-enabled", state.ob, "enabled", recomputeAll);
+  bindCheckbox("ob-only-open", state.ob, "onlyOpen", recomputeAll);
+  bindCheckbox("ob-show-bull", state.ob, "showBull", recomputeAll);
+  bindCheckbox("ob-show-bear", state.ob, "showBear", recomputeAll);
+  bindCheckbox("liquidity-enabled", state.liquidity, "enabled", recomputeAll);
+  bindNumber("liquidity-rangePercent", state.liquidity, "rangePercent", recomputeAll);
+  bindCheckbox("liquidity-show-bsl", state.liquidity, "showBsl", recomputeAll);
+  bindCheckbox("liquidity-show-ssl", state.liquidity, "showSsl", recomputeAll);
+
+  openSettingsBtn.addEventListener("click", () => { syncSettingsUI(); settingsModal.classList.add("open"); });
+  closeSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("open"));
+  applySettingsBtn.addEventListener("click", () => { settingsModal.classList.remove("open"); recomputeAll(); });
+  settingsModal.addEventListener("click", (e) => { if (e.target === settingsModal) settingsModal.classList.remove("open"); });
+  recalcBrickBtn.addEventListener("click", () => { recalcBrickSize(); showToast("Đã tính lại Brick Size — áp dụng cho lần click Renko tiếp theo"); });
+  forceReloadBtn.addEventListener("click", async () => {
+    forceReloadBtn.disabled = true;
+    try {
+      await clearCachedKlines(`${SYMBOL}_${INTERVAL}_${TARGET_CANDLES}`);
+      settingsModal.classList.remove("open");
+      await loadAndRender(true);
+    } finally { forceReloadBtn.disabled = false; }
+  });
+
+  // ---------------------------------------------------------------------
+  // Recompute — 1 hàm dùng chung cho CẢ HAI panel, chỉ khác `candles` đưa
+  // vào. Đây là nơi duy nhất gọi SMC.*/ATRBotM1Indicator, đảm bảo panel nến
+  // thường và panel Renko luôn dùng ĐÚNG CÙNG 1 bộ tham số state.
+  // ---------------------------------------------------------------------
+  function recomputePanel(panel, candles, updateBadges) {
+    panel.candles = candles;
+    panel.candleSeries.setData(candles);
+    if (!candles.length) return;
+
+    // ATRBot M1
+    if (state.atrbot.enabled && typeof ATRBotM1Indicator !== "undefined") {
+      const results = ATRBotM1Indicator.calculate(candles, state.atrbot);
+      panel.atrBotPrimitive.setData(results, state.atrbot);
+      if (updateBadges) {
+        let buys = 0, sells = 0;
+        for (const r of results) { if (r.isBuy) buys++; else if (r.isSell) sells++; }
+        setStat("stat-atrbot", `${buys} BUY · ${sells} SELL`);
+      }
+    } else {
+      panel.atrBotPrimitive.setData([], {});
+      if (updateBadges) setStat("stat-atrbot", "");
+    }
+
+    // Swing Highs/Lows (+ xoá artefact rìa cuối mảng — không có nghĩa với
+    // dữ liệu tĩnh nhưng vẫn đúng về mặt thuật toán: nến cuối luôn bị ép
+    // thành swing point giả bởi chính swingHighsLows(), không phản ánh xác
+    // nhận thật).
+    let swingHL = [];
+    if (state.swing.enabled) {
+      swingHL = SMC.swingHighsLows(candles, { swingLength: state.swing.swingLength });
+      if (swingHL.length) swingHL[swingHL.length - 1] = { highLow: null, level: null };
+    }
+    if (state.swing.enabled) {
+      const zigzagItems = [], markers = [];
+      let lastPoint = null, prevHigh = null, prevLow = null, hi = 0, lo = 0;
+      for (let i = 0; i < swingHL.length; i++) {
+        const r = swingHL[i];
+        if (r.highLow === null) continue;
+        const isHigh = r.highLow === 1;
+        if (isHigh) hi++; else lo++;
+        const price = r.level, time = candles[i].time;
+        let label = isHigh ? "H" : "L";
+        if (state.swing.showLabels) {
+          if (isHigh) { label = prevHigh !== null ? (price > prevHigh ? "HH" : "LH") : "H"; prevHigh = price; }
+          else { label = prevLow !== null ? (price > prevLow ? "HL" : "LL") : "L"; prevLow = price; }
+        }
+        markers.push({ time, position: isHigh ? "aboveBar" : "belowBar", color: isHigh ? (label === "HH" ? "#10b981" : "#f43f5e") : (label === "HL" ? "#10b981" : "#f43f5e"), shape: isHigh ? "arrowDown" : "arrowUp", text: label });
+        if (state.swing.showZigzag && lastPoint) zigzagItems.push({ time1: lastPoint.time, time2: time, price1: lastPoint.price, price2: price, color: isHigh ? "rgba(16,185,129,0.45)" : "rgba(244,63,94,0.45)", width: 1.5, dash: [2, 2] });
+        lastPoint = { time, price };
+      }
+      panel.zigzagPrimitive.setItems(zigzagItems);
+      markers.sort((a, b) => a.time - b.time);
+      panel.markersPlugin.setMarkers(markers);
+      if (updateBadges) setStat("stat-swing", `${hi} Đỉnh · ${lo} Đáy`);
+    } else {
+      panel.zigzagPrimitive.setItems([]);
+      panel.markersPlugin.setMarkers([]);
+      if (updateBadges) setStat("stat-swing", "");
+    }
+
+    // BOS/CHOCH
+    if (state.bos.enabled && state.swing.enabled) {
+      const res = SMC.bosChoch(candles, swingHL, { closeBreak: state.bos.closeBreak });
+      const items = [];
+      let cB = 0, cC = 0;
+      for (let i = 0; i < res.length; i++) {
+        const r = res[i];
+        if (r.bos === null && r.choch === null) continue;
+        const isBos = r.bos !== null;
+        if (isBos) { cB++; if (!state.bos.showBos) continue; } else { cC++; if (!state.bos.showChoch) continue; }
+        const isBull = r.bos === 1 || r.choch === 1;
+        const endIdx = r.brokenIndex ? Math.min(r.brokenIndex, candles.length - 1) : candles.length - 1;
+        const color = isBos ? (isBull ? "#10b981" : "#f43f5e") : (isBull ? "#06b6d4" : "#f59e0b");
+        items.push({ time1: candles[i].time, time2: candles[endIdx].time, price1: r.level, price2: r.level, color, width: 1.5, dash: isBos ? [] : [4, 4], label: isBos ? (isBull ? "BOS▲" : "BOS▼") : (isBull ? "CHOCH▲" : "CHOCH▼"), labelColor: "#fff", labelBg: color + "cc" });
+      }
+      panel.bosChochPrimitive.setItems(items);
+      if (updateBadges) setStat("stat-bos", `${cB} BOS · ${cC} CHOCH`);
+    } else {
+      panel.bosChochPrimitive.setItems([]);
+      if (updateBadges) setStat("stat-bos", "");
+    }
+
+    // FVG
+    if (state.fvg.enabled) {
+      const res = SMC.fvg(candles, {});
+      const boxes = [];
+      let total = 0, open = 0;
+      for (let i = 0; i < res.length; i++) {
+        const r = res[i];
+        if (r.fvg === null) continue;
+        total++;
+        const isUnmitigated = !r.mitigatedIndex;
+        if (isUnmitigated) open++;
+        if (state.fvg.onlyOpen && !isUnmitigated) continue;
+        const isBull = r.fvg === 1;
+        if (isBull && !state.fvg.showBull) continue;
+        if (!isBull && !state.fvg.showBear) continue;
+        const endIdx = r.mitigatedIndex ? Math.min(r.mitigatedIndex, candles.length - 1) : candles.length - 1;
+        const color = isBull ? "#10b981" : "#f43f5e";
+        boxes.push({ time1: candles[i].time, time2: isUnmitigated ? null : candles[endIdx].time, price1: r.top, price2: r.bottom, fill: isBull ? "rgba(16,185,129,0.15)" : "rgba(244,63,94,0.15)", border: color, borderDash: isUnmitigated ? [4, 4] : null, label: isUnmitigated ? (isBull ? "BULL FVG" : "BEAR FVG") : "", labelColor: color, fontSize: 9 });
+      }
+      panel.fvgPrimitive.setBoxes(boxes);
+      if (updateBadges) setStat("stat-fvg", `${total} zones (${open} mở)`);
+    } else {
+      panel.fvgPrimitive.setBoxes([]);
+      if (updateBadges) setStat("stat-fvg", "");
+    }
+
+    // Order Blocks
+    if (state.ob.enabled && candles.every((c) => c.volume !== undefined)) {
+      const res = SMC.orderBlocks(candles, swingHL.length ? swingHL : SMC.swingHighsLows(candles, { swingLength: state.swing.swingLength }), {});
+      const boxes = [];
+      let bull = 0, bear = 0, active = 0;
+      for (let i = 0; i < res.length; i++) {
+        const r = res[i];
+        if (r.ob === null) continue;
+        const isBull = r.ob === 1;
+        if (isBull) bull++; else bear++;
+        const isUnmitigated = !r.mitigatedIndex;
+        if (isUnmitigated) active++;
+        if (state.ob.onlyOpen && !isUnmitigated) continue;
+        if (isBull && !state.ob.showBull) continue;
+        if (!isBull && !state.ob.showBear) continue;
+        const endIdx = r.mitigatedIndex ? Math.min(r.mitigatedIndex, candles.length - 1) : candles.length - 1;
+        const color = isBull ? "#10b981" : "#f43f5e";
+        const pct = state.ob.showPct && r.percentage !== null ? `${Math.round(r.percentage)}%` : "";
+        boxes.push({ time1: candles[i].time, time2: isUnmitigated ? null : candles[endIdx].time, price1: r.top, price2: r.bottom, fill: isBull ? "rgba(16,185,129,0.2)" : "rgba(244,63,94,0.2)", border: color, borderDash: isUnmitigated ? null : [1.5, 2.5], label: `OB ${pct}`, labelColor: color, fontSize: 9 });
+      }
+      panel.obPrimitive.setBoxes(boxes);
+      if (updateBadges) setStat("stat-ob", `${bull} Bull · ${bear} Bear (${active} mở)`);
+    } else {
+      panel.obPrimitive.setBoxes([]);
+      if (updateBadges) setStat("stat-ob", "");
+    }
+
+    // Liquidity
+    if (state.liquidity.enabled) {
+      const sw = swingHL.length ? swingHL : SMC.swingHighsLows(candles, { swingLength: state.swing.swingLength });
+      const res = SMC.liquidity(candles, sw, { rangePercent: state.liquidity.rangePercent / 100 });
+      const items = [];
+      let count = 0, swept = 0;
+      for (let i = 0; i < res.length; i++) {
+        const r = res[i];
+        if (r.liquidity === null) continue;
+        count++;
+        const isBsl = r.liquidity === 1;
+        if (isBsl && !state.liquidity.showBsl) continue;
+        if (!isBsl && !state.liquidity.showSsl) continue;
+        const endIdx = Math.min(r.end, candles.length - 1);
+        const isSwept = r.swept && r.swept > 0;
+        if (isSwept) swept++;
+        const baseColor = isBsl ? "#f97316" : "#a855f7";
+        items.push({ time1: candles[i].time, time2: candles[endIdx].time, price1: r.level, price2: r.level, color: baseColor, width: 1.5, label: isBsl ? "BSL" : "SSL", labelColor: "#fff", labelBg: baseColor + "e6" });
+        if (isSwept) {
+          const sweptIdx = Math.min(r.swept, candles.length - 1);
+          items.push({ time1: candles[endIdx].time, time2: candles[sweptIdx].time, price1: r.level, price2: r.level, color: "rgba(244,63,94,0.85)", width: 1.2, dash: [3, 3] });
+        }
+      }
+      panel.liquidityPrimitive.setItems(items);
+      if (updateBadges) setStat("stat-liquidity", `${count} cụm (${swept} đã quét)`);
+    } else {
+      panel.liquidityPrimitive.setItems([]);
+      if (updateBadges) setStat("stat-liquidity", "");
+    }
+  }
+
+  let allCandles = [];
+
+  function recalcBrickSize() {
+    if (!allCandles.length || typeof Renko === "undefined") return;
+    const size = Renko.computeBrickSize(allCandles, { mode: "atr", atrPeriod: state.renko.atrPeriod, atrMult: state.renko.atrMult });
+    state.renko.brickSize = size;
+    saveSettings();
+    const precision = size < 0.01 ? 6 : size < 1 ? 4 : 2;
+    brickBadge.textContent = `Brick: ${size.toFixed(precision)} (ATR${state.renko.atrPeriod}×${state.renko.atrMult})`;
+    setStat("stat-renko", `Brick size hiện tại: ${size.toFixed(precision)} — click vào 1 nến trên chart để xem Renko`);
+    // Nếu dialog Renko đang mở, brick size mới chỉ áp dụng cho lần click tiếp
+    // theo — không tự vẽ lại dialog đang mở để tránh giật hình bất ngờ.
+  }
+
+  function recomputeAll() {
+    if (!allCandles.length) return;
+    recomputePanel(topPanel, allCandles, true);
+    document.getElementById("statTop").textContent = `${allCandles.length.toLocaleString()} nến`;
+  }
+
+  async function loadAndRender(forceRefresh = false) {
+    try {
+      allCandles = await loadKlinesData(forceRefresh);
+      recalcBrickSize();
+      recomputeAll();
+      topDrawTools.reload(); // đổi symbol/timeframe -> chuyển đúng bộ hình vẽ đã lưu của cặp đó
+      resizeCharts();
+      topPanel.chart.timeScale().fitContent();
+      syncSettingsUI();
+    } catch (err) {
+      console.error(err);
+      setStatus("Lỗi tải dữ liệu: " + err.message, "error");
+      showToast("Lỗi tải dữ liệu: " + err.message);
+    }
+  }
+
+  resizeCharts();
+  loadAndRender();
+})();
+</script>
+</body>
+</html>
