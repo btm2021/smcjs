@@ -352,13 +352,18 @@
           ctx.font = 'bold 9px "JetBrains Mono", monospace';
           const textW = ctx.measureText(label).width;
           const badgeW = textW + 10, badgeH = 15;
+          // Cờ do PnfLevels.gradeSignals() gắn (nếu trang có dùng mức P&F):
+          // bị mức chắn ngay trước mặt -> làm mờ; tựa vào mức -> viền trắng.
+          ctx.globalAlpha = item.pnfBlocked ? 0.3 : 1.0;
           ctx.fillStyle = bgColor;
           if (ctx.roundRect) {
             ctx.beginPath();
             ctx.roundRect(x - badgeW / 2, pillY - badgeH / 2, badgeW, badgeH, 4);
             ctx.fill();
+            if (item.pnfConfirm) { ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.4; ctx.stroke(); }
           } else {
             ctx.fillRect(x - badgeW / 2, pillY - badgeH / 2, badgeW, badgeH);
+            if (item.pnfConfirm) { ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.4; ctx.strokeRect(x - badgeW / 2, pillY - badgeH / 2, badgeW, badgeH); }
           }
           ctx.fillStyle = '#ffffff';
           ctx.textAlign = 'center';
@@ -370,6 +375,7 @@
             ctx.font = '8px "JetBrains Mono", monospace';
             ctx.fillText(`x${item.adaptiveMult.toFixed(2)}`, x, pillY + (isBuy ? 12 : -12));
           }
+          ctx.globalAlpha = 1.0;
         }
       }
 

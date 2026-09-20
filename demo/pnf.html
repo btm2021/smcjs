@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SMC.js — Renko + Nến thường (Đồng bộ)</title>
+<title>SMC.js — Point & Figure</title>
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,7 +70,7 @@
   #progressBar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.2s ease; }
 
   /* -------------------------------------------------------------
-     CHART CHÍNH (nến thường) — Renko chỉ hiện qua dialog khi click
+     CHART CHÍNH — Point & Figure
      ------------------------------------------------------------- */
   #stackWrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .chart-panel { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; }
@@ -165,7 +165,7 @@
     <div class="topbar-left">
       <span class="brand-badge">SMC.JS</span>
       <a class="nav-link" href="index.html" title="Quay lại biểu đồ chính">← Chart chính</a>
-      <a class="nav-link" href="pnf.html" title="Xem chart Point & Figure">P&amp;F</a>
+      <a class="nav-link" href="renko.html" title="Xem Renko">Renko</a>
 
       <div class="symbol-select-wrap">
         <button class="symbol-btn" id="symbolBtn" title="Chọn cặp giao dịch Binance Futures">
@@ -193,12 +193,13 @@
       </select>
 
       <span class="data-badge" id="dataBadge">15M · 15K NẾN</span>
-      <span class="brick-badge" id="brickBadge">Brick: —</span>
+      <span class="brick-badge" id="brickBadge">Box: —</span>
     </div>
     <div class="topbar-right">
       <div class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">Khởi tạo...</span></div>
-      <button class="btn-action btn-primary" id="openSettingsBtn">⚙ Cài đặt SMC & Renko</button>
-      <button class="btn-icon" id="fitChartBtn" title="Khớp toàn bộ dữ liệu (cả 2 chart)">⛶</button>
+      <button class="btn-action btn-primary" id="openSettingsBtn">⚙ Cài đặt SMC & P&amp;F</button>
+      <button class="btn-action" id="viewModeBtn" title="Chuyển đổi hiển thị: Nến thường + mức P&F ⟷ Lưới X/O">🕯️ Nến + mức P&F</button>
+      <button class="btn-icon" id="fitChartBtn" title="Khớp toàn bộ dữ liệu">⛶</button>
     </div>
   </header>
 
@@ -207,15 +208,14 @@
   <div id="stackWrap">
     <div class="chart-panel" id="panelTop">
       <div class="chart-panel-header">
-        <span class="chart-panel-title"><span class="dot" style="background:var(--accent-blue);"></span>Nến thường (Candlestick)</span>
+        <span class="chart-panel-title"><span class="dot" style="background:var(--accent-blue);"></span>Point &amp; Figure</span>
         <span class="chart-panel-ohlc" id="ohlcTop">O: — H: — L: — C: —</span>
-        <span class="chart-panel-hint">🧱 Click vào 1 nến để xem Renko tại thời điểm đó</span>
         <span class="chart-panel-stat" id="statTop">—</span>
       </div>
       <div class="chart-container" id="chartTop"></div>
       <div class="draw-toolbar" id="drawToolbarTop">
         <button class="draw-tool-btn active" data-tool="cursor" title="Con trỏ (thoát chế độ vẽ — phím Esc)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l7 17 2-7 7-2z"/></svg></button>
-        <button class="draw-tool-btn" data-tool="measure" title="Thước đo: kéo giữa 2 điểm để xem chênh lệch giá/%/số nến"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M7 9v2M11 9v3M15 9v2M19 9v3"/></svg></button>
+        <button class="draw-tool-btn" data-tool="measure" title="Thước đo: kéo giữa 2 điểm để xem chênh lệch giá/%/số cột"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M7 9v2M11 9v3M15 9v2M19 9v3"/></svg></button>
         <button class="draw-tool-btn" data-tool="line" title="Vẽ đường thẳng: kéo giữa 2 điểm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/></svg></button>
         <button class="draw-tool-btn" data-tool="rect" title="Vẽ hình chữ nhật: kéo từ góc này sang góc kia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
         <button class="draw-tool-btn" data-tool="clear" title="Xoá tất cả hình đã vẽ trên chart này"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0l1 12a1 1 0 001 1h6a1 1 0 001-1l1-12"/></svg></button>
@@ -226,50 +226,29 @@
 
 <div id="toast"></div>
 
-<!-- Renko Dialog — mở khi click vào 1 nến trên chart chính -->
-<div class="modal-backdrop" id="renkoDialog">
-  <div class="modal-dialog" style="width:min(1100px, 94vw);">
-    <div class="modal-header">
-      <div class="modal-title">🧱 Renko tại <span id="renkoDialogTime">—</span></div>
-      <button class="modal-close" id="renkoDialogClose">&times;</button>
-    </div>
-    <div id="renkoDialogStat" style="padding:8px 18px; font-size:11px; color:var(--text-secondary); border-bottom:1px solid var(--border);">—</div>
-    <div style="position:relative; height:560px;">
-      <div id="renkoDialogChart" style="width:100%; height:100%;"></div>
-      <div class="draw-toolbar" id="drawToolbarDialog" style="top:8px;">
-        <button class="draw-tool-btn active" data-tool="cursor" title="Con trỏ (thoát chế độ vẽ — phím Esc)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l7 17 2-7 7-2z"/></svg></button>
-        <button class="draw-tool-btn" data-tool="measure" title="Thước đo: kéo giữa 2 điểm để xem chênh lệch giá/%/số brick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M7 9v2M11 9v3M15 9v2M19 9v3"/></svg></button>
-        <button class="draw-tool-btn" data-tool="line" title="Vẽ đường thẳng"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/></svg></button>
-        <button class="draw-tool-btn" data-tool="rect" title="Vẽ hình chữ nhật"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
-        <button class="draw-tool-btn" data-tool="clear" title="Xoá tất cả hình đã vẽ trên dialog này"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0l1 12a1 1 0 001 1h6a1 1 0 001-1l1-12"/></svg></button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Settings Modal -->
 <div class="modal-backdrop" id="settingsModal">
   <div class="modal-dialog">
     <div class="modal-header">
-      <div class="modal-title">Cài đặt SMC, ATRBot M1 & Renko</div>
+      <div class="modal-title">Cài đặt SMC, ATRBot M1 & Point &amp; Figure</div>
       <button class="modal-close" id="closeSettingsBtn">&times;</button>
     </div>
     <div class="modal-body">
-      <!-- Renko -->
+      <!-- Point & Figure -->
       <div class="indicator-card card-featured" id="card-renko" style="grid-column: span 2;">
         <div class="card-top">
-          <div class="card-title"><span class="card-icon" style="background:var(--accent-purple);"></span><span>★ Renko — Brick Size (theo ATR)</span></div>
+          <div class="card-title"><span class="card-icon" style="background:var(--accent-purple);"></span><span>★ Point &amp; Figure — Box Size (theo ATR)</span></div>
         </div>
         <div class="card-body">
           <div style="font-size:10px; color:var(--text-muted); line-height:1.5;">
-            Click vào 1 nến trên chart chính để mở dialog Renko tại đúng thời điểm đó (dùng dữ liệu TRƯỚC điểm click, không nhìn tương lai). Brick size = ATR(chu kỳ) × hệ số, tính 1 LẦN khi tải dữ liệu (không tự tính lại theo từng nến — nếu không, brick size sẽ khác nhau giữa các lần click, khó so sánh). Bấm "Tính lại" sau khi đổi tham số.
+            Box size = ATR(chu kỳ) × hệ số, tính 1 LẦN khi tải dữ liệu (không tự tính lại theo từng nến — nếu không, toàn bộ cột X/O sẽ vẽ lại khác đi mỗi khi có nến mới). Đảo chiều (reversal) = số box giá phải đi ngược mới lật cột X↔O, mặc định 3 (chuẩn P&amp;F). Bấm "Tính lại" sau khi đổi tham số.
           </div>
           <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:8px 18px;">
             <div class="ctrl-row"><span>Chu kỳ ATR</span><input type="number" id="renko-atrPeriod" class="ctrl-input-num" value="14" min="2" max="200" style="width:70px" /></div>
-            <div class="ctrl-row"><span>Hệ số nhân</span><input type="number" id="renko-atrMult" class="ctrl-input-num" value="3.0" min="0.1" max="10" step="0.1" style="width:70px" /></div>
-            <div class="ctrl-row"><span>Cửa sổ dữ liệu (nến)</span><input type="number" id="renko-windowSize" class="ctrl-input-num" value="3000" min="200" max="15000" step="100" style="width:70px" /></div>
+            <div class="ctrl-row"><span>Hệ số nhân</span><input type="number" id="renko-atrMult" class="ctrl-input-num" value="1.0" min="0.1" max="10" step="0.1" style="width:70px" /></div>
+            <div class="ctrl-row"><span>Đảo chiều (box)</span><input type="number" id="pnf-reversal" class="ctrl-input-num" value="3" min="1" max="10" step="1" style="width:70px" /></div>
           </div>
-          <button class="btn-action" id="recalcBrickBtn" style="align-self:flex-start;">↻ Tính lại Brick Size</button>
+          <button class="btn-action" id="recalcBrickBtn" style="align-self:flex-start;">↻ Tính lại & vẽ lại</button>
         </div>
         <span class="stat-badge" id="stat-renko">—</span>
       </div>
@@ -284,6 +263,10 @@
           <div style="display:grid; grid-template-columns: repeat(2,1fr); gap:8px 18px;">
             <div class="ctrl-row"><span>ATR Period / Base Mult</span><span style="display:flex; gap:4px;"><input type="number" id="atrbot-atrLength" class="ctrl-input-num" style="width:50px" value="14" /><input type="number" id="atrbot-baseAtrMult" class="ctrl-input-num" style="width:50px" value="2.0" step="0.1" /></span></div>
             <div class="ctrl-row"><span>Adaptive K</span><input type="number" id="atrbot-adaptiveK" class="ctrl-input-num" style="width:70px" value="1.5" step="0.1" /></div>
+            <div class="ctrl-row" style="grid-column: span 2;"><span title="0 = tắt. Tín hiệu có mức P&F chắn ngay trước mặt trong khoảng % này sẽ bị làm mờ (hết dư địa); tín hiệu tựa lưng vào mức P&F được viền trắng.">Chấm điểm bằng mức P&amp;F (%)</span><input type="number" id="atrbot-pnfFilterPct" class="ctrl-input-num" style="width:70px" value="1.0" min="0" max="10" step="0.1" /></div>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted); line-height:1.5;">
+            Tín hiệu <b>mờ</b> = có mức P&amp;F (kháng cự với BUY / hỗ trợ với SELL) chắn ngay trước mặt → ít dư địa, dễ whipsaw. Tín hiệu <b>viền trắng</b> = vào lệnh sát mức đỡ phía sau lưng. Mức được tính CAUSAL: tại mỗi nến chỉ dùng những mức đã đủ số lần chạm tính đến nến đó.
           </div>
           <div class="ctrl-row"><label><input type="checkbox" id="atrbot-showRibbon" checked /> Ribbon Cloud</label></div>
           <div class="ctrl-row"><label><input type="checkbox" id="atrbot-showVidyaLine" checked /> VIDYA Line</label></div>
@@ -373,7 +356,8 @@
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"></script>
 <script src="../dist/smc.umd.js"></script>
 <script src="../indicator_atrbot_m1.js"></script>
-<script src="../renko.js"></script>
+<script src="../pnf.js"></script>
+<script src="../pnf_levels.js"></script>
 <script>
 (function () {
   "use strict";
@@ -411,6 +395,7 @@
   const recalcBrickBtn = document.getElementById("recalcBrickBtn");
   const settingsModal = document.getElementById("settingsModal");
   const fitChartBtn = document.getElementById("fitChartBtn");
+  const viewModeBtn = document.getElementById("viewModeBtn");
 
   function showToast(msg, duration = 3000) {
     toast.textContent = msg;
@@ -840,6 +825,52 @@
     }
   }
 
+  // Lưới X/O — đặc trưng thị giác của Point & Figure. candleSeries vẫn giữ
+  // (chỉ tô trong suốt) để cấp toạ độ time/price + auto-range price scale +
+  // crosshair OHLC cho mọi primitive khác; ô X/O vẽ ĐÈ lên trên bằng chính
+  // primitive này, 1 cột = 1 chồng X (tăng) hoặc O (giảm) theo từng box.
+  class PnfGridPrimitive {
+    constructor() { this._columns = []; this._boxSize = 0; this._chart = null; this._series = null; this._requestUpdate = null; }
+    attached({ chart, series, requestUpdate }) { this._chart = chart; this._series = series; this._requestUpdate = requestUpdate; }
+    detached() { this._chart = null; this._series = null; }
+    setData(columns, boxSize) { this._columns = columns; this._boxSize = boxSize; if (this._requestUpdate) this._requestUpdate(); }
+    updateAllViews() {}
+    paneViews() { return [{ renderer: () => this._renderer() }]; }
+    _renderer() {
+      const columns = this._columns, boxSize = this._boxSize, chart = this._chart, series = this._series;
+      return { draw(target) {
+        if (!chart || !series || !columns.length || !boxSize) return;
+        target.useBitmapCoordinateSpace((scope) => {
+          const ctx = scope.context, ts = chart.timeScale();
+          const barSpacingCss = ts.options().barSpacing || 8;
+          for (const col of columns) {
+            const xCss = ts.timeToCoordinate(col.time);
+            const top = Math.max(col.open, col.close), bottom = Math.min(col.open, col.close);
+            const yTopCss = series.priceToCoordinate(top), yBottomCss = series.priceToCoordinate(bottom);
+            if (xCss === null || yTopCss === null || yBottomCss === null) continue;
+            const numBoxes = Math.max(1, Math.round((top - bottom) / boxSize));
+            const cellCssH = Math.abs(yBottomCss - yTopCss) / numBoxes;
+            const cellCss = Math.min(barSpacingCss, cellCssH) * 0.34; // nửa cạnh glyph
+            const color = col.direction === 1 ? "#10b981" : "#f43f5e";
+            ctx.strokeStyle = color;
+            ctx.lineWidth = Math.max(1, 1.6 * scope.verticalPixelRatio);
+            for (let i = 0; i < numBoxes; i++) {
+              const cyCss = Math.min(yTopCss, yBottomCss) + (i + 0.5) * cellCssH;
+              const X = xCss * scope.horizontalPixelRatio, Y = cyCss * scope.verticalPixelRatio;
+              const hw = cellCss * scope.horizontalPixelRatio, hh = cellCss * scope.verticalPixelRatio;
+              if (col.direction === 1) {
+                ctx.beginPath(); ctx.moveTo(X - hw, Y - hh); ctx.lineTo(X + hw, Y + hh);
+                ctx.moveTo(X - hw, Y + hh); ctx.lineTo(X + hw, Y - hh); ctx.stroke();
+              } else {
+                ctx.beginPath(); ctx.ellipse(X, Y, hw, hh, 0, 0, Math.PI * 2); ctx.stroke();
+              }
+            }
+          }
+        });
+      } };
+    }
+  }
+
   // ---------------------------------------------------------------------
   // Panel factory — 1 chart hoàn chỉnh (candle series + mọi primitive SMC)
   // ---------------------------------------------------------------------
@@ -852,8 +883,11 @@
       rightPriceScale: { borderColor: "#1c2436", scaleMargins: { top: 0.08, bottom: 0.08 } },
       crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { color: "#38bdf8", width: 1, style: 3, labelBackgroundColor: "#0f1422" }, horzLine: { color: "#38bdf8", width: 1, style: 3, labelBackgroundColor: "#0f1422" } },
     });
+    // Màu nến do setCandleVisualMode() điều khiển theo state.pnf.viewMode
+    // (trong suốt ở chế độ lưới X/O, bình thường ở chế độ nến+mức P&F).
     const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
-      upColor: "#10b981", downColor: "#f43f5e", borderVisible: false, wickUpColor: "#10b981", wickDownColor: "#f43f5e",
+      upColor: "#10b981", downColor: "#f43f5e", borderVisible: false,
+      wickUpColor: "#10b981", wickDownColor: "#f43f5e",
       priceFormat: { type: "price", precision: 4, minMove: 0.0001 },
     });
     const zigzagPrimitive = new LinesPrimitive();
@@ -863,6 +897,14 @@
     const obPrimitive = new BoxesPrimitive();
     const atrBotPrimitive = new ATRBotPrimitive();
     const drawingsPrimitive = new DrawingsPrimitive();
+    const pnfGridPrimitive = new PnfGridPrimitive();
+    // S/R (đường ngang) + Range (hộp) rút ra từ phân tích P&F — tái dùng
+    // nguyên bản LinesPrimitive/BoxesPrimitive đã có, không cần primitive mới.
+    const pnfSrPrimitive = new LinesPrimitive();
+    const pnfRangePrimitive = new BoxesPrimitive();
+    candleSeries.attachPrimitive(pnfGridPrimitive);
+    candleSeries.attachPrimitive(pnfRangePrimitive);
+    candleSeries.attachPrimitive(pnfSrPrimitive);
     candleSeries.attachPrimitive(atrBotPrimitive);
     candleSeries.attachPrimitive(fvgPrimitive);
     candleSeries.attachPrimitive(obPrimitive);
@@ -871,18 +913,15 @@
     candleSeries.attachPrimitive(liquidityPrimitive);
     candleSeries.attachPrimitive(drawingsPrimitive);
     const markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, []);
-    return { chart, candleSeries, containerId, zigzagPrimitive, bosChochPrimitive, liquidityPrimitive, fvgPrimitive, obPrimitive, atrBotPrimitive, drawingsPrimitive, markersPlugin, candles: [] };
+    return { chart, candleSeries, containerId, zigzagPrimitive, bosChochPrimitive, liquidityPrimitive, fvgPrimitive, obPrimitive, atrBotPrimitive, drawingsPrimitive, pnfGridPrimitive, pnfSrPrimitive, pnfRangePrimitive, markersPlugin, candles: [] };
+  }
+
+  function setCandleVisualMode(panel, visible) {
+    const c = visible ? "#10b981" : "rgba(0,0,0,0)", d = visible ? "#f43f5e" : "rgba(0,0,0,0)";
+    panel.candleSeries.applyOptions({ upColor: c, downColor: d, wickUpColor: c, wickDownColor: d });
   }
 
   const topPanel = createPanel("chartTop");
-  // Chart Renko trong dialog được tạo SẴN (ẩn tới khi mở) để tái dùng 1 chart
-  // instance duy nhất qua nhiều lần click, thay vì tạo/huỷ mỗi lần.
-  const renkoDialogPanel = createPanel("renkoDialogChart");
-  const renkoDialogEl = document.getElementById("renkoDialog");
-  // Markers plugin RIÊNG cho mũi tên đánh dấu điểm click — tách khỏi
-  // renkoDialogPanel.markersPlugin (đang dùng cho nhãn HH/HL/LH/LL của
-  // Swing) để 2 nguồn không ghi đè nhau mỗi lần recomputePanel() chạy lại.
-  const dialogClickMarkers = LightweightCharts.createSeriesMarkers(renkoDialogPanel.candleSeries, []);
 
   // ---------------------------------------------------------------------
   // Công cụ vẽ: thước đo / line / rectangle — dùng chung cho MỌI panel.
@@ -994,16 +1033,11 @@
     };
   }
 
-  const topDrawTools = attachDrawingTools(topPanel, "drawToolbarTop", () => `smc_renko_drawings_${SYMBOL}_${INTERVAL}`);
-  const dialogDrawTools = attachDrawingTools(renkoDialogPanel, "drawToolbarDialog", () => null);
+  const topDrawTools = attachDrawingTools(topPanel, "drawToolbarTop", () => `smc_pnf_drawings_${SYMBOL}_${INTERVAL}`);
 
   function resizeCharts() {
     const elTop = document.getElementById("chartTop");
     if (elTop) topPanel.chart.applyOptions({ width: elTop.clientWidth, height: elTop.clientHeight });
-    if (renkoDialogEl.classList.contains("open")) {
-      const elD = document.getElementById("renkoDialogChart");
-      renkoDialogPanel.chart.applyOptions({ width: elD.clientWidth, height: elD.clientHeight });
-    }
   }
   new ResizeObserver(resizeCharts).observe(document.getElementById("stackWrap"));
   window.addEventListener("resize", resizeCharts);
@@ -1026,84 +1060,25 @@
     topPanel.chart.timeScale().fitContent();
   });
 
-  // ---------------------------------------------------------------------
-  // Click vào 1 nến trên chart chính -> mở dialog Renko tại đúng thời điểm
-  // đó. Chỉ dùng dữ liệu TỪ TRƯỚC tới điểm click (allCandles.slice(start,
-  // clickIndex+1), giới hạn cửa sổ state.renko.windowSize nến gần nhất để
-  // dialog vẫn gọn) — không có nghĩa "nhìn tương lai" nào ở đây.
-  // ---------------------------------------------------------------------
-  function formatDialogTime(ts) {
-    const d = new Date(ts * 1000);
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+  function updateViewModeBtn() {
+    viewModeBtn.textContent = state.pnf.viewMode === "grid" ? "❌⭕ Lưới X/O" : "🕯️ Nến + mức P&F";
   }
-
-  function openRenkoDialog(clickIndex) {
-    if (!allCandles.length || typeof Renko === "undefined") return;
-    if (!state.renko.brickSize) recalcBrickSize();
-
-    const windowSize = state.renko.windowSize || 3000;
-    const start = Math.max(0, clickIndex - windowSize);
-    const windowCandles = allCandles.slice(start, clickIndex + 1);
-    const renkoResult = Renko.calculate(windowCandles, { brickSize: state.renko.brickSize });
-
-    document.getElementById("renkoDialogTime").textContent = formatDialogTime(allCandles[clickIndex].time);
-    document.getElementById("renkoDialogStat").textContent =
-      `${renkoResult.bricks.length.toLocaleString()} brick từ ${windowCandles.length.toLocaleString()} nến trước đó (cửa sổ ${windowSize.toLocaleString()} nến) · brickSize=${state.renko.brickSize.toFixed(6)}`;
-
-    // Mỗi dialog là 1 cửa sổ dữ liệu Renko khác nhau — hình vẽ của lần mở
-    // trước không còn ý nghĩa, xoá sạch + về chế độ con trỏ mỗi lần mở mới.
-    dialogDrawTools.clearAll();
-    dialogDrawTools.resetTool();
-
-    renkoDialogEl.classList.add("open");
-    requestAnimationFrame(() => {
-      const el = document.getElementById("renkoDialogChart");
-      renkoDialogPanel.chart.applyOptions({ width: el.clientWidth, height: el.clientHeight });
-      recomputePanel(renkoDialogPanel, renkoResult.bricks, false);
-
-      // Đánh dấu mũi tên tại brick cuối cùng — đúng vị trí "hiện tại" của
-      // giá tính tới đúng thời điểm vừa click, để phân biệt với các brick
-      // lịch sử phía trước.
-      const lastBrick = renkoResult.bricks[renkoResult.bricks.length - 1];
-      dialogClickMarkers.setMarkers(lastBrick ? [{
-        time: lastBrick.time,
-        position: "belowBar",
-        color: "#38bdf8",
-        shape: "arrowUp",
-        text: "Điểm click",
-      }] : []);
-
-      // Chừa thêm vài cột trống bên phải — nếu không, mũi tên "Điểm click"
-      // (luôn nằm ở brick cuối cùng) bị dồn sát mép phải và dễ bị cắt chữ.
-      // fitContent() phải chạy TRƯỚC vì bản thân nó cũng set lại rightOffset.
-      renkoDialogPanel.chart.timeScale().fitContent();
-      renkoDialogPanel.chart.timeScale().applyOptions({ rightOffset: 6 });
-    });
-  }
-
-  topPanel.chart.subscribeClick((param) => {
-    // Bỏ qua nếu đang ở chế độ vẽ (thước đo/line/rect) — tránh click để kết
-    // thúc 1 hình vẽ lại vô tình mở luôn dialog Renko.
-    if (topDrawTools.isActive()) return;
-    if (!param.time) return;
-    const idx = allCandles.findIndex((c) => c.time === param.time);
-    if (idx < 0) return;
-    openRenkoDialog(idx);
+  viewModeBtn.addEventListener("click", () => {
+    state.pnf.viewMode = state.pnf.viewMode === "grid" ? "candles" : "grid";
+    saveSettings();
+    updateViewModeBtn();
+    recomputeAll();
   });
-
-  document.getElementById("renkoDialogClose").addEventListener("click", () => { dialogDrawTools.resetTool(); renkoDialogEl.classList.remove("open"); });
-  renkoDialogEl.addEventListener("click", (e) => { if (e.target === renkoDialogEl) { dialogDrawTools.resetTool(); renkoDialogEl.classList.remove("open"); } });
 
   // ---------------------------------------------------------------------
   // State — CHUNG cho cả 2 chart (cùng 1 bộ tham số SMC/ATRBot áp cho cả
   // nến thường lẫn Renko, chỉ khác nhau ở CHUỖI CANDLE đưa vào).
   // ---------------------------------------------------------------------
   const defaultState = {
-    renko: { atrPeriod: 14, atrMult: 3.0, brickSize: 0, windowSize: 3000 },
+    pnf: { atrPeriod: 14, atrMult: 1.0, boxSize: 0, reversal: 3, viewMode: "candles" },
     atrbot: {
       enabled: true, maType: "VIDYA", cmoLength: 14, maLength: 21, atrLength: 14, baseAtrMult: 2.0,
-      percentileWindow: 5000, minPeriods: 200, adaptiveK: 1.5, liqSweepFilterPct: 0,
+      percentileWindow: 5000, minPeriods: 200, adaptiveK: 1.5, liqSweepFilterPct: 0, pnfFilterPct: 1.0,
       showRibbon: true, bullCloudColor: "#10b981", bearCloudColor: "#f43f5e",
       showVidyaLine: true, vidyaColor: "#a855f7", showStopLine: true, stopColor: "#f59e0b",
       showSignals: true, showMultPanel: false,
@@ -1114,7 +1089,7 @@
     ob: { enabled: true, onlyOpen: true, showPct: true, showBull: true, showBear: true },
     liquidity: { enabled: true, rangePercent: 1.0, showBsl: true, showSsl: true },
   };
-  const SETTINGS_CACHE_KEY = "smc_renko_options";
+  const SETTINGS_CACHE_KEY = "smc_pnf_options";
   let state = JSON.parse(JSON.stringify(defaultState));
   try {
     const saved = localStorage.getItem(SETTINGS_CACHE_KEY);
@@ -1130,13 +1105,14 @@
   }
 
   function syncSettingsUI() {
-    document.getElementById("renko-atrPeriod").value = state.renko.atrPeriod;
-    document.getElementById("renko-atrMult").value = state.renko.atrMult;
-    document.getElementById("renko-windowSize").value = state.renko.windowSize;
+    document.getElementById("renko-atrPeriod").value = state.pnf.atrPeriod;
+    document.getElementById("renko-atrMult").value = state.pnf.atrMult;
+    document.getElementById("pnf-reversal").value = state.pnf.reversal;
     document.getElementById("atrbot-enabled").checked = state.atrbot.enabled;
     document.getElementById("atrbot-atrLength").value = state.atrbot.atrLength;
     document.getElementById("atrbot-baseAtrMult").value = state.atrbot.baseAtrMult;
     document.getElementById("atrbot-adaptiveK").value = state.atrbot.adaptiveK;
+    document.getElementById("atrbot-pnfFilterPct").value = state.atrbot.pnfFilterPct;
     document.getElementById("atrbot-showRibbon").checked = state.atrbot.showRibbon;
     document.getElementById("atrbot-showVidyaLine").checked = state.atrbot.showVidyaLine;
     document.getElementById("atrbot-showStopLine").checked = state.atrbot.showStopLine;
@@ -1173,13 +1149,14 @@
     document.getElementById(id).addEventListener("change", (e) => { obj[key] = e.target.checked; saveSettings(); if (cb) cb(); });
   }
 
-  bindNumber("renko-atrPeriod", state.renko, "atrPeriod");
-  bindNumber("renko-atrMult", state.renko, "atrMult");
-  bindNumber("renko-windowSize", state.renko, "windowSize");
+  bindNumber("renko-atrPeriod", state.pnf, "atrPeriod");
+  bindNumber("renko-atrMult", state.pnf, "atrMult");
+  bindNumber("pnf-reversal", state.pnf, "reversal");
   bindCheckbox("atrbot-enabled", state.atrbot, "enabled", recomputeAll);
   bindNumber("atrbot-atrLength", state.atrbot, "atrLength", recomputeAll);
   bindNumber("atrbot-baseAtrMult", state.atrbot, "baseAtrMult", recomputeAll);
   bindNumber("atrbot-adaptiveK", state.atrbot, "adaptiveK", recomputeAll);
+  bindNumber("atrbot-pnfFilterPct", state.atrbot, "pnfFilterPct", recomputeAll);
   bindCheckbox("atrbot-showRibbon", state.atrbot, "showRibbon", recomputeAll);
   bindCheckbox("atrbot-showVidyaLine", state.atrbot, "showVidyaLine", recomputeAll);
   bindCheckbox("atrbot-showStopLine", state.atrbot, "showStopLine", recomputeAll);
@@ -1209,7 +1186,7 @@
   closeSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("open"));
   applySettingsBtn.addEventListener("click", () => { settingsModal.classList.remove("open"); recomputeAll(); });
   settingsModal.addEventListener("click", (e) => { if (e.target === settingsModal) settingsModal.classList.remove("open"); });
-  recalcBrickBtn.addEventListener("click", () => { recalcBrickSize(); showToast("Đã tính lại Brick Size — áp dụng cho lần click Renko tiếp theo"); });
+  recalcBrickBtn.addEventListener("click", () => { recalcBoxSize(); recomputeAll(); showToast("Đã tính lại Box Size"); });
   forceReloadBtn.addEventListener("click", async () => {
     forceReloadBtn.disabled = true;
     try {
@@ -1224,19 +1201,24 @@
   // vào. Đây là nơi duy nhất gọi SMC.*/ATRBotM1Indicator, đảm bảo panel nến
   // thường và panel Renko luôn dùng ĐÚNG CÙNG 1 bộ tham số state.
   // ---------------------------------------------------------------------
-  function recomputePanel(panel, candles, updateBadges) {
+  function recomputePanel(panel, candles, updateBadges, pnfKeyLevels) {
     panel.candles = candles;
     panel.candleSeries.setData(candles);
     if (!candles.length) return;
 
-    // ATRBot M1
+    // ATRBot M1 (+ chấm điểm tín hiệu bằng mức P&F nếu có)
     if (state.atrbot.enabled && typeof ATRBotM1Indicator !== "undefined") {
       const results = ATRBotM1Indicator.calculate(candles, state.atrbot);
+      let pnfNote = "";
+      if (pnfKeyLevels && pnfKeyLevels.length && state.atrbot.pnfFilterPct > 0) {
+        const g = PnfLevels.gradeSignals(candles, results, pnfKeyLevels, { blockPct: state.atrbot.pnfFilterPct });
+        pnfNote = ` · P&F ${g.confirmed}✓ / ${g.blocked}⛔`;
+      }
       panel.atrBotPrimitive.setData(results, state.atrbot);
       if (updateBadges) {
         let buys = 0, sells = 0;
         for (const r of results) { if (r.isBuy) buys++; else if (r.isSell) sells++; }
-        setStat("stat-atrbot", `${buys} BUY · ${sells} SELL`);
+        setStat("stat-atrbot", `${buys} BUY · ${sells} SELL${pnfNote}`);
       }
     } else {
       panel.atrBotPrimitive.setData([], {});
@@ -1388,28 +1370,96 @@
 
   let allCandles = [];
 
-  function recalcBrickSize() {
-    if (!allCandles.length || typeof Renko === "undefined") return;
-    const size = Renko.computeBrickSize(allCandles, { mode: "atr", atrPeriod: state.renko.atrPeriod, atrMult: state.renko.atrMult });
-    state.renko.brickSize = size;
+  function recalcBoxSize() {
+    if (!allCandles.length || typeof PointAndFigure === "undefined") return;
+    const size = PointAndFigure.computeBoxSize(allCandles, { mode: "atr", atrPeriod: state.pnf.atrPeriod, atrMult: state.pnf.atrMult });
+    state.pnf.boxSize = size;
     saveSettings();
     const precision = size < 0.01 ? 6 : size < 1 ? 4 : 2;
-    brickBadge.textContent = `Brick: ${size.toFixed(precision)} (ATR${state.renko.atrPeriod}×${state.renko.atrMult})`;
-    setStat("stat-renko", `Brick size hiện tại: ${size.toFixed(precision)} — click vào 1 nến trên chart để xem Renko`);
-    // Nếu dialog Renko đang mở, brick size mới chỉ áp dụng cho lần click tiếp
-    // theo — không tự vẽ lại dialog đang mở để tránh giật hình bất ngờ.
+    brickBadge.textContent = `Box: ${size.toFixed(precision)} (ATR${state.pnf.atrPeriod}×${state.pnf.atrMult})`;
+  }
+
+  // Chỉ hiển thị các mức S/R chạm nhiều nhất + các range gần đây nhất — vẽ
+  // hết (có thể tới vài trăm mức) sẽ rối, không đọc được gì.
+  const PNF_MAX_SR_PER_SIDE = 15;
+  const PNF_MAX_RANGES = 8;
+
+  // Chart giới hạn minBarSpacing=2 -> không bao giờ hiện được hết 15k nến
+  // cùng lúc (~640 nến tối đa với khung 1280px). Nếu tính S/R trên toàn bộ
+  // lịch sử, phần lớn mức rơi vào vùng giá của những thời điểm xa xưa, không
+  // bao giờ trùng vùng giá đang xem được -> chỉ lấy N nến gần nhất.
+  const PNF_LEVELS_LOOKBACK_CANDLES = 3000;
+
+  function drawPnfLevels(panel, allCandles, pnfResult) {
+    const allColumns = PnfLevels.buildColumns(pnfResult);
+    const cutoffTime = allCandles[Math.max(0, allCandles.length - PNF_LEVELS_LOOKBACK_CANDLES)].time;
+    const columns = allColumns.filter((c) => c.time >= cutoffTime);
+    const sr = PnfLevels.findSupportResistance(columns, { minTouches: 2 });
+    const ranges = PnfLevels.findRanges(columns, { minColumns: 4, minTouches: 2, maxHeight: pnfResult.boxSize * 15 });
+
+    const lines = [];
+    for (const levels of [sr.resistance, sr.support]) {
+      const isRes = levels === sr.resistance;
+      levels.slice(0, PNF_MAX_SR_PER_SIDE).forEach((lv) => {
+        const first = columns[lv.columnIndices[0]].time;
+        const color = isRes ? "#f43f5e" : "#10b981";
+        // time2 bỏ trống để LinesPrimitive tự kéo dài mức tới rìa phải hiện
+        // tại (giá đang chạy) thay vì dừng ở lần chạm cuối trong lịch sử —
+        // lần chạm cuối thường đã cũ, nằm ngoài khung nhìn mặc định.
+        lines.push({
+          time1: first, price1: lv.price, price2: lv.price,
+          color, width: 1.3, dash: [4, 3],
+          label: `${isRes ? "R" : "S"} ${lv.touches}x`, labelColor: color, labelBg: "rgba(15,20,34,0.9)",
+        });
+      });
+    }
+    panel.pnfSrPrimitive.setItems(lines);
+
+    const boxes = ranges.slice(-PNF_MAX_RANGES).map((r) => ({
+      time1: columns[r.startIndex].time, time2: columns[r.endIndex].time,
+      price1: r.top, price2: r.bottom,
+      fill: "rgba(168,85,247,0.08)", border: "#a855f7", borderDash: [2, 2],
+      label: `Range ${r.columnCount} cột`, labelColor: "#a855f7", fontSize: 9,
+    }));
+    panel.pnfRangePrimitive.setBoxes(boxes);
+
+    return {
+      srCount: sr.resistance.length + sr.support.length,
+      rangeCount: ranges.length,
+      keyLevels: PnfLevels.keyLevels(columns, sr),
+    };
   }
 
   function recomputeAll() {
-    if (!allCandles.length) return;
-    recomputePanel(topPanel, allCandles, true);
-    document.getElementById("statTop").textContent = `${allCandles.length.toLocaleString()} nến`;
+    if (!allCandles.length || !state.pnf.boxSize) return;
+    const result = PointAndFigure.calculate(allCandles, { boxSize: state.pnf.boxSize, reversal: state.pnf.reversal });
+    let x = 0, o = 0;
+    for (const c of result.columns) { if (c.direction === 1) x++; else o++; }
+
+    if (state.pnf.viewMode === "grid") {
+      setCandleVisualMode(topPanel, false);
+      recomputePanel(topPanel, result.columns, true);
+      topPanel.pnfGridPrimitive.setData(result.columns, state.pnf.boxSize);
+      topPanel.pnfSrPrimitive.setItems([]);
+      topPanel.pnfRangePrimitive.setBoxes([]);
+      document.getElementById("statTop").textContent = `${allCandles.length.toLocaleString()} nến → ${result.columns.length.toLocaleString()} cột (${x}X/${o}O)`;
+      setStat("stat-renko", `Lưới X/O: ${result.columns.length.toLocaleString()} cột · boxSize=${state.pnf.boxSize.toFixed(6)} · đảo chiều=${state.pnf.reversal} box`);
+    } else {
+      setCandleVisualMode(topPanel, true);
+      topPanel.pnfGridPrimitive.setData([], 0);
+      // Mức P&F phải tính TRƯỚC để ATRBot dùng chúng chấm điểm tín hiệu.
+      const { srCount, rangeCount, keyLevels } = drawPnfLevels(topPanel, allCandles, result);
+      recomputePanel(topPanel, allCandles, true, keyLevels);
+      document.getElementById("statTop").textContent = `${allCandles.length.toLocaleString()} nến (${result.columns.length.toLocaleString()} cột P&F ngầm, ${x}X/${o}O)`;
+      setStat("stat-renko", `P&F ngầm: ${result.columns.length.toLocaleString()} cột · boxSize=${state.pnf.boxSize.toFixed(6)} · ${srCount} mức S/R (hiện ≤${PNF_MAX_SR_PER_SIDE * 2}) · ${rangeCount} range (hiện ≤${PNF_MAX_RANGES})`);
+    }
   }
 
   async function loadAndRender(forceRefresh = false) {
     try {
       allCandles = await loadKlinesData(forceRefresh);
-      recalcBrickSize();
+      updateViewModeBtn();
+      recalcBoxSize();
       recomputeAll();
       topDrawTools.reload(); // đổi symbol/timeframe -> chuyển đúng bộ hình vẽ đã lưu của cặp đó
       resizeCharts();
